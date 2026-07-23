@@ -6,6 +6,17 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.4] — 2026-07-24
+
+### Added
+
+- **OpenAlex** offline adapter (`python -m adapters openalex …`) + fixture/tests
+- Data Explorer uses `GET /api/entities?q=` for server-side entity filter
+
+### Changed
+
+- Engine / package → **0.1.4**
+
 ## [0.1.3] — 2026-07-24
 
 ### Added

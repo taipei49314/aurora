@@ -1,0 +1,58 @@
+{
+  "_provenance": {
+    "format": "openalex-works-v1",
+    "honesty": [
+      "Synthetic OpenAlex-shaped works for CI.",
+      "Replace with a real OpenAlex works export of the same shape."
+    ]
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/W9000000001",
+      "doi": "https://doi.org/10.1234/esml.ironair.2019",
+      "title": "Reversible iron oxidation pathways for multi-day storage",
+      "publication_date": "2019-06-01",
+      "abstract": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
+      "authorships": [
+        {
+          "institutions": [
+            {
+              "id": "https://openalex.org/I9001",
+              "display_name": "Grid Storage Research Lab",
+              "country_code": "US"
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "source": { "display_name": "Energy Storage Materials Letters" }
+      }
+    },
+    {
+      "id": "https://openalex.org/W9000000002",
+      "doi": "https://doi.org/10.1234/oa.ironair.2021",
+      "title": "Oxygen electrode stacks for long-duration iron-air cells",
+      "publication_date": "2021-03-12",
+      "abstract": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "authorships": [
+        {
+          "institutions": [
+            {
+              "id": "https://openalex.org/I9002",
+              "display_name": "European Electrochemistry Institute",
+              "country_code": "DE"
+            },
+            {
+              "id": "https://openalex.org/I9001",
+              "display_name": "Grid Storage Research Lab",
+              "country_code": "US"
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "source": { "display_name": "Journal of Power Sources Concepts" }
+      }
+    }
+  ]
+}

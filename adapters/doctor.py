@@ -45,11 +45,21 @@ def _smoke_news() -> Tuple[bool, str]:
     return n > 0, f"sources={n}"
 
 
+def _smoke_openalex() -> Tuple[bool, str]:
+    from .openalex import convert_openalex
+
+    raw = json.loads((FIX / "openalex_sample.json").read_text(encoding="utf-8"))
+    pkg = convert_openalex(raw)
+    n = len(pkg.get("sources") or [])
+    return n > 0, f"sources={n}"
+
+
 ADAPTERS: List[Tuple[str, str, Callable[[], Tuple[bool, str]]]] = [
     ("uspto", "adapters/fixtures/uspto_sample.json", _smoke_uspto),
     ("patentsview", "adapters/fixtures/patentsview_sample.json", _smoke_patentsview),
     ("jobs", "adapters/fixtures/jobs_sample.json", _smoke_jobs),
     ("news", "adapters/fixtures/news_sample.json", _smoke_news),
+    ("openalex", "adapters/fixtures/openalex_sample.json", _smoke_openalex),
     ("merge", "(compose packages)", lambda: (True, "no standalone fixture")),
 ]
 

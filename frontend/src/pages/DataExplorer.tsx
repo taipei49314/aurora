@@ -39,9 +39,11 @@ export function DataExplorer() {
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
 
+  // Server-side filter for entities (?q=); client filter for other tabs
+  const serverQ = tab === "entities" && q.trim() && !looksLikeResolveRef(q) ? q.trim() : undefined;
   const entities = useQuery({
-    queryKey: ["entities"],
-    queryFn: getEntities,
+    queryKey: ["entities", serverQ ?? ""],
+    queryFn: () => getEntities(serverQ),
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
@@ -65,13 +67,21 @@ export function DataExplorer() {
 
   const filtered = useMemo(() => {
     const rows = data ?? [];
+    if (tab === "entities") {
+      // already filtered server-side (except resolve-shaped queries)
+      if (looksLikeResolveRef(q)) {
+        const needle = q.trim().toLowerCase();
+        return rows.filter((row: any) => JSON.stringify(row).toLowerCase().includes(needle));
+      }
+      return rows;
+    }
     const needle = q.trim().toLowerCase();
     if (!needle) return rows;
     return rows.filter((row: any) => {
       const blob = JSON.stringify(row).toLowerCase();
       return blob.includes(needle);
     });
-  }, [data, q]);
+  }, [data, q, tab]);
 
   async function runResolve(ref?: string) {
     const target = (ref ?? resolveRef).trim();
