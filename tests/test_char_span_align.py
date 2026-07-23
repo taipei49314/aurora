@@ -40,6 +40,32 @@ def test_align_exact_and_case_and_whitespace():
 
 
 @pytest.mark.unit
+def test_align_progressive_prefix_near_match():
+    """0.1.24+: trailing-clause / punctuation drift still yields a span."""
+    doc = (
+        "Laboratory review of reversible iron oxidation pathways and "
+        "porous electrode limits for multi-day grid storage concepts."
+    )
+    ex = (
+        "Laboratory review of reversible iron oxidation pathways and "
+        "porous electrode limits for multi-day grid storage."
+    )
+    span = align_char_span(doc, ex)
+    assert span is not None
+    assert span == engine_align(doc, ex)
+    a, b = span
+    assert "Laboratory review" in doc[a:b]
+    assert b - a >= 12
+
+    # Case-insensitive progressive on title-ish vs abstract
+    doc2 = "A porous iron electrode enables reversible iron oxidation for storage."
+    ex2 = "Porous iron electrode for reversible iron oxidation and hundred-hour duty"
+    span2 = align_char_span(doc2, ex2)
+    assert span2 is not None
+    assert "porous iron electrode" in doc2[span2[0] : span2[1]].lower()
+
+
+@pytest.mark.unit
 def test_import_auto_aligns_missing_char_span():
     pkg = {
         "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
@@ -106,6 +132,25 @@ def test_import_preserves_explicit_char_span():
     assert snap.observations[0].char_span == [4, 10]
     assert snap.counts.get("char_spans_auto_aligned") == 0
     assert not (snap.observations[0].metadata or {}).get("char_span_auto")
+
+
+@pytest.mark.integration
+def test_retro_package_has_majority_char_spans():
+    """iron-air-retro: progressive align + append_unmatched → near-full span coverage."""
+    pkg_path = ROOT / "cases" / "iron-air-retro" / "package.json"
+    if not pkg_path.is_file():
+        pytest.skip("retro package missing")
+    pkg = json.loads(pkg_path.read_text(encoding="utf-8"))
+    snap = import_package({
+        "entities": pkg.get("entities") or [],
+        "sources": pkg.get("sources") or [],
+        "observations": pkg.get("observations") or [],
+        "documents": pkg.get("documents") or [],
+    })
+    assert snap.import_errors == []
+    with_span = sum(1 for o in snap.observations if o.char_span is not None)
+    assert with_span == len(snap.observations)
+    assert len(snap.documents) >= 1
 
 
 @pytest.mark.integration

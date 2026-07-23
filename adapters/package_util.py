@@ -9,14 +9,15 @@ Package = Dict[str, Any]
 
 # Keep in sync with backend/aurora/char_span.py (adapters stay backend-independent).
 _MIN_EXCERPT_LEN = 4
+_MIN_PREFIX_LEN = 12
+_MIN_PREFIX_WORDS = 3
 
 
 def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]]:
     """Locate *text_excerpt* in *document_text*; return ``[start, end]`` or None.
 
-    Deterministic: exact → case-insensitive → whitespace-flexible regex.
-    Mirrors ``aurora.char_span.align_char_span`` so adapter packages ship spans
-    before import (engine 0.1.20+).
+    Deterministic: exact → casefold → whitespace-flexible → progressive word /
+    character prefix (0.1.24+). Mirrors ``aurora.char_span.align_char_span``.
     """
     doc = document_text if isinstance(document_text, str) else ""
     ex = (text_excerpt if isinstance(text_excerpt, str) else "").strip()
@@ -25,7 +26,8 @@ def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]
     idx = doc.find(ex)
     if idx >= 0:
         return [idx, idx + len(ex)]
-    idx = doc.lower().find(ex.lower())
+    lower_doc = doc.lower()
+    idx = lower_doc.find(ex.lower())
     if idx >= 0:
         return [idx, idx + len(ex)]
     tokens = [t for t in re.split(r"\s+", ex) if t]
@@ -37,14 +39,48 @@ def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]
             m = None
         if m is not None:
             return [m.start(), m.end()]
+    # Progressive word-prefix
+    if len(tokens) >= _MIN_PREFIX_WORDS:
+        for n in range(len(tokens) - 1, _MIN_PREFIX_WORDS - 1, -1):
+            cand = " ".join(tokens[:n]).rstrip(".,;:!?\"'")
+            if len(cand) < _MIN_PREFIX_LEN:
+                continue
+            idx = doc.find(cand)
+            if idx >= 0:
+                return [idx, idx + len(cand)]
+            idx = lower_doc.find(cand.lower())
+            if idx >= 0:
+                return [idx, idx + len(cand)]
+    # Progressive character-prefix
+    for end in range(len(ex) - 1, _MIN_PREFIX_LEN - 1, -1):
+        cand = ex[:end].rstrip(".,;:!?\"' \t")
+        if len(cand) < _MIN_PREFIX_LEN:
+            continue
+        if end < len(ex) and ex[end - 1 : end].isalnum() and ex[end : end + 1].isalnum():
+            continue
+        idx = doc.find(cand)
+        if idx >= 0:
+            return [idx, idx + len(cand)]
+        idx = lower_doc.find(cand.lower())
+        if idx >= 0:
+            return [idx, idx + len(cand)]
     return None
 
 
-def align_observation_char_spans(pkg: Package) -> Package:
-    """Fill missing observation ``char_span`` from document text + text_excerpt."""
+def align_observation_char_spans(
+    pkg: Package,
+    *,
+    append_unmatched: bool = False,
+) -> Package:
+    """Fill missing observation ``char_span`` from document text + text_excerpt.
+
+    When ``append_unmatched`` is true (demo/curated packages), text_excerpts that
+    still fail alignment are appended to the document body so a span can be
+    recorded (``metadata.char_span_appended=true``).
+    """
     out = dict(pkg)
     docs = {
-        (d.get("document_id") or d.get("id") or "").strip(): d
+        (d.get("document_id") or d.get("id") or "").strip(): dict(d)
         for d in (out.get("documents") or [])
         if isinstance(d, dict) and (d.get("document_id") or d.get("id"))
     }
@@ -65,14 +101,36 @@ def align_observation_char_spans(pkg: Package) -> Package:
             continue
         d = docs[did]
         text = d.get("text") or d.get("body") or ""
-        excerpt = row.get("text_excerpt") or ""
+        excerpt = (row.get("text_excerpt") or "").strip()
         span = align_char_span(text, excerpt)
+        appended = False
+        if span is None and append_unmatched and excerpt:
+            sep = "\n\n" if text and not text.endswith("\n") else "\n"
+            if not text:
+                sep = ""
+            # Avoid double-append on re-run
+            if excerpt not in text:
+                start = len(text) + len(sep)
+                text = text + sep + excerpt
+                d["text"] = text
+                dmeta = dict(d.get("metadata") or {})
+                dmeta["appended_excerpts"] = int(dmeta.get("appended_excerpts") or 0) + 1
+                d["metadata"] = dmeta
+                docs[did] = d
+                span = [start, start + len(excerpt)]
+                appended = True
+            else:
+                span = align_char_span(text, excerpt)
         if span is not None:
             row["char_span"] = span
             meta = dict(row.get("metadata") or {})
             meta["char_span_auto"] = True
+            if appended:
+                meta["char_span_appended"] = True
             row["metadata"] = meta
         observations.append(row)
+    if docs:
+        out["documents"] = [docs[k] for k in sorted(docs.keys())]
     out["observations"] = observations
     return out
 
@@ -261,9 +319,18 @@ def build_documents_from_sources(
 
 
 def ensure_documents(pkg: Package, **kwargs: Any) -> Package:
-    """Ensure package has ``documents[]`` and auto-aligned ``char_span`` when useful."""
-    out = build_documents_from_sources(pkg, **kwargs)
-    return align_observation_char_spans(out)
+    """Ensure package has ``documents[]`` and auto-aligned ``char_span`` when useful.
+
+    Extra kwargs for alignment:
+      append_unmatched: if True, append unmatched text_excerpts into document text
+    """
+    append_unmatched = bool(kwargs.pop("append_unmatched", False))
+    # build_documents_from_sources only accepts only_referenced
+    build_kwargs = {}
+    if "only_referenced" in kwargs:
+        build_kwargs["only_referenced"] = kwargs.pop("only_referenced")
+    out = build_documents_from_sources(pkg, **build_kwargs)
+    return align_observation_char_spans(out, append_unmatched=append_unmatched)
 
 
 def merge_packages(packages: Iterable[Package]) -> Package:

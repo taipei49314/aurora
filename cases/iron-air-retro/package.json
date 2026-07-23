@@ -303,7 +303,14 @@
       "observed_at": "2019-06-01",
       "text_excerpt": "Laboratory review of reversible iron oxidation pathways and porous electrode limits for multi-day grid storage.",
       "confidence": 0.8,
-      "document_id": "paper-2019-review"
+      "document_id": "paper-2019-review",
+      "char_span": [
+        0,
+        102
+      ],
+      "metadata": {
+        "char_span_auto": true
+      }
     },
     {
       "source_ref": "news-2020-hype-only",
@@ -313,7 +320,15 @@
       "observed_at": "2020-08-15",
       "text_excerpt": "Opinion hype about rust batteries changing everything; no contracts or capex.",
       "confidence": 0.35,
-      "document_id": "news-2020-hype-only"
+      "document_id": "news-2020-hype-only",
+      "char_span": [
+        137,
+        214
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "pat-us-ferro-2022",
@@ -327,9 +342,14 @@
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
-        ]
+        ],
+        "char_span_auto": true
       },
-      "document_id": "pat-us-ferro-2022"
+      "document_id": "pat-us-ferro-2022",
+      "char_span": [
+        2,
+        23
+      ]
     },
     {
       "source_ref": "pat-us-ferro-2022",
@@ -339,7 +359,15 @@
       "observed_at": "2021-11-02",
       "text_excerpt": "Electrode performance depends on food-grade iron powder feedstock morphology.",
       "confidence": 0.85,
-      "document_id": "pat-us-ferro-2022"
+      "document_id": "pat-us-ferro-2022",
+      "char_span": [
+        141,
+        218
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "pat-us-ferro-2022",
@@ -349,7 +377,15 @@
       "observed_at": "2021-11-02",
       "text_excerpt": "System architecture centers on reversible iron oxidation for multi-day storage.",
       "confidence": 0.88,
-      "document_id": "pat-us-ferro-2022"
+      "document_id": "pat-us-ferro-2022",
+      "char_span": [
+        220,
+        299
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "pat-ep-oxa-2023",
@@ -359,7 +395,15 @@
       "observed_at": "2022-08-01",
       "text_excerpt": "Oxygen electrode stack optimized for long-duration iron-air duty cycles.",
       "confidence": 0.9,
-      "document_id": "pat-ep-oxa-2023"
+      "document_id": "pat-ep-oxa-2023",
+      "char_span": [
+        131,
+        203
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "pat-us-ferro-electrolyte-2023",
@@ -369,7 +413,15 @@
       "observed_at": "2022-03-15",
       "text_excerpt": "Electrolyte formulation for hundred-hour iron-air depth discharge.",
       "confidence": 0.9,
-      "document_id": "pat-us-ferro-electrolyte-2023"
+      "document_id": "pat-us-ferro-electrolyte-2023",
+      "char_span": [
+        122,
+        188
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "pat-us-ferro-electrolyte-2023",
@@ -379,7 +431,15 @@
       "observed_at": "2022-03-15",
       "text_excerpt": "Co-assignee LongHaul Energy on electrolyte formulation patent family.",
       "confidence": 0.85,
-      "document_id": "pat-us-ferro-electrolyte-2023"
+      "document_id": "pat-us-ferro-electrolyte-2023",
+      "char_span": [
+        190,
+        259
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "news-longhaul-2023-pilot",
@@ -389,7 +449,15 @@
       "observed_at": "2023-09-15",
       "text_excerpt": "Pilot deployments with regional utilities for hundred-hour grid firming.",
       "confidence": 0.75,
-      "document_id": "news-longhaul-2023-pilot"
+      "document_id": "news-longhaul-2023-pilot",
+      "char_span": [
+        142,
+        214
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "news-longhaul-2023-pilot",
@@ -399,7 +467,15 @@
       "observed_at": "2023-09-15",
       "text_excerpt": "LongHaul pilots hundred-hour depth-discharge iron-air modules for dispatchable firming.",
       "confidence": 0.7,
-      "document_id": "news-longhaul-2023-pilot"
+      "document_id": "news-longhaul-2023-pilot",
+      "char_span": [
+        216,
+        303
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "news-longhaul-2023-pilot",
@@ -409,7 +485,15 @@
       "observed_at": "2023-09-15",
       "text_excerpt": "Pilots use reversible iron oxidation stacks.",
       "confidence": 0.8,
-      "document_id": "news-longhaul-2023-pilot"
+      "document_id": "news-longhaul-2023-pilot",
+      "char_span": [
+        305,
+        349
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "std-giwg-2024",
@@ -419,7 +503,15 @@
       "observed_at": "2024-02-01",
       "text_excerpt": "Draft interconnection test profile for multi-day long-duration storage including iron-air.",
       "confidence": 0.85,
-      "document_id": "std-giwg-2024"
+      "document_id": "std-giwg-2024",
+      "char_span": [
+        136,
+        226
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "std-giwg-2024",
@@ -428,7 +520,14 @@
       "observed_at": "2024-02-01",
       "text_excerpt": "Interconnection drafts contemplate multi-day iron-air dispatch profiles.",
       "confidence": 0.7,
-      "document_id": "std-giwg-2024"
+      "document_id": "std-giwg-2024",
+      "char_span": [
+        28,
+        43
+      ],
+      "metadata": {
+        "char_span_auto": true
+      }
     },
     {
       "source_ref": "job-ferro-2024-chem",
@@ -440,7 +539,15 @@
       "confidence": 0.8,
       "numeric_value": 6,
       "unit": "openings",
-      "document_id": "job-ferro-2024-chem"
+      "document_id": "job-ferro-2024-chem",
+      "char_span": [
+        119,
+        185
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "job-oxa-2024-mfg",
@@ -452,7 +559,14 @@
       "confidence": 0.75,
       "numeric_value": 12,
       "unit": "openings",
-      "document_id": "job-oxa-2024-mfg"
+      "document_id": "job-oxa-2024-mfg",
+      "char_span": [
+        24,
+        37
+      ],
+      "metadata": {
+        "char_span_auto": true
+      }
     },
     {
       "source_ref": "filing-ferro-2024-capex",
@@ -464,7 +578,14 @@
       "confidence": 0.95,
       "numeric_value": 120000000,
       "unit": "USD",
-      "document_id": "filing-ferro-2024-capex"
+      "document_id": "filing-ferro-2024-capex",
+      "char_span": [
+        15,
+        36
+      ],
+      "metadata": {
+        "char_span_auto": true
+      }
     },
     {
       "source_ref": "filing-ferro-2024-capex",
@@ -476,7 +597,14 @@
       "confidence": 0.9,
       "numeric_value": 40,
       "unit": "pct",
-      "document_id": "filing-ferro-2024-capex"
+      "document_id": "filing-ferro-2024-capex",
+      "char_span": [
+        49,
+        83
+      ],
+      "metadata": {
+        "char_span_auto": true
+      }
     },
     {
       "source_ref": "filing-ferro-2024-capex",
@@ -486,7 +614,15 @@
       "observed_at": "2024-06-20",
       "text_excerpt": "Expansion justified by utility interest in multi-day firming capacity.",
       "confidence": 0.65,
-      "document_id": "filing-ferro-2024-capex"
+      "document_id": "filing-ferro-2024-capex",
+      "char_span": [
+        121,
+        191
+      ],
+      "metadata": {
+        "char_span_auto": true,
+        "char_span_appended": true
+      }
     },
     {
       "source_ref": "news-reuters-2024-supply",
@@ -497,9 +633,14 @@
       "text_excerpt": "Multi-year supplier agreement for food-grade iron powder feedstock.",
       "confidence": 0.85,
       "metadata": {
-        "event_id": "evt_ferro_purechitin_supply_2024"
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "char_span_auto": true
       },
-      "document_id": "news-reuters-2024-supply"
+      "document_id": "news-reuters-2024-supply",
+      "char_span": [
+        25,
+        54
+      ]
     },
     {
       "source_ref": "news-reuters-2024-supply",
@@ -510,9 +651,15 @@
       "text_excerpt": "Feedstock contract covers food-grade iron powder for porous iron electrodes.",
       "confidence": 0.8,
       "metadata": {
-        "event_id": "evt_ferro_purechitin_supply_2024"
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "char_span_auto": true,
+        "char_span_appended": true
       },
-      "document_id": "news-reuters-2024-supply"
+      "document_id": "news-reuters-2024-supply",
+      "char_span": [
+        145,
+        221
+      ]
     },
     {
       "source_ref": "news-reprint-2024-supply",
@@ -524,9 +671,14 @@
       "confidence": 0.7,
       "metadata": {
         "event_id": "evt_ferro_purechitin_supply_2024",
-        "is_reprint": true
+        "is_reprint": true,
+        "char_span_auto": true
       },
-      "document_id": "news-reprint-2024-supply"
+      "document_id": "news-reprint-2024-supply",
+      "char_span": [
+        25,
+        54
+      ]
     }
   ],
   "documents": [
@@ -534,26 +686,28 @@
       "document_id": "filing-ferro-2024-capex",
       "source_ref": "filing-ferro-2024-capex",
       "title": "Material event: Arizona pilot plant capacity expansion",
-      "text": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.",
+      "text": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.\n\nExpansion justified by utility interest in multi-day firming capacity.",
       "url_or_local_path": "local://filings/ferrogrid-2024-06-20.html",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 1
       }
     },
     {
       "document_id": "job-ferro-2024-chem",
       "source_ref": "job-ferro-2024-chem",
       "title": "Electrochemical engineer — iron-air stack scale-up",
-      "text": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona.",
+      "text": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona.\n\nHiring for porous iron electrode and long-duration stack scale-up.",
       "url_or_local_path": "https://ferrogrid.example/careers/ee-stack",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 1
       }
     },
     {
@@ -573,26 +727,28 @@
       "document_id": "news-2020-hype-only",
       "source_ref": "news-2020-hype-only",
       "title": "Could rust batteries change everything?",
-      "text": "Opinion piece wonders if rust batteries and reversible iron oxidation could one day power cities; no hiring, capex, or contracts cited.",
+      "text": "Opinion piece wonders if rust batteries and reversible iron oxidation could one day power cities; no hiring, capex, or contracts cited.\n\nOpinion hype about rust batteries changing everything; no contracts or capex.",
       "url_or_local_path": "https://buzzgrid.example/rust-hype-2020",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 1
       }
     },
     {
       "document_id": "news-longhaul-2023-pilot",
       "source_ref": "news-longhaul-2023-pilot",
       "title": "LongHaul Energy pilots hundred-hour iron-air with utilities",
-      "text": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming using reversible iron oxidation.",
+      "text": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming using reversible iron oxidation.\n\nPilot deployments with regional utilities for hundred-hour grid firming.\n\nLongHaul pilots hundred-hour depth-discharge iron-air modules for dispatchable firming.\n\nPilots use reversible iron oxidation stacks.",
       "url_or_local_path": "https://gridtech.example/longhaul-pilot",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 3
       }
     },
     {
@@ -612,13 +768,14 @@
       "document_id": "news-reuters-2024-supply",
       "source_ref": "news-reuters-2024-supply",
       "title": "FerroGrid signs iron powder supply with PureChitin Bio",
-      "text": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes.",
+      "text": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes.\n\nFeedstock contract covers food-grade iron powder for porous iron electrodes.",
       "url_or_local_path": "https://news.example/reuter/ferrogrid-supply",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 1
       }
     },
     {
@@ -638,52 +795,56 @@
       "document_id": "pat-ep-oxa-2023",
       "source_ref": "pat-ep-oxa-2023",
       "title": "Oxygen electrode stack for long-duration iron-air cells",
-      "text": "Oxygen-electrode architecture for long-duration multi-day iron-air cells with reversible oxidation and grid-dispatch duty cycles.",
+      "text": "Oxygen-electrode architecture for long-duration multi-day iron-air cells with reversible oxidation and grid-dispatch duty cycles.\n\nOxygen electrode stack optimized for long-duration iron-air duty cycles.",
       "url_or_local_path": "https://patents.example/EP4123456A1",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 1
       }
     },
     {
       "document_id": "pat-us-ferro-2022",
       "source_ref": "pat-us-ferro-2022",
       "title": "Porous iron electrode for multi-day iron-air storage",
-      "text": "A porous iron electrode enables reversible iron oxidation for hundred-hour depth-discharge grid-dispatch storage with alkaline electrolyte.",
+      "text": "A porous iron electrode enables reversible iron oxidation for hundred-hour depth-discharge grid-dispatch storage with alkaline electrolyte.\n\nElectrode performance depends on food-grade iron powder feedstock morphology.\n\nSystem architecture centers on reversible iron oxidation for multi-day storage.",
       "url_or_local_path": "https://patents.example/US20220123456A1",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 2
       }
     },
     {
       "document_id": "pat-us-ferro-electrolyte-2023",
       "source_ref": "pat-us-ferro-electrolyte-2023",
       "title": "Alkaline electrolyte formulation for iron-air depth discharge",
-      "text": "Electrolyte additives improve reversible iron oxidation stability over hundred-hour discharge for grid-dispatch modules.",
+      "text": "Electrolyte additives improve reversible iron oxidation stability over hundred-hour discharge for grid-dispatch modules.\n\nElectrolyte formulation for hundred-hour iron-air depth discharge.\n\nCo-assignee LongHaul Energy on electrolyte formulation patent family.",
       "url_or_local_path": "https://patents.example/US20230111222A1",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 2
       }
     },
     {
       "document_id": "std-giwg-2024",
       "source_ref": "std-giwg-2024",
       "title": "Draft note: multi-day storage interconnection test profile",
-      "text": "Working group draft defines interconnection test profiles for multi-day long-duration storage including iron-air dispatchable firming.",
+      "text": "Working group draft defines interconnection test profiles for multi-day long-duration storage including iron-air dispatchable firming.\n\nDraft interconnection test profile for multi-day long-duration storage including iron-air.",
       "url_or_local_path": "https://giwg.example/drafts/mdr-storage-2024",
       "language": "en",
       "license": "",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "appended_excerpts": 1
       }
     }
   ]

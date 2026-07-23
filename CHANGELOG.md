@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.24] — 2026-07-24
+
+### Added
+
+- **Progressive char_span align** (word/char prefix) for near-prefix excerpts
+- `align_observation_char_spans(append_unmatched=True)` appends unmatched
+  excerpts into document body (demo/curated packages)
+- iron-air-retro: **21/21** observations now have char_span (progressive + append)
+
+### Changed
+
+- Engine / feature → **0.1.24**
+
 ## [0.1.23] — 2026-07-24
 
 ### Added

@@ -252,12 +252,16 @@ source `excerpt` (title/url/license copied). Existing rows with text are
 never overwritten. `metadata.auto_built=true` marks generated rows.
 `strip_package` and `merge_packages` preserve / merge `documents[]`.
 
-**char_span auto-align (0.1.20+):** when an observation has `document_id` and
-`text_excerpt` but no `char_span`, the engine (and `ensure_documents`) locate
-the excerpt inside document text — exact, then case-insensitive, then
-whitespace-flexible — and set `[start, end]` with `metadata.char_span_auto`.
-Explicit spans are never overwritten. Snapshot count:
-`char_spans_auto_aligned`.
+**char_span auto-align (0.1.20+ / progressive 0.1.24+):** when an observation
+has `document_id` and `text_excerpt` but no `char_span`, the engine (and
+`ensure_documents`) locate the excerpt inside document text — exact →
+case-insensitive → whitespace-flexible → **progressive word/char prefix** —
+and set `[start, end]` with `metadata.char_span_auto`. Explicit spans are
+never overwritten. Snapshot count: `char_spans_auto_aligned`.
+
+Curated demos may call `align_observation_char_spans(pkg, append_unmatched=True)`
+to append still-unmatched excerpts onto the document body
+(`metadata.char_span_appended`).
 
 **lint document policy (0.1.22+):** `lint_package` always reports
 `orphan_document_ids` (observation `document_id` with no `documents[]` row).
