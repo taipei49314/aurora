@@ -34,3 +34,4 @@ Data Explorer column; USPTO adapter emits top-level `family_id`.
 - Dual dates: first-class `event_date` vs `published_at` (app vs grant)
 - Schema: first-class `event_id` for event-level dedup
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
+- Dashboard: surface `sources_with_family_id` from `/api/stats`
