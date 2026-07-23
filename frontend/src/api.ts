@@ -45,11 +45,28 @@ async function j<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const getHealth = () => j<{ status: string; engine: string; snapshot: string; runs: number }>(`/api/health`);
+
+export interface CorpusStats {
+  engine: string;
+  snapshot_id: string;
+  counts: Record<string, number>;
+  entities_total: number;
+  entities_with_external_ids: number;
+  reliability_tier_counts: Record<string, number>;
+  observation_type_counts: Record<string, number>;
+}
+
+export const getStats = () => j<CorpusStats>(`/api/stats`);
 export const getRuns = () => j<RunSummary[]>(`/api/research-runs`);
 export const getHypotheses = (runId: string) => j<Hypothesis[]>(`/api/research-runs/${runId}/hypotheses`);
 export const getEntities = (q?: string) =>
   j<any[]>(`/api/entities?limit=500${q ? `&q=${encodeURIComponent(q)}` : ""}`);
-export const getObservations = () => j<any[]>(`/api/observations?limit=800`);
+export const getObservations = (opts?: { observation_type?: string; q?: string }) => {
+  const params = new URLSearchParams({ limit: "800" });
+  if (opts?.observation_type) params.set("observation_type", opts.observation_type);
+  if (opts?.q) params.set("q", opts.q);
+  return j<any[]>(`/api/observations?${params.toString()}`);
+};
 export const getSources = (opts?: { reliability_tier?: string; q?: string }) => {
   const params = new URLSearchParams({ limit: "500" });
   if (opts?.reliability_tier) params.set("reliability_tier", opts.reliability_tier);

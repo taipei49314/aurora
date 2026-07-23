@@ -82,15 +82,16 @@ export function DataExplorer() {
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
-    queryKey: ["observations"],
-    queryFn: getObservations,
+    queryKey: ["observations", q],
+    queryFn: () => getObservations({ q: q.trim() || undefined }),
     enabled: tab === "observations",
   });
   const sources = useQuery({
-    queryKey: ["sources", tierFilter],
+    queryKey: ["sources", tierFilter, q],
     queryFn: () =>
       getSources({
         reliability_tier: tierFilter || undefined,
+        q: q.trim() || undefined,
       }),
     enabled: tab === "sources",
   });

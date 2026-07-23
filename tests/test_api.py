@@ -54,15 +54,6 @@ def test_entities_query_filter(client):
     assert miss == []
 
 
-def test_sources_reliability_tier_filter(client):
-    all_src = client.get("/api/sources?limit=200").json()
-    assert all_src
-    tier = all_src[0].get("reliability_tier") or "C"
-    filtered = client.get(f"/api/sources?reliability_tier={tier}&limit=200").json()
-    assert filtered
-    assert all(str(s.get("reliability_tier", "")).upper() == str(tier).upper() for s in filtered)
-
-
 def test_stats_endpoint(client):
     r = client.get("/api/stats")
     assert r.status_code == 200, r.text
@@ -70,6 +61,8 @@ def test_stats_endpoint(client):
     assert body["entities_total"] > 0
     assert "reliability_tier_counts" in body
     assert "engine" in body
+    assert isinstance(body["reliability_tier_counts"], dict)
+    assert sum(body["reliability_tier_counts"].values()) > 0
 
 
 def test_sources_reliability_tier_filter(client):
@@ -96,6 +89,16 @@ def test_sources_query_filter(client):
     assert any(s.get("publisher") == publisher for s in hit)
     miss = client.get("/api/sources?q=___no_match_src_xyz___&limit=50").json()
     assert miss == []
+
+
+def test_observations_type_filter(client):
+    all_obs = client.get("/api/observations?limit=100").json()
+    assert all_obs
+    ot = all_obs[0].get("observation_type")
+    assert ot
+    filtered = client.get(f"/api/observations?observation_type={ot}&limit=100").json()
+    assert filtered
+    assert all(o.get("observation_type") == ot for o in filtered)
 
 
 def test_export_is_round_trippable_via_import_upload(client):
