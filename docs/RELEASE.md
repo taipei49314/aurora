@@ -4,10 +4,8 @@ Use this for each public tag.
 
 ## Pre-flight
 
-- [ ] `PYTHONPATH=backend python -m pytest tests/ -q` green
+- [ ] `make check-all` (or `python scripts/check_all.py`) green
 - [ ] `make demo` (or CLI demo) produces classifications
-- [ ] `make retro-case` passes
-- [ ] `make patentsview-sample` passes
 - [ ] No secrets in tree (search for tokens/keys)
 - [ ] `CHANGELOG.md` updated for the version
 - [ ] `ENGINE_VERSION` / package `__version__` match tag intent

@@ -4,7 +4,7 @@
 PY ?= python
 PYTHONPATH := backend
 
-.PHONY: help install test lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case
+.PHONY: help install test lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case check-all
 
 help:
 	@echo "make install    - install python deps (fastapi, pytest, hypothesis)"
@@ -20,6 +20,7 @@ help:
 	@echo "make retro-case  - iron-air-retro cutoff ledger (Loop 3)"
 	@echo "make patentsview-sample - PatentsView-compatible dump case (Loop 4A)"
 	@echo "make multisource-case - patents+jobs+news with LEI external_ids"
+	@echo "make check-all   - pytest + cases + resolve smoke (pre-push gate)"
 	@echo "make api         - run the FastAPI backend on :8000"
 	@echo "make frontend    - run the Vite dev server on :5173 (needs npm install)"
 
@@ -70,6 +71,9 @@ patentsview-sample:
 multisource-case:
 	$(PY) scripts/build_multisource_case.py
 	PYTHONPATH=$(PYTHONPATH) $(PY) scripts/check_case_scorecard.py cases/multisource-iron-air
+
+check-all:
+	$(PY) scripts/check_all.py
 
 api:
 	PYTHONPATH=$(PYTHONPATH) $(PY) -m uvicorn api:app --app-dir backend --port 8000

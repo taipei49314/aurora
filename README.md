@@ -47,6 +47,7 @@ $env:PYTHONPATH = "backend"
 
 python backend/aurora/cli.py          # demo: generate corpus → classify
 python -m pytest tests/ -q            # full suite
+python scripts/check_all.py           # pre-push: tests + cases + resolve smoke
 ```
 
 With Make (if available):
@@ -54,6 +55,7 @@ With Make (if available):
 ```bash
 make demo
 make test
+make check-all    # recommended before release push
 make backtest
 make api          # FastAPI :8000
 make frontend     # Vite :5173
