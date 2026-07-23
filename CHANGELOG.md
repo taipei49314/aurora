@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.22] — 2026-07-24
+
+### Added
+
+- `lint_package --require-documents` fails when `observation.document_id` has no `documents[]` row
+- Lint report fields: documents totals, referenced/orphan ids, span counts (incl. auto)
+- Lint imports `documents[]` (was previously dropped)
+- `check_all` runs multisource lint with `--require-documents`
+- `examples/real_mini_package.json` now includes auto-built `documents[]` for refs
+
+### Changed
+
+- Engine / feature → **0.1.22**
+
 ## [0.1.21] — 2026-07-24
 
 ### Added
