@@ -49,9 +49,14 @@ adapters emit top-level; stats + Data Explorer columns.
 `Source.geo` + `Observation.geo` (country/region/city/jurisdiction/raw);
 jobs adapter emits top-level geo; stats country histograms; Data Explorer column.
 
+## 11. License first-class + public-corpus lint — **done (v0.1.14)**
+
+`Source.license` (metadata + package default); stats/UI; USPTO/OpenAlex emit
+license; `lint_package --public-corpus` / `--require-license`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- License field first-class / required for public corpora
 - Full document + span (`documents[]`)
+- PERSON entities optional type

@@ -139,7 +139,6 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             "external_ids": [{"system": "us_publication", "id": pub}],
             "extractor_id": ADAPTER_ID,
             "extractor_version": ADAPTER_VERSION,
-            "license": "public-patent-text",
         }
         if family:
             source_meta["external_ids"].append({"system": "patent_family", "id": family})
@@ -164,6 +163,7 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             "url_or_local_path": url,
             "language": patent.get("language") or "en",
             "outlet_domain": outlet,  # first-class 0.1.12+
+            "license": patent.get("license") or "public-patent-text",  # first-class 0.1.14+
             "metadata": source_meta,
         }
         if family:

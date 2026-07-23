@@ -69,5 +69,6 @@ POST /api/resolve
 
 - [ ] Document source URL / bulk name / access date in the case README
 - [ ] Do not claim industry discovery without a cutoff ledger + public methodology
-- [ ] Respect redistribution license of the dump
+- [ ] Respect redistribution license of the dump — set package or per-source `license` (engine 0.1.14+)
+- [ ] Run `PYTHONPATH=backend python scripts/lint_package.py … --public-corpus` before publishing a corpus
 - [ ] Prefer synthetic LEI only in demos (`LEI-*-DEMO`); real dumps use real ids

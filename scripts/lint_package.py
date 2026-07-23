@@ -20,7 +20,18 @@ def main(argv=None) -> int:
     ap.add_argument("package", type=Path)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--strict", action="store_true", help="Fail on any import_errors")
+    ap.add_argument(
+        "--require-license",
+        action="store_true",
+        help="Fail if any source lacks a first-class license (public-corpus policy)",
+    )
+    ap.add_argument(
+        "--public-corpus",
+        action="store_true",
+        help="Alias for --require-license (sources must declare redistribution license)",
+    )
     args = ap.parse_args(argv)
+    require_license = args.require_license or args.public_corpus
 
     sys.path.insert(0, str(ROOT / "backend"))
     from aurora import import_package
@@ -36,6 +47,8 @@ def main(argv=None) -> int:
         "observation_types": {},
         "entity_types": {},
         "entities_with_external_ids": 0,
+        "sources_with_license": 0,
+        "license_counts": {},
         "import_errors": 0,
     }
 
@@ -66,11 +79,19 @@ def main(argv=None) -> int:
         if ot and ot not in OBSERVATION_TYPES:
             report["issues"].append(f"observations[{i}] unknown observation_type {ot}")
 
+    # Preserve package-level license default for import
     pkg = {
         "entities": raw.get("entities") or [],
         "sources": raw.get("sources") or [],
         "observations": raw.get("observations") or [],
     }
+    if raw.get("license"):
+        pkg["license"] = raw["license"]
+    elif isinstance(raw.get("package"), dict) and raw["package"].get("license"):
+        pkg["package"] = {"license": raw["package"]["license"]}
+    elif isinstance(raw.get("meta"), dict) and raw["meta"].get("license"):
+        pkg["meta"] = {"license": raw["meta"]["license"]}
+
     snap = import_package(pkg)
     report["import_errors"] = len(snap.import_errors or [])
     report["counts"] = dict(snap.counts)
@@ -82,6 +103,24 @@ def main(argv=None) -> int:
     report["entities_with_external_ids"] = sum(
         1 for e in snap.entities if e.external_ids
     )
+    license_counter: Counter = Counter()
+    missing_license = 0
+    for s in snap.sources:
+        lic = (getattr(s, "license", None) or "").strip()
+        if lic:
+            license_counter[lic] += 1
+        else:
+            missing_license += 1
+    report["sources_with_license"] = sum(license_counter.values())
+    report["license_counts"] = dict(license_counter)
+    report["sources_missing_license"] = missing_license
+
+    if require_license and missing_license:
+        report["ok"] = False
+        report["issues"].append(
+            f"{missing_license} source(s) missing license "
+            f"(public-corpus policy: every source needs Source.license)"
+        )
     if args.strict and report["import_errors"]:
         report["ok"] = False
         report["issues"].append(f"{report['import_errors']} import_errors")
@@ -98,6 +137,11 @@ def main(argv=None) -> int:
         print(
             f"  entities_with_external_ids: {report['entities_with_external_ids']}/"
             f"{report['counts'].get('entities', 0)}"
+        )
+        print(
+            f"  sources_with_license: {report['sources_with_license']}/"
+            f"{report['counts'].get('sources', 0)}"
+            f"  licenses={report['license_counts']}"
         )
         print(f"  import_errors: {report['import_errors']}")
         for i in report["issues"][:20]:

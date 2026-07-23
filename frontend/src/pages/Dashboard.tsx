@@ -91,6 +91,19 @@ export function Dashboard() {
             value={st.sources_with_geo ?? "—"}
             sub={`${st.observations_with_geo ?? 0} obs · ${st.entities_with_country ?? 0} ents w/ country`}
           />
+          <StatCard
+            label="license"
+            value={st.sources_with_license ?? "—"}
+            sub={
+              st.license_counts
+                ? Object.entries(st.license_counts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 2)
+                    .map(([k, n]) => `${k}×${n}`)
+                    .join(" · ") || "no licenses declared"
+                : "coverage"
+            }
+          />
         </div>
       )}
 

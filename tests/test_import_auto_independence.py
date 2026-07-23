@@ -335,3 +335,44 @@ def test_geo_from_metadata_location_and_country_shorthand():
     obs = snap.observations[0]
     assert obs.geo.get("country") == "DE"
     assert obs.geo.get("jurisdiction") == "DE-BE"
+
+
+@pytest.mark.unit
+def test_license_first_class_and_package_default():
+    """Engine 0.1.14+: Source.license from top-level, metadata, or package default."""
+    pkg = {
+        "license": "cc-by-4.0",
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
+        "sources": [
+            {
+                "ref": "a",
+                "source_type": "NEWS",
+                "publisher": "Wire",
+                "title": "Uses package default",
+                "excerpt": "body a",
+            },
+            {
+                "ref": "b",
+                "source_type": "PATENT",
+                "publisher": "USPTO",
+                "title": "Explicit license",
+                "excerpt": "body b",
+                "license": "public-patent-text",
+            },
+            {
+                "ref": "c",
+                "source_type": "PAPER",
+                "publisher": "Journal",
+                "title": "Metadata license",
+                "excerpt": "body c",
+                "metadata": {"license": "cc0-1.0"},
+            },
+        ],
+        "observations": [],
+    }
+    snap = import_package(pkg)
+    by_title = {s.title: s for s in snap.sources}
+    assert by_title["Uses package default"].license == "cc-by-4.0"
+    assert by_title["Explicit license"].license == "public-patent-text"
+    assert by_title["Metadata license"].license == "cc0-1.0"
+    assert all("license" not in (s.metadata or {}) for s in snap.sources)

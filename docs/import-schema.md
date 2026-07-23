@@ -139,6 +139,7 @@ Without `ref`, observations cannot attach to the source.
 | `outlet_domain` | string | `""` | **First-class** (engine 0.1.12+); digital outlet host. Metadata fallback. When `independence_group` empty → `domain:<host>` (after wire) |
 | `wire_id` | string | `""` | **First-class** (engine 0.1.12+); news wire / syndication key. Metadata fallback. When `independence_group` empty → `wire:<id>` (highest priority auto-derive) |
 | `geo` | object | `{}` | **First-class** (engine 0.1.13+); keys: `country`, `region`, `city`, `raw`, `jurisdiction`. Accepts `location` alias and top-level `country` / `jurisdiction` shorthands. Metadata fallback. |
+| `license` | string | `""` | **First-class** (engine 0.1.14+); redistribution terms (SPDX-ish: `cc-by-4.0`, `public-patent-text`, …). Metadata fallback; package-level `license` / `package.license` / `meta.license` fills gaps |
 | `reliability_tier` | `"A"\|"B"\|"C"\|"D"` | `"C"` | **Scored** via data_quality_penalty (engine 0.1.1+); stamped onto observation metadata at import |
 | `url_or_local_path` | string | `""` | Provenance |
 | `language` | string | `"en"` | **Stored only** today |
@@ -157,15 +158,34 @@ Adapters should canonicalize excerpt (e.g. first 500 chars of abstract, stable w
 
 ```json
 "independence_group": "wire:reuters",
+"license": "cc-by-4.0",
 "metadata": {
-  "outlet_domain": "reuters.com",
-  "wire_id": "reuters",
   "external_ids": [{"system": "doi", "id": "10.1234/foo"}],
-  "license": "cc-by-4.0",
   "extractor_id": "patent-adapter",
   "extractor_version": "0.1.0"
 }
 ```
+
+### Public-corpus license policy (engine 0.1.14+)
+
+Redistribution of real dumps requires an explicit license per source (or a package
+default). The engine does **not** block import without licenses (research corpora
+may be private), but the linter can enforce the policy:
+
+```bash
+PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --public-corpus
+# or: --require-license
+```
+
+Suggested license strings (not an exhaustive legal list):
+
+| String | Typical use |
+|--------|-------------|
+| `public-patent-text` | Published patent full text (verify jurisdiction) |
+| `cc-by-4.0` / `cc0-1.0` | Creative Commons open text |
+| `company-release` | Official press/IR release |
+| `proprietary` / `all-rights-reserved` | Not redistributable publicly |
+| `unknown` | Honesty when the dump does not declare terms |
 
 Suggested `independence_group` prefixes (adapters should set these, not leave empty when known):
 
@@ -332,7 +352,7 @@ Do **not** assume these exist as first-class fields:
 | Event-level dedup | **done** first-class `event_id` on Source + Observation | independence layer 2b |
 | Geo / jurisdiction in model | **done** first-class `geo` on Source + Observation | entity.country already first-class |
 | reliability in score | **done (engine 0.1.1)** via data_quality_penalty | optional: tier-weighted independence |
-| License for redistribution | metadata.license | required for public corpora |
+| License for redistribution | **done** first-class `Source.license` + package default | `lint_package --public-corpus` |
 | PERSON entities | metadata / free text | optional type or out of scope |
 
 Engine evolution should prefer **small schema increments** listed in the project
