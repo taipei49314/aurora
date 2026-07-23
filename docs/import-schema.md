@@ -68,32 +68,43 @@ but do not always hard-fail the whole package.
 | `aliases` | string[] | `[]` | Entity resolution / renames |
 | `description` | string | `""` | Stored; light influence on features only if text is reused elsewhere |
 | `country` | string | `""` | **Stored only** (not used in scoring/clustering today) |
-| `external_ids` | `{system,id}[]` | `[]` | **First-class** (engine 0.1.1+); also accepted under `metadata.external_ids` |
+| `external_ids` | `{system,id}[]` | `[]` | **First-class**; joins dumps; also under `metadata.external_ids` |
 | `metadata` | object | `{}` | Opaque passthrough (`external_ids` lifted out if nested) |
 
 ### Derived (engine)
 
-- `entity_id` = content-addressed from `(entity_type, normalize(canonical_name))`
+- `entity_id` = content-addressed from `(entity_type, normalize(canonical_name))` for the **first** row of that name
+- Rows that share an `external_ids` key **merge** into the first owner (aliases ∪ external_ids)
 - `created_at` = import timestamp
 
-### Real-data conventions (metadata, v0)
-
-Until first-class fields exist, put stable crosswalks here:
+### Real-data conventions
 
 ```json
-"metadata": {
-  "external_ids": [
-    {"system": "lei", "id": "5493001KJTIIGC8Y1R12"},
-    {"system": "cik", "id": "0000320193"},
-    {"system": "openalex_org", "id": "I123"},
-    {"system": "uspto_assignee", "id": "123456"}
-  ],
-  "domains": ["example.com"],
-  "hq_geo": {"country": "US", "region": "CA"}
-}
+"external_ids": [
+  {"system": "lei", "id": "5493001KJTIIGC8Y1R12"},
+  {"system": "cik", "id": "0000320193"},
+  {"system": "domain", "id": "example.com"},
+  {"system": "uspto_assignee", "id": "123456"}
+]
 ```
 
 **Do not** invent industry labels in `metadata` that the engine should treat as ground truth.
+
+### Observation subject / object resolution (engine 0.1.2+)
+
+`subject` / `object` may be:
+
+| Form | Example |
+|------|---------|
+| Name string | `"FerroGrid Power"` |
+| Compact external ref | `"ext:lei:LEI-FERRO"` or `"lei:LEI-FERRO"` |
+| Structured | `{"name": "Trade Name", "external_ids": [{"system":"lei","id":"…"}]}` |
+
+Optional fields on the observation row:
+
+- `subject_external_ids` / `object_external_ids` — disambiguate when the name is shared by two entities
+
+Resolution order: unique external id → compact ext ref → name/alias → external disambiguation of ambiguous names.
 
 ---
 

@@ -92,10 +92,16 @@ Living checklist for real-world AURORA evolution. Each loop is intentionally sma
 - Empty `independence_group` → derive `wire:` / `domain:` / `family:` from metadata
 - Tests: `test_import_auto_independence.py`
 
-## Loop 9 (next)
+## Loop 9 (done) — external_ids ER + import merge
 
-1. ER: resolve subject/object by `external_ids` when names conflict
-2. Package merge of patentsview + iron-air multi-source as a published demo case
-3. Human: real PatentsView export drop-in
+- `EntityResolver` resolves `ext:system:id`, structured refs, ambiguous-name disambiguation
+- Import merges entities sharing an external id; `EXTERNAL_ID_COLLISION` reported
+- Engine **0.1.2**; tests `test_external_id_resolution.py`
+
+## Loop 10 (next)
+
+1. Tag/push v0.1.2 release notes
+2. Human: real PatentsView export drop-in
+3. Optional: ER API endpoint for dry-run resolve
 
 **Out of scope:** live crawl service, multi-tenant SaaS, stock outputs
