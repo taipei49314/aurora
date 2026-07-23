@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.12)
+## Shipped (through 0.1.13)
 
 | Ver | Highlights |
 |-----|------------|
@@ -20,10 +20,11 @@
 | 0.1.10 | first-class `event_date` dual dates; dashboard coverage cards |
 | 0.1.11 | first-class `event_id` event-level independence dedup |
 | 0.1.12 | first-class `outlet_domain` / `wire_id` |
+| 0.1.13 | first-class `geo` on Source + Observation |
 
 ## Next
 
-1. First-class geo / jurisdiction (today metadata / unused country)
+1. License field first-class / public-corpus policy
 2. Real PatentsView dump (human data)
 3. Enable Actions with workflow-scoped PAT (human)
 

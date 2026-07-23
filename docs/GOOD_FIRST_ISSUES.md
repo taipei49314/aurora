@@ -44,8 +44,14 @@ independence; obs inherits from source; adapters emit top-level; stats/UI.
 Source fields for outlet identity; independence derive `wire:` / `domain:`;
 adapters emit top-level; stats + Data Explorer columns.
 
+## 10. First-class geo / jurisdiction — **done (v0.1.13)**
+
+`Source.geo` + `Observation.geo` (country/region/city/jurisdiction/raw);
+jobs adapter emits top-level geo; stats country histograms; Data Explorer column.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- First-class geo / jurisdiction on sources or observations
+- License field first-class / required for public corpora
+- Full document + span (`documents[]`)

@@ -159,8 +159,16 @@ def convert_jobs(raw: dict) -> Package:
             source_meta["valid_to"] = closed
         if posted:
             source_meta["valid_from"] = posted
-        if loc:
-            source_meta["geo"] = loc
+
+        # Normalize location → first-class geo (engine 0.1.13+)
+        geo: Dict[str, Any] = {}
+        if isinstance(loc, dict):
+            for k in ("country", "region", "city", "raw", "jurisdiction", "state", "admin1"):
+                if loc.get(k) not in (None, ""):
+                    key = "region" if k in ("state", "admin1") else k
+                    geo.setdefault(key, str(loc[k]).strip())
+        if country and "country" not in geo:
+            geo["country"] = country
 
         src_row: Dict[str, Any] = {
             "ref": ref,
@@ -177,6 +185,8 @@ def convert_jobs(raw: dict) -> Package:
         }
         if domain:
             src_row["outlet_domain"] = domain  # first-class 0.1.12+
+        if geo:
+            src_row["geo"] = dict(geo)
         sources.append(src_row)
 
         obj = comps[0] if comps else (techs[0] if techs else None)
@@ -189,8 +199,6 @@ def convert_jobs(raw: dict) -> Package:
             obs_meta["valid_from"] = posted
         if closed:
             obs_meta["valid_to"] = closed
-        if loc:
-            obs_meta["geo"] = loc
 
         obs: Dict[str, Any] = {
             "source_ref": ref,
@@ -203,13 +211,15 @@ def convert_jobs(raw: dict) -> Package:
             "confidence": float(row.get("confidence") or 0.8),
             "metadata": obs_meta,
         }
+        if geo:
+            obs["geo"] = dict(geo)
         if openings_n is not None:
             obs["numeric_value"] = openings_n
             obs["unit"] = "openings"
         observations.append(obs)
 
         for tech in techs:
-            observations.append({
+            dep: Dict[str, Any] = {
                 "source_ref": ref,
                 "observation_type": "TECHNICAL_DEPENDENCY",
                 "subject": company,
@@ -219,7 +229,10 @@ def convert_jobs(raw: dict) -> Package:
                 "confidence": 0.55,
                 "event_id": f"evt_hire_{job_id}",
                 "metadata": dict(obs_meta),
-            })
+            }
+            if geo:
+                dep["geo"] = dict(geo)
+            observations.append(dep)
 
     return {
         "entities": list(entities.values()),

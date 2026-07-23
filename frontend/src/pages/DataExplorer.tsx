@@ -66,6 +66,15 @@ function cellValue(tab: Tab, col: string, row: any): ReactNode {
   if (col === "wire_id") {
     return String(row.wire_id || row.metadata?.wire_id || "—");
   }
+  if (col === "geo") {
+    const g = row.geo || row.metadata?.geo;
+    if (!g || (typeof g === "object" && !Object.keys(g).length)) return "—";
+    if (typeof g === "object") {
+      const parts = [g.country, g.region, g.city, g.jurisdiction, g.raw].filter(Boolean);
+      return parts.length ? parts.join(" · ") : JSON.stringify(g);
+    }
+    return String(g);
+  }
   const v = row[col];
   if (v == null || v === "") return "—";
   if (typeof v === "object") return JSON.stringify(v);
@@ -125,8 +134,8 @@ export function DataExplorer() {
     tab === "entities"
       ? ["entity_type", "canonical_name", "country", "external_ids", "entity_id"]
       : tab === "observations"
-        ? ["observation_type", "subject_entity", "observed_at", "event_id", "confidence", "observation_id"]
-        : ["source_type", "publisher", "reliability_tier", "outlet_domain", "wire_id", "event_date", "published_at", "event_id", "family_id", "independence_group", "source_id"];
+        ? ["observation_type", "subject_entity", "observed_at", "geo", "event_id", "confidence", "observation_id"]
+        : ["source_type", "publisher", "reliability_tier", "outlet_domain", "wire_id", "geo", "event_date", "published_at", "event_id", "family_id", "independence_group", "source_id"];
 
   // entities / sources / observations use server-side filters when possible
   const filtered = useMemo(() => {
