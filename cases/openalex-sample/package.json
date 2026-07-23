@@ -1,0 +1,141 @@
+{
+  "entities": [
+    {
+      "entity_type": "RESEARCH_INSTITUTE",
+      "canonical_name": "Grid Storage Research Lab",
+      "aliases": [],
+      "description": "",
+      "country": "US",
+      "external_ids": [
+        {
+          "system": "openalex_org",
+          "id": "I9001"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "UNIVERSITY",
+      "canonical_name": "European Electrochemistry Institute",
+      "aliases": [],
+      "description": "",
+      "country": "DE",
+      "external_ids": [
+        {
+          "system": "openalex_org",
+          "id": "I9002"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "ref": "oa-w9000000001",
+      "source_type": "PAPER",
+      "publisher": "Energy Storage Materials Letters",
+      "title": "Reversible iron oxidation pathways for multi-day storage",
+      "published_at": "2019-06-01",
+      "excerpt": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
+      "independence_group": "doi:10.1234/esml.ironair.2019",
+      "reliability_tier": "B",
+      "url_or_local_path": "https://doi.org/10.1234/esml.ironair.2019",
+      "language": "en",
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0",
+        "source_format": "openalex-works-v1",
+        "external_ids": [
+          {
+            "system": "openalex_work",
+            "id": "W9000000001"
+          },
+          {
+            "system": "doi",
+            "id": "10.1234/esml.ironair.2019"
+          }
+        ]
+      }
+    },
+    {
+      "ref": "oa-w9000000002",
+      "source_type": "PAPER",
+      "publisher": "Journal of Power Sources Concepts",
+      "title": "Oxygen electrode stacks for long-duration iron-air cells",
+      "published_at": "2021-03-12",
+      "excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "independence_group": "doi:10.1234/oa.ironair.2021",
+      "reliability_tier": "B",
+      "url_or_local_path": "https://doi.org/10.1234/oa.ironair.2021",
+      "language": "en",
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0",
+        "source_format": "openalex-works-v1",
+        "external_ids": [
+          {
+            "system": "openalex_work",
+            "id": "W9000000002"
+          },
+          {
+            "system": "doi",
+            "id": "10.1234/oa.ironair.2021"
+          }
+        ]
+      }
+    }
+  ],
+  "observations": [
+    {
+      "source_ref": "oa-w9000000001",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "Grid Storage Research Lab",
+      "object": null,
+      "observed_at": "2019-06-01",
+      "text_excerpt": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "oa-w9000000001",
+        "extractor_id": "openalex-offline",
+        "work_id": "W9000000001",
+        "doi": "10.1234/esml.ironair.2019"
+      }
+    },
+    {
+      "source_ref": "oa-w9000000002",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "European Electrochemistry Institute",
+      "object": null,
+      "observed_at": "2021-03-12",
+      "text_excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "oa-w9000000002",
+        "extractor_id": "openalex-offline",
+        "work_id": "W9000000002",
+        "doi": "10.1234/oa.ironair.2021"
+      }
+    },
+    {
+      "source_ref": "oa-w9000000002",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "Grid Storage Research Lab",
+      "object": null,
+      "observed_at": "2021-03-12",
+      "text_excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "oa-w9000000002",
+        "extractor_id": "openalex-offline",
+        "work_id": "W9000000002",
+        "doi": "10.1234/oa.ironair.2021"
+      }
+    }
+  ]
+}

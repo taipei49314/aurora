@@ -102,6 +102,25 @@ def main(argv=None) -> int:
         ],
     )
     run("adapters-doctor", [py, "-m", "adapters", "doctor"])
+    run(
+        "openalex-case",
+        [
+            py,
+            "-m",
+            "adapters",
+            "openalex",
+            "adapters/fixtures/openalex_sample.json",
+            "-o",
+            "cases/openalex-sample/package.json",
+            "--strip",
+            "--validate",
+            "--strict",
+        ],
+    )
+    run(
+        "openalex-scorecard",
+        [py, "scripts/check_case_scorecard.py", "cases/openalex-sample"],
+    )
     print("=" * 72)
     print("ALL OK")
     return 0

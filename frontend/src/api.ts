@@ -50,7 +50,12 @@ export const getHypotheses = (runId: string) => j<Hypothesis[]>(`/api/research-r
 export const getEntities = (q?: string) =>
   j<any[]>(`/api/entities?limit=500${q ? `&q=${encodeURIComponent(q)}` : ""}`);
 export const getObservations = () => j<any[]>(`/api/observations?limit=800`);
-export const getSources = () => j<any[]>(`/api/sources?limit=500`);
+export const getSources = (opts?: { reliability_tier?: string; q?: string }) => {
+  const params = new URLSearchParams({ limit: "500" });
+  if (opts?.reliability_tier) params.set("reliability_tier", opts.reliability_tier);
+  if (opts?.q) params.set("q", opts.q);
+  return j<any[]>(`/api/sources?${params.toString()}`);
+};
 export const getGraph = (id: string) => j<{ nodes: any[]; edges: any[] }>(`/api/hypotheses/${id}/graph`);
 export const getTimeline = (id: string) => j<{ timeline: any[] }>(`/api/hypotheses/${id}/timeline`);
 export const getBottlenecks = (id: string) => j<any[]>(`/api/hypotheses/${id}/bottlenecks`);

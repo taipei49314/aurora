@@ -137,8 +137,38 @@ def entity(entity_id: str):
 
 
 @app.get("/api/sources")
-def sources(limit: int = 200):
-    return [to_dict(s) for s in REPO.snapshot.sources[:limit]]
+def sources(
+    limit: int = 200,
+    reliability_tier: Optional[str] = None,
+    q: Optional[str] = None,
+):
+    """List sources. Optional filters:
+
+    - ``reliability_tier``: single letter or comma list (``A``, ``B,C``)
+    - ``q``: case-insensitive substring over the serialized row
+    """
+    rows = [to_dict(s) for s in REPO.snapshot.sources]
+    if reliability_tier:
+        tiers = {t.strip().upper() for t in reliability_tier.split(",") if t.strip()}
+        allowed = {"A", "B", "C", "D"}
+        bad = tiers - allowed
+        if bad:
+            raise HTTPException(
+                422,
+                f"reliability_tier must be A/B/C/D (got {sorted(bad)})",
+            )
+        rows = [
+            r for r in rows
+            if str(r.get("reliability_tier") or "C").upper() in tiers
+        ]
+    if q:
+        needle = q.strip().lower()
+        if needle:
+            rows = [
+                r for r in rows
+                if needle in json.dumps(r, ensure_ascii=False).lower()
+            ]
+    return rows[:limit]
 
 
 @app.get("/api/observations")
