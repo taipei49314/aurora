@@ -18,6 +18,7 @@ export interface Hypothesis {
   bottleneck_score: number;
   cluster_stability_score: number;
   source_independence_score: number;
+  data_quality_penalty?: number;
   confidence_band: string;
   entity_ids: string[];
   observation_ids: string[];
@@ -73,6 +74,19 @@ export const setHumanName = (id: string, human_name: string) =>
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ human_name }),
+  });
+
+export const resolveEntity = (ref: string, external_ids?: { system: string; id: string }[]) =>
+  j<{
+    ref: string;
+    entity_id: string;
+    canonical_name: string;
+    aliases: string[];
+    external_ids: { system: string; id: string }[];
+  }>(`/api/resolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ref, external_ids }),
   });
 
 export const STATUS_COLORS: Record<string, string> = {

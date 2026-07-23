@@ -18,6 +18,8 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 - `scripts/resolve_entities.py` dry-run CLI; `POST /api/resolve`
 - Case `cases/multisource-iron-air` (patents+jobs+news joined by demo LEI)
 - `scripts/build_multisource_case.py`, `make multisource-case`
+- Data Explorer UI: `external_ids` column + detail pane; hypothesis data_quality bars
+- `docs/real-dump-guide.md` for real PatentsView / bulk drop-in
 
 ### Changed
 

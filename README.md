@@ -70,6 +70,8 @@ INSUFFICIENT_EVIDENCE           25.0    73     55  0.00  volumetric-display-free
 
 ## Bring your own data (import package)
 
+Guide for real offline dumps: [docs/real-dump-guide.md](docs/real-dump-guide.md).
+
 AURORA does **not** crawl the web. Feed a JSON package:
 
 ```json
