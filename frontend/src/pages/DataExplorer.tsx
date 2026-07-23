@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   getDocument,
+  getDocuments,
   getEntities,
   getObservations,
   getSources,
@@ -9,7 +10,7 @@ import {
   resolveEntity,
 } from "../api";
 
-type Tab = "entities" | "observations" | "sources";
+type Tab = "entities" | "observations" | "sources" | "documents";
 type Tier = "A" | "B" | "C" | "D";
 
 const TIER_COLORS: Record<Tier, { bg: string; fg: string; label: string }> = {
@@ -94,6 +95,14 @@ function cellValue(tab: Tab, col: string, row: any): ReactNode {
     if (Array.isArray(sp) && sp.length >= 2) return `[${sp[0]}, ${sp[1]}]`;
     return String(JSON.stringify(sp));
   }
+  if (tab === "documents" && col === "stub") {
+    return row.stub ? "stub" : "full";
+  }
+  if (tab === "documents" && col === "text") {
+    const t = String(row.text || "");
+    if (!t) return "—";
+    return t.length > 80 ? `${t.slice(0, 80)}…` : t;
+  }
   const v = row[col];
   if (v == null || v === "") return "—";
   if (typeof v === "object") return JSON.stringify(v);
@@ -148,14 +157,28 @@ export function DataExplorer() {
       }),
     enabled: tab === "sources",
   });
+  const documents = useQuery({
+    queryKey: ["documents", q],
+    queryFn: () => getDocuments({ q: q.trim() || undefined, include_stubs: true }),
+    enabled: tab === "documents",
+  });
 
-  const data = tab === "entities" ? entities.data : tab === "observations" ? observations.data : sources.data;
+  const data =
+    tab === "entities"
+      ? entities.data
+      : tab === "observations"
+        ? observations.data
+        : tab === "sources"
+          ? sources.data
+          : documents.data;
   const cols =
     tab === "entities"
       ? ["entity_type", "canonical_name", "country", "external_ids", "entity_id"]
       : tab === "observations"
         ? ["observation_type", "subject_entity", "observed_at", "document_id", "char_span", "geo", "event_id", "confidence", "observation_id"]
-        : ["source_type", "publisher", "reliability_tier", "license", "outlet_domain", "wire_id", "geo", "event_date", "published_at", "event_id", "family_id", "independence_group", "source_id"];
+        : tab === "sources"
+          ? ["source_type", "publisher", "reliability_tier", "license", "outlet_domain", "wire_id", "geo", "event_date", "published_at", "event_id", "family_id", "independence_group", "source_id"]
+          : ["document_id", "title", "stub", "observation_count", "license", "source_id", "text"];
 
   // entities / sources / observations use server-side filters when possible
   const filtered = useMemo(() => {
@@ -240,7 +263,7 @@ export function DataExplorer() {
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
-        {(["entities", "observations", "sources"] as Tab[]).map((t) => (
+        {(["entities", "observations", "sources", "documents"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => {
@@ -250,6 +273,9 @@ export function DataExplorer() {
             style={{ fontWeight: tab === t ? 700 : 400 }}
           >
             {t}
+            {t === "documents" && stats.data?.document_ids_referenced != null
+              ? ` (${stats.data.document_ids_referenced})`
+              : ""}
           </button>
         ))}
         <input
@@ -265,7 +291,9 @@ export function DataExplorer() {
               ? "Filter table… (Enter on lei:… also resolves)"
               : tab === "sources"
                 ? "Filter sources (title, publisher…)"
-                : "Filter…"
+                : tab === "documents"
+                  ? "Filter documents (id, title, text…)"
+                  : "Filter…"
           }
           style={{ marginLeft: 8, padding: "4px 8px", minWidth: 260, border: "1px solid #d0d7de", borderRadius: 6 }}
         />
@@ -556,7 +584,8 @@ export function DataExplorer() {
                   selected &&
                   ((tab === "entities" && selected.entity_id === row.entity_id) ||
                     (tab === "sources" && selected.source_id === row.source_id) ||
-                    (tab === "observations" && selected.observation_id === row.observation_id));
+                    (tab === "observations" && selected.observation_id === row.observation_id) ||
+                    (tab === "documents" && selected.document_id === row.document_id));
                 return (
                   <tr
                     key={i}
@@ -665,8 +694,20 @@ export function DataExplorer() {
             {tab === "observations" && selected.observation_id && (
               <ObservationDetail obs={selected} />
             )}
+            {tab === "documents" && selected.document_id && (
+              <DocumentDetail
+                doc={selected}
+                onOpenObservation={(obs) => {
+                  setTab("observations");
+                  setSelected(obs);
+                  setObsType("");
+                  setQ(obs.document_id || "");
+                }}
+              />
+            )}
             {tab !== "entities" &&
               tab !== "sources" &&
+              tab !== "documents" &&
               !selected.canonical_name &&
               !selected.observation_id && (
                 <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 11 }}>
@@ -677,6 +718,134 @@ export function DataExplorer() {
         )}
       </div>
       {!data && <p>Loading…</p>}
+    </div>
+  );
+}
+
+function DocumentDetail({
+  doc,
+  onOpenObservation,
+}: {
+  doc: any;
+  onOpenObservation: (obs: any) => void;
+}) {
+  const linked = useQuery({
+    queryKey: ["observations-by-doc", doc.document_id],
+    queryFn: () => getObservations({ document_id: doc.document_id }),
+    enabled: !!doc.document_id,
+  });
+
+  return (
+    <div>
+      <div style={{ marginBottom: 6 }}>
+        <b>{doc.title || doc.document_id}</b>
+        {doc.stub ? (
+          <span
+            style={{
+              marginLeft: 8,
+              fontSize: 10,
+              padding: "1px 6px",
+              borderRadius: 8,
+              background: "#fff8c5",
+              color: "#9a6700",
+            }}
+          >
+            stub
+          </span>
+        ) : (
+          <span
+            style={{
+              marginLeft: 8,
+              fontSize: 10,
+              padding: "1px 6px",
+              borderRadius: 8,
+              background: "#dafbe1",
+              color: "#1a7f37",
+            }}
+          >
+            full
+          </span>
+        )}
+      </div>
+      <div style={{ color: "#57606a", marginBottom: 8, fontSize: 11 }}>
+        <code>{doc.document_id}</code>
+      </div>
+      <div style={{ marginBottom: 6 }}>
+        <b>obs</b> {doc.observation_count ?? linked.data?.length ?? "—"} · <b>license</b>{" "}
+        {doc.license || "—"} · <b>source</b>{" "}
+        <code style={{ fontSize: 10 }}>{doc.source_id || "—"}</code>
+      </div>
+      {doc.url_or_local_path && (
+        <div style={{ marginBottom: 8, fontSize: 11, color: "#57606a" }}>
+          path: {doc.url_or_local_path}
+        </div>
+      )}
+      <div
+        style={{
+          marginTop: 8,
+          padding: 10,
+          background: "white",
+          border: "1px solid #d0d7de",
+          borderRadius: 6,
+          maxHeight: 180,
+          overflow: "auto",
+          fontSize: 12,
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        {doc.text ? (
+          doc.text
+        ) : (
+          <span style={{ color: "#8c959f" }}>
+            {doc.stub
+              ? "Stub document: referenced by observations but no full text in snapshot. Import a package with documents[] to attach body text."
+              : "(empty text)"}
+          </span>
+        )}
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <b style={{ fontSize: 12 }}>Linked observations</b>
+        <span style={{ fontSize: 11, color: "#8c959f", marginLeft: 6 }}>
+          GET /api/observations?document_id=
+        </span>
+        {linked.isLoading && <p style={{ color: "#57606a" }}>Loading…</p>}
+        {linked.data && linked.data.length === 0 && (
+          <p style={{ color: "#57606a", fontSize: 12 }}>none</p>
+        )}
+        <ul style={{ margin: "6px 0 0", paddingLeft: 18, fontSize: 12 }}>
+          {(linked.data || []).slice(0, 40).map((o: any) => (
+            <li key={o.observation_id} style={{ marginBottom: 4 }}>
+              <button
+                type="button"
+                onClick={() => onOpenObservation(o)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#0969da",
+                  cursor: "pointer",
+                  padding: 0,
+                  fontSize: 12,
+                  textAlign: "left",
+                }}
+              >
+                {o.observation_type}
+              </button>
+              {o.char_span != null && (
+                <span style={{ color: "#57606a", marginLeft: 6 }}>
+                  span{" "}
+                  {Array.isArray(o.char_span)
+                    ? `[${o.char_span[0]}, ${o.char_span[1]}]`
+                    : JSON.stringify(o.char_span)}
+                </span>
+              )}
+              <div style={{ color: "#57606a", fontSize: 11 }}>
+                {(o.text_excerpt || "").slice(0, 100)}
+                {(o.text_excerpt || "").length > 100 ? "…" : ""}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

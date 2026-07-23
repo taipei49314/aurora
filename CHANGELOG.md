@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.18] — 2026-07-24
+
+### Added
+
+- Data Explorer **documents** tab (list + detail + linked observations)
+- `GET /api/documents?include_stubs=` — stubs from `observation.document_id` when no full row
+- `GET /api/observations?document_id=` filter
+- Stats: `document_ids_referenced`; Dashboard shows full vs referenced counts
+
+### Changed
+
+- Engine / feature → **0.1.18**
+
 ## [0.1.17] — 2026-07-24
 
 ### Added

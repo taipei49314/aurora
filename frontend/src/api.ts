@@ -66,6 +66,7 @@ export interface CorpusStats {
   observations_with_document_id?: number;
   observations_with_char_span?: number;
   documents_total?: number;
+  document_ids_referenced?: number;
   observation_country_counts?: Record<string, number>;
   entities_with_country?: number;
   entity_country_counts?: Record<string, number>;
@@ -86,9 +87,14 @@ export const getEntities = (q?: string, entityType?: string) => {
   if (entityType) params.set("entity_type", entityType);
   return j<any[]>(`/api/entities?${params.toString()}`);
 };
-export const getObservations = (opts?: { observation_type?: string; q?: string }) => {
+export const getObservations = (opts?: {
+  observation_type?: string;
+  document_id?: string;
+  q?: string;
+}) => {
   const params = new URLSearchParams({ limit: "800" });
   if (opts?.observation_type) params.set("observation_type", opts.observation_type);
+  if (opts?.document_id) params.set("document_id", opts.document_id);
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/observations?${params.toString()}`);
 };
@@ -105,8 +111,12 @@ export const getSources = (opts?: {
 };
 export const getDocument = (documentId: string) =>
   j<any>(`/api/documents/${encodeURIComponent(documentId)}`);
-export const getDocuments = (q?: string) =>
-  j<any[]>(`/api/documents?limit=200${q ? `&q=${encodeURIComponent(q)}` : ""}`);
+export const getDocuments = (opts?: { q?: string; include_stubs?: boolean }) => {
+  const params = new URLSearchParams({ limit: "500" });
+  if (opts?.q) params.set("q", opts.q);
+  if (opts?.include_stubs === false) params.set("include_stubs", "false");
+  return j<any[]>(`/api/documents?${params.toString()}`);
+};
 export const getGraph = (id: string) => j<{ nodes: any[]; edges: any[] }>(`/api/hypotheses/${id}/graph`);
 export const getTimeline = (id: string) => j<{ timeline: any[] }>(`/api/hypotheses/${id}/timeline`);
 export const getBottlenecks = (id: string) => j<any[]>(`/api/hypotheses/${id}/bottlenecks`);

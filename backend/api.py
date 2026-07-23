@@ -182,6 +182,11 @@ def stats():
         "observations_with_document_id": obs_with_document_id,
         "observations_with_char_span": obs_with_char_span,
         "documents_total": len(getattr(s, "documents", None) or []),
+        "document_ids_referenced": len({
+            (getattr(o, "document_id", None) or (o.metadata or {}).get("document_id") or "").strip()
+            for o in s.observations
+            if (getattr(o, "document_id", None) or (o.metadata or {}).get("document_id") or "").strip()
+        }),
         "observation_country_counts": country_counts,
         "unique_event_ids": len(unique_event_ids),
         "reliability_tier_counts": tier_counts,
@@ -251,10 +256,54 @@ def entity(entity_id: str):
     raise HTTPException(404, "entity not found")
 
 
+def _document_index(*, include_stubs: bool = True) -> dict:
+    """Build document_id → row map from explicit documents + observation refs."""
+    s = REPO.snapshot
+    by_id: dict = {}
+    for d in getattr(s, "documents", None) or []:
+        row = to_dict(d)
+        row["stub"] = False
+        row["observation_count"] = 0
+        by_id[d.document_id] = row
+    for o in s.observations:
+        did = (getattr(o, "document_id", None) or (o.metadata or {}).get("document_id") or "").strip()
+        if not did:
+            continue
+        if did not in by_id:
+            if not include_stubs:
+                continue
+            by_id[did] = {
+                "document_id": did,
+                "source_id": o.source_id,
+                "title": "",
+                "text": "",
+                "url_or_local_path": "",
+                "language": "en",
+                "license": "",
+                "metadata": {"stub": True, "from": "observation.document_id"},
+                "stub": True,
+                "observation_count": 0,
+            }
+        by_id[did]["observation_count"] = int(by_id[did].get("observation_count") or 0) + 1
+        # Prefer a source_id when stub is empty
+        if by_id[did].get("stub") and not by_id[did].get("source_id"):
+            by_id[did]["source_id"] = o.source_id
+    return by_id
+
+
 @app.get("/api/documents")
-def documents(limit: int = 200, q: Optional[str] = None):
-    """List optional full-document records (engine 0.1.15+)."""
-    rows = [to_dict(d) for d in (getattr(REPO.snapshot, "documents", None) or [])]
+def documents(
+    limit: int = 200,
+    q: Optional[str] = None,
+    include_stubs: bool = True,
+):
+    """List documents (engine 0.1.15+).
+
+    When ``include_stubs`` is true (default, 0.1.18+), also emit rows for
+    ``observation.document_id`` values that have no full ``documents[]`` record.
+    """
+    by_id = _document_index(include_stubs=include_stubs)
+    rows = sorted(by_id.values(), key=lambda r: str(r.get("document_id") or ""))
     if q:
         needle = q.strip().lower()
         rows = [r for r in rows if needle in json.dumps(r, ensure_ascii=False).lower()]
@@ -262,11 +311,12 @@ def documents(limit: int = 200, q: Optional[str] = None):
 
 
 @app.get("/api/documents/{document_id}")
-def document(document_id: str):
-    for d in getattr(REPO.snapshot, "documents", None) or []:
-        if d.document_id == document_id:
-            return to_dict(d)
-    raise HTTPException(404, "document not found")
+def document(document_id: str, include_stubs: bool = True):
+    by_id = _document_index(include_stubs=include_stubs)
+    hit = by_id.get(document_id)
+    if hit is None:
+        raise HTTPException(404, "document not found")
+    return hit
 
 
 @app.get("/api/sources")
@@ -316,13 +366,20 @@ def sources(
 def observations(
     limit: int = 500,
     observation_type: Optional[str] = None,
+    document_id: Optional[str] = None,
     q: Optional[str] = None,
 ):
-    """List observations. Optional ``observation_type`` (comma list) and ``q``."""
+    """List observations. Optional ``observation_type``, ``document_id``, and ``q``."""
     rows = [to_dict(o) for o in REPO.snapshot.observations]
     if observation_type:
         types = {t.strip() for t in observation_type.split(",") if t.strip()}
         rows = [r for r in rows if str(r.get("observation_type") or "") in types]
+    if document_id:
+        did = document_id.strip()
+        rows = [
+            r for r in rows
+            if str(r.get("document_id") or (r.get("metadata") or {}).get("document_id") or "").strip() == did
+        ]
     if q:
         needle = q.strip().lower()
         if needle:
