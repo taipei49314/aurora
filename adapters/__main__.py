@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from .doctor import run_doctor
+from .filings import convert_filings
 from .jobs import convert_jobs
 from .news import convert_news
 from .openalex import convert_openalex
@@ -195,6 +196,22 @@ def _cmd_openalex(args: argparse.Namespace) -> int:
     )
 
 
+def _cmd_filings(args: argparse.Namespace) -> int:
+    raw = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    pkg = convert_filings(raw)
+    return _emit_convert(
+        "filings",
+        pkg,
+        count_key="filings_in",
+        count_val=pkg.get("_adapter", {}).get("filing_count", 0),
+        output=args.output,
+        strip=args.strip,
+        validate=args.validate,
+        run=args.run,
+        strict=args.strict,
+    )
+
+
 def _cmd_merge(args: argparse.Namespace) -> int:
     packages: List[dict] = []
     for path in args.inputs:
@@ -254,6 +271,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     p_oa.add_argument("input", help="Path to OpenAlex works JSON")
     _add_io_flags(p_oa)
     p_oa.set_defaults(func=_cmd_openalex)
+
+    p_fil = sub.add_parser("filings", help="Convert company filing / material-event JSON")
+    p_fil.add_argument("input", help="Path to filings JSON")
+    _add_io_flags(p_fil)
+    p_fil.set_defaults(func=_cmd_filings)
 
     p_merge = sub.add_parser("merge", help="Merge import packages")
     p_merge.add_argument(

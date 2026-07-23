@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getEntities, getObservations, getSources, resolveEntity } from "../api";
+import { getEntities, getObservations, getSources, getStats, resolveEntity } from "../api";
 
 type Tab = "entities" | "observations" | "sources";
 type Tier = "A" | "B" | "C" | "D";
@@ -70,9 +70,12 @@ export function DataExplorer() {
   const [tab, setTab] = useState<Tab>("entities");
   const [q, setQ] = useState("");
   const [tierFilter, setTierFilter] = useState<"" | Tier>("");
+  const [obsType, setObsType] = useState("");
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
+
+  const stats = useQuery({ queryKey: ["stats"], queryFn: getStats, staleTime: 30_000 });
 
   // Server-side filter for entities (?q=); client filter for other tabs
   const serverQ = tab === "entities" && q.trim() && !looksLikeResolveRef(q) ? q.trim() : undefined;
@@ -82,8 +85,12 @@ export function DataExplorer() {
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
-    queryKey: ["observations", q],
-    queryFn: () => getObservations({ q: q.trim() || undefined }),
+    queryKey: ["observations", q, obsType],
+    queryFn: () =>
+      getObservations({
+        q: q.trim() || undefined,
+        observation_type: obsType || undefined,
+      }),
     enabled: tab === "observations",
   });
   const sources = useQuery({
@@ -218,9 +225,68 @@ export function DataExplorer() {
         />
         <span style={{ fontSize: 12, color: "#57606a" }}>
           {filtered.length} rows
-          {q || (tab === "sources" && tierFilter) ? " (filtered)" : ""}
+          {q || (tab === "sources" && tierFilter) || (tab === "observations" && obsType)
+            ? " (filtered)"
+            : ""}
         </span>
       </div>
+
+      {tab === "observations" && (
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#f6f8fa",
+            border: "1px solid #d0d7de",
+            borderRadius: 8,
+          }}
+        >
+          <b style={{ fontSize: 12 }}>observation_type</b>
+          <button
+            type="button"
+            onClick={() => setObsType("")}
+            style={{
+              fontWeight: obsType === "" ? 700 : 400,
+              border: obsType === "" ? "1px solid #0969da" : "1px solid #d0d7de",
+              borderRadius: 6,
+              padding: "2px 8px",
+              background: obsType === "" ? "#ddf4ff" : "white",
+              cursor: "pointer",
+              fontSize: 11,
+            }}
+          >
+            All
+          </button>
+          {Object.entries(stats.data?.observation_type_counts || {})
+            .sort((a, b) => b[1] - a[1])
+            .map(([t, n]) => {
+              const active = obsType === t;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setObsType(active ? "" : t)}
+                  style={{
+                    fontWeight: active ? 700 : 400,
+                    border: active ? "1px solid #0969da" : "1px solid #d0d7de",
+                    borderRadius: 6,
+                    padding: "2px 8px",
+                    background: active ? "#ddf4ff" : "white",
+                    cursor: "pointer",
+                    fontSize: 11,
+                  }}
+                >
+                  {t} ({n})
+                </button>
+              );
+            })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/observations?observation_type=</span>
+        </div>
+      )}
 
       {tab === "sources" && (
         <div

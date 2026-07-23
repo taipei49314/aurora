@@ -6,6 +6,18 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.6] — 2026-07-24
+
+### Added
+
+- Data Explorer **observation_type** chips (from `/api/stats`)
+- **Filings** offline adapter (`python -m adapters filings …`) + fixture/tests
+- Session-only intensive mode (scheduler disabled)
+
+### Changed
+
+- Engine → **0.1.6**
+
 ## [0.1.5] — 2026-07-24
 
 ### Added
