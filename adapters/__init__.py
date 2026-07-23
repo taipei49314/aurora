@@ -8,7 +8,7 @@ from .filings import convert_filings
 from .jobs import convert_jobs
 from .news import convert_news
 from .openalex import convert_openalex
-from .package_util import merge_packages, strip_package
+from .package_util import ensure_documents, merge_packages, strip_package
 from .patentsview import convert_patentsview
 from .uspto import convert_uspto
 
@@ -19,7 +19,8 @@ __all__ = [
     "convert_news",
     "convert_openalex",
     "convert_filings",
+    "ensure_documents",
     "merge_packages",
     "strip_package",
 ]
-__version__ = "0.1.5"
+__version__ = "0.1.6"

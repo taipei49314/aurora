@@ -242,6 +242,13 @@ Full-text / path records. Observations point here via `document_id` (+ optional 
 
 Not required for scoring; enables span-level provenance for real dumps.
 
+**Adapter auto-build (0.1.19+):** offline adapters call
+`adapters.package_util.ensure_documents` so each `observation.document_id`
+that equals a `source.ref` gets a `documents[]` row with `text` from the
+source `excerpt` (title/url/license copied). Existing rows with text are
+never overwritten. `metadata.auto_built=true` marks generated rows.
+`strip_package` and `merge_packages` preserve / merge `documents[]`.
+
 ### Resolution rules
 
 - `subject` / `object` are resolved by **normalized name / alias**.

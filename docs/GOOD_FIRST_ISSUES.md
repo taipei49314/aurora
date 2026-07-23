@@ -74,8 +74,14 @@ OpenAlex adapter emits PERSON from authorships (orcid/openalex_author ids);
 Documents tab with stubs from observation.document_id; linked observations via
 `?document_id=`; stats `document_ids_referenced`.
 
+## 16. Auto-build documents[] from source excerpts — **done (v0.1.19)**
+
+Adapters call `ensure_documents` so packages include full `documents[]` rows
+built from source title/excerpt/url/license (`document_id` == `source.ref`).
+`strip_package` / `merge_packages` preserve and merge documents.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Auto-build documents[] from adapter source excerpts
+- Optional: char_span auto-align from text_excerpt against document text

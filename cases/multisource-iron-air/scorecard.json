@@ -1,7 +1,7 @@
 {
   "case_id": "multisource-iron-air",
-  "loop": 17,
-  "purpose": "Five-adapter merge with shared LEI/domain external_ids",
+  "loop": 19,
+  "purpose": "Five-adapter merge with shared LEI/domain external_ids + auto documents[]",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": [

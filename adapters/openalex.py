@@ -29,10 +29,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from .package_util import Package
+from .package_util import Package, ensure_documents
 
 ADAPTER_ID = "openalex-offline"
-ADAPTER_VERSION = "0.1.1"
+ADAPTER_VERSION = "0.1.2"
 
 
 def _date(value: Optional[str]) -> Optional[str]:
@@ -312,7 +312,7 @@ def convert_openalex(raw: dict) -> Package:
                     },
                 })
 
-    return {
+    return ensure_documents({
         "entities": list(entities.values()),
         "sources": sources,
         "observations": observations,
@@ -322,4 +322,4 @@ def convert_openalex(raw: dict) -> Package:
             "source_format": "openalex-works-v1",
             "work_count": len(works),
         },
-    }
+    })

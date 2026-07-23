@@ -25,10 +25,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from .package_util import Package
+from .package_util import Package, ensure_documents
 
 ADAPTER_ID = "jobs-offline"
-ADAPTER_VERSION = "0.1.0"
+ADAPTER_VERSION = "0.1.1"
 
 
 def _date(value: Optional[str]) -> Optional[str]:
@@ -235,7 +235,7 @@ def convert_jobs(raw: dict) -> Package:
                 dep["geo"] = dict(geo)
             observations.append(dep)
 
-    return {
+    return ensure_documents({
         "entities": list(entities.values()),
         "sources": sources,
         "observations": observations,
@@ -245,4 +245,4 @@ def convert_jobs(raw: dict) -> Package:
             "source_format": "jobs-offline-v1",
             "posting_count": len(postings),
         },
-    }
+    })

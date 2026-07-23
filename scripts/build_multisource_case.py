@@ -63,6 +63,9 @@ def export_snapshot(snap) -> dict:
     for src in snap.sources:
         meta = dict(src.metadata or {})
         excerpt = meta.pop("excerpt", "")
+        license_s = getattr(src, "license", "") or meta.pop("license", "") or ""
+        if license_s:
+            meta.pop("license", None)
         sources.append({
             "ref": src.source_id,
             "source_type": src.source_type,
@@ -73,6 +76,7 @@ def export_snapshot(snap) -> dict:
             "independence_group": src.independence_group,
             "reliability_tier": src.reliability_tier,
             "language": src.language,
+            "license": license_s,
             "excerpt": excerpt,
             "metadata": meta,
         })
@@ -82,7 +86,15 @@ def export_snapshot(snap) -> dict:
             k: v for k, v in (o.metadata or {}).items()
             if k not in ("source_type", "independence_group")
         }
-        observations.append({
+        document_id = getattr(o, "document_id", "") or meta.pop("document_id", "") or ""
+        if document_id:
+            meta.pop("document_id", None)
+        char_span = getattr(o, "char_span", None)
+        if char_span is None:
+            char_span = meta.pop("char_span", None)
+        else:
+            meta.pop("char_span", None)
+        row = {
             "source_ref": o.source_id,
             "observation_type": o.observation_type,
             "subject": name_by_id.get(o.subject_entity, o.subject_entity),
@@ -92,9 +104,25 @@ def export_snapshot(snap) -> dict:
             "unit": o.unit,
             "text_excerpt": o.text_excerpt,
             "confidence": o.confidence,
+            "document_id": document_id,
             "metadata": meta,
+        }
+        if char_span is not None:
+            row["char_span"] = char_span
+        observations.append(row)
+    documents = []
+    for d in getattr(snap, "documents", None) or []:
+        documents.append({
+            "document_id": d.document_id,
+            "source_ref": d.source_id,
+            "title": d.title,
+            "text": d.text,
+            "url_or_local_path": d.url_or_local_path,
+            "language": d.language,
+            "license": d.license,
+            "metadata": dict(d.metadata or {}),
         })
-    return {
+    out = {
         "_comment": (
             "Multi-adapter iron-air demo: patentsview + jobs + news + filings + openalex. "
             "Shared LEI/domain external_ids. Built by scripts/build_multisource_case.py."
@@ -103,6 +131,9 @@ def export_snapshot(snap) -> dict:
         "sources": sources,
         "observations": observations,
     }
+    if documents:
+        out["documents"] = documents
+    return out
 
 
 def main() -> int:
