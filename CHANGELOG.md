@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.12] — 2026-07-24
+
+### Added
+
+- First-class **`Source.outlet_domain`** and **`Source.wire_id`** (metadata fallback)
+- Stats: `sources_with_outlet_domain`, `sources_with_wire_id`
+- Data Explorer columns + Dashboard outlet/wire card
+- News / jobs / filings / USPTO adapters emit top-level outlet fields
+
+### Changed
+
+- Engine / feature → **0.1.12**
+- Import-schema outlet auto-independence gap marked done
+
 ## [0.1.11] — 2026-07-24
 
 ### Added

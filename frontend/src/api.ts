@@ -56,6 +56,8 @@ export interface CorpusStats {
   sources_with_family_id?: number;
   sources_with_event_date?: number;
   sources_with_event_id?: number;
+  sources_with_outlet_domain?: number;
+  sources_with_wire_id?: number;
   observations_with_event_id?: number;
   unique_event_ids?: number;
   reliability_tier_counts: Record<string, number>;

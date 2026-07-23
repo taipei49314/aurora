@@ -108,6 +108,14 @@
           "type": "string",
           "description": "Real-world event key; sources sharing event_id are not independent (0.1.11+)"
         },
+        "outlet_domain": {
+          "type": "string",
+          "description": "Digital outlet host; when independence_group empty → domain:<host> (0.1.12+)"
+        },
+        "wire_id": {
+          "type": "string",
+          "description": "News wire / syndication family; when independence_group empty → wire:<id> (0.1.12+)"
+        },
         "metadata": { "type": "object" }
       }
     },

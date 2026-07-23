@@ -150,10 +150,6 @@ def convert_news(raw: dict) -> Package:
             "extractor_version": ADAPTER_VERSION,
             "external_ids": [{"system": "article_id", "id": art_id}],
         }
-        if domain:
-            source_meta["outlet_domain"] = domain
-        if wire:
-            source_meta["wire_id"] = wire
         if reprint_of:
             source_meta["is_reprint_of"] = reprint_of
             source_meta["primary_ref"] = id_to_ref.get(reprint_of)
@@ -170,6 +166,10 @@ def convert_news(raw: dict) -> Package:
             "language": art.get("language") or "en",
             "metadata": source_meta,
         }
+        if domain:
+            src_row["outlet_domain"] = domain  # first-class 0.1.12+
+        if wire:
+            src_row["wire_id"] = wire  # first-class 0.1.12+
         if event_id:
             # First-class event_id (engine 0.1.11+) for event-level independence
             src_row["event_id"] = event_id

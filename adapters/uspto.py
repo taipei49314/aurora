@@ -134,8 +134,8 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
         url = patent.get("url") or patent.get("url_or_local_path") or f"local://patents/{pub}"
 
         ref = f"pat-{pub.lower().replace(' ', '')}"
+        outlet = "patents.example" if "example" in str(url) else "uspto"
         source_meta: Dict[str, Any] = {
-            "outlet_domain": "patents.example" if "example" in str(url) else "uspto",
             "external_ids": [{"system": "us_publication", "id": pub}],
             "extractor_id": ADAPTER_ID,
             "extractor_version": ADAPTER_VERSION,
@@ -163,6 +163,7 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             "reliability_tier": "A",
             "url_or_local_path": url,
             "language": patent.get("language") or "en",
+            "outlet_domain": outlet,  # first-class 0.1.12+
             "metadata": source_meta,
         }
         if family:

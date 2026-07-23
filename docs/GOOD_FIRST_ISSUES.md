@@ -39,8 +39,13 @@ adapter emits top-level; Dashboard + stats coverage.
 `Source.event_id` + `Observation.event_id`; shared event_id collapses source
 independence; obs inherits from source; adapters emit top-level; stats/UI.
 
+## 9. First-class `outlet_domain` / `wire_id` — **done (v0.1.12)**
+
+Source fields for outlet identity; independence derive `wire:` / `domain:`;
+adapters emit top-level; stats + Data Explorer columns.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- First-class `outlet_domain` / `wire_id` (today metadata-only derivation)
+- First-class geo / jurisdiction on sources or observations

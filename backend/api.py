@@ -96,6 +96,8 @@ def stats():
     with_family = 0
     with_event = 0
     with_event_id = 0
+    with_outlet = 0
+    with_wire = 0
     for src in s.sources:
         t = (src.reliability_tier or "C").upper()
         tier_counts[t] = tier_counts.get(t, 0) + 1
@@ -107,6 +109,10 @@ def stats():
             with_event += 1
         if getattr(src, "event_id", None) or (src.metadata or {}).get("event_id"):
             with_event_id += 1
+        if getattr(src, "outlet_domain", None) or (src.metadata or {}).get("outlet_domain"):
+            with_outlet += 1
+        if getattr(src, "wire_id", None) or (src.metadata or {}).get("wire_id"):
+            with_wire += 1
     type_counts: dict = {}
     obs_with_event_id = 0
     unique_event_ids: set = set()
@@ -131,6 +137,8 @@ def stats():
         "sources_with_family_id": with_family,
         "sources_with_event_date": with_event,
         "sources_with_event_id": with_event_id,
+        "sources_with_outlet_domain": with_outlet,
+        "sources_with_wire_id": with_wire,
         "observations_with_event_id": obs_with_event_id,
         "unique_event_ids": len(unique_event_ids),
         "reliability_tier_counts": tier_counts,
@@ -309,12 +317,21 @@ def export_package():
         event_id = getattr(src, "event_id", "") or meta.pop("event_id", "") or ""
         if event_id:
             meta.pop("event_id", None)
+        outlet_domain = getattr(src, "outlet_domain", "") or meta.pop("outlet_domain", "") or ""
+        if outlet_domain:
+            meta.pop("outlet_domain", None)
+            meta.pop("domain", None)
+        wire_id = getattr(src, "wire_id", "") or meta.pop("wire_id", "") or ""
+        if wire_id:
+            meta.pop("wire_id", None)
         sources.append({
             "ref": src.source_id, "source_type": src.source_type,
             "publisher": src.publisher, "title": src.title,
             "published_at": src.published_at,
             "event_date": event_date,
             "event_id": event_id,
+            "outlet_domain": outlet_domain,
+            "wire_id": wire_id,
             "url_or_local_path": src.url_or_local_path,
             "independence_group": src.independence_group,
             "reliability_tier": src.reliability_tier,

@@ -65,6 +65,8 @@ def test_stats_endpoint(client):
     assert "sources_with_family_id" in body
     assert "sources_with_event_date" in body
     assert "sources_with_event_id" in body
+    assert "sources_with_outlet_domain" in body
+    assert "sources_with_wire_id" in body
     assert "observations_with_event_id" in body
     assert "unique_event_ids" in body
     assert body["sources_total"] > 0
@@ -72,6 +74,8 @@ def test_stats_endpoint(client):
     assert body["sources_with_family_id"] >= 0
     assert isinstance(body["sources_with_event_date"], int)
     assert body["sources_with_event_date"] >= 0
+    assert isinstance(body["sources_with_outlet_domain"], int)
+    assert body["sources_with_outlet_domain"] >= 0
     assert isinstance(body["unique_event_ids"], int)
     assert body["unique_event_ids"] >= 0
     assert sum(body["source_type_counts"].values()) == body["sources_total"]

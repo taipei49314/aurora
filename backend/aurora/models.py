@@ -83,6 +83,9 @@ class Source:
     event_date: Optional[str] = None
     # Real-world event key for event-level independence (metadata.event_id fallback)
     event_id: str = ""
+    # Outlet identity for independence (metadata fallback; engine 0.1.12+)
+    outlet_domain: str = ""
+    wire_id: str = ""
     metadata: dict = field(default_factory=dict)
 
 

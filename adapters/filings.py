@@ -139,14 +139,12 @@ def convert_filings(raw: dict) -> Package:
         }
         if form:
             meta["form"] = form
-        if domain:
-            meta["outlet_domain"] = domain
         if row.get("currency"):
             meta["currency"] = row["currency"]
         if row.get("amount") is not None:
             meta["amount_original"] = row["amount"]
 
-        sources.append({
+        src_row: Dict[str, Any] = {
             "ref": ref,
             "source_type": "COMPANY_FILING",
             "publisher": publisher,
@@ -158,7 +156,10 @@ def convert_filings(raw: dict) -> Package:
             "url_or_local_path": row.get("url") or f"local://filings/{fid}",
             "language": row.get("language") or "en",
             "metadata": meta,
-        })
+        }
+        if domain:
+            src_row["outlet_domain"] = domain  # first-class 0.1.12+
+        sources.append(src_row)
 
         obs: Dict[str, Any] = {
             "source_ref": ref,
