@@ -123,10 +123,15 @@ Commits ahead of `origin/master` for **v0.1.2** batch:
 - Multisource case, resolve CLI/API
 - Frontend external_ids + dump guide
 
-## Loop 12 (next)
+## Loop 12 (done, local) — resolve UI + check-all
+
+- Data Explorer Resolve bar → `POST /api/resolve`
+- `scripts/check_all.py` / `make check-all` pre-push gate
+
+## Loop 13 (next)
 
 1. Push **v0.1.2** when you say so
-2. Optional: wire frontend resolve search box to `/api/resolve`
-3. Human: drop real PatentsView dump
+2. Human: real PatentsView dump
+3. Optional: CI workflow file (GitHub Actions) when ready to push
 
 **Out of scope:** live crawl service, multi-tenant SaaS, stock outputs

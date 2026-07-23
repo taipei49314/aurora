@@ -19,7 +19,9 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 - Case `cases/multisource-iron-air` (patents+jobs+news joined by demo LEI)
 - `scripts/build_multisource_case.py`, `make multisource-case`
 - Data Explorer UI: `external_ids` column + detail pane; hypothesis data_quality bars
+- Data Explorer **Resolve** bar wired to `POST /api/resolve`
 - `docs/real-dump-guide.md` for real PatentsView / bulk drop-in
+- `scripts/check_all.py` / `make check-all` local pre-push gate
 
 ### Changed
 
