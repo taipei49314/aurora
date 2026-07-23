@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.25] — 2026-07-24
+
+### Added
+
+- Scorecard gates: `min_observations_with_char_span`, `min_char_span_ratio`
+- `check_case_scorecard` reports `spans=N/M (pct)`
+- All case scorecards set span floors; iron-air-retro scorecard.json added
+- check_all runs iron-air-mini + retro scorecards
+
+### Changed
+
+- Engine / feature → **0.1.25**
+
 ## [0.1.24] — 2026-07-24
 
 ### Added

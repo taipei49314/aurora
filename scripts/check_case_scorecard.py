@@ -40,6 +40,11 @@ def main(argv=None) -> int:
     raw = snap.counts.get("raw_source_count", 0)
     indep = snap.counts.get("independent_source_count", 0)
     n_docs = len(getattr(snap, "documents", None) or [])
+    n_obs = len(snap.observations)
+    n_spans = sum(
+        1 for o in snap.observations if getattr(o, "char_span", None) is not None
+    )
+    span_ratio = (n_spans / n_obs) if n_obs else 0.0
 
     # Orphan document_ids: referenced by obs but missing from documents[]
     present = {
@@ -70,10 +75,21 @@ def main(argv=None) -> int:
         failures.append(
             f"{len(orphans)} orphan document_id(s) without documents[] row: {sample}"
         )
+    min_spans = gates.get("min_observations_with_char_span")
+    if min_spans is not None and n_spans < int(min_spans):
+        failures.append(
+            f"observations_with_char_span={n_spans} < min_observations_with_char_span {min_spans}"
+        )
+    min_ratio = gates.get("min_char_span_ratio")
+    if min_ratio is not None and span_ratio + 1e-12 < float(min_ratio):
+        failures.append(
+            f"char_span_ratio={span_ratio:.3f} < min_char_span_ratio {min_ratio}"
+        )
 
     print(
         f"case={scorecard.get('case_id')} errors={n_err} "
         f"sources={raw} independent={indep} documents={n_docs} "
+        f"spans={n_spans}/{n_obs} ({span_ratio:.0%}) "
         f"orphan_doc_ids={len(orphans)} obs_types={sorted(obs_types)}"
     )
     if failures:

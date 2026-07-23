@@ -1,7 +1,7 @@
 {
   "case_id": "multisource-iron-air",
-  "loop": 23,
-  "purpose": "Five-adapter merge with shared LEI/domain external_ids + auto documents[]",
+  "loop": 25,
+  "purpose": "Five-adapter merge with shared LEI/domain external_ids + documents[] + spans",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": [
@@ -14,7 +14,9 @@
     "independent_lt_raw": true,
     "min_sources": 12,
     "min_documents": 12,
-    "require_no_orphan_document_ids": true
+    "require_no_orphan_document_ids": true,
+    "min_observations_with_char_span": 15,
+    "min_char_span_ratio": 0.5
   },
   "adapters": [
     "patentsview",

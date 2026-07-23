@@ -107,8 +107,13 @@ document_id + ensure_documents. Scorecard gates `min_documents` +
 align_char_span adds progressive word/char prefix match. Curated packages may
 `append_unmatched` excerpts into document text. iron-air-retro: 21/21 spans.
 
+## 22. Scorecard char_span floors — **done (v0.1.25)**
+
+Gates `min_observations_with_char_span` and `min_char_span_ratio` on all cases;
+iron-air-retro gains scorecard.json; check_all runs mini + retro scorecards.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: scorecard gate min_observations_with_char_span
+- Optional: lint_package --require-char-spans soft/hard policy
