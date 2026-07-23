@@ -89,7 +89,11 @@
         "title": { "type": "string", "minLength": 1 },
         "published_at": {
           "type": ["string", "null"],
-          "description": "ISO date or datetime; first 10 chars used as date"
+          "description": "Publication/grant ISO date; first 10 chars used as date"
+        },
+        "event_date": {
+          "type": ["string", "null"],
+          "description": "Activity/application/filing date (dual-date with published_at); first 10 chars used"
         },
         "excerpt": { "type": "string" },
         "independence_group": { "type": "string" },

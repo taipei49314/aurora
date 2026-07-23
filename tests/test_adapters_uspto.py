@@ -46,7 +46,8 @@ def test_date_policy_application_vs_publication(uspto_pkg):
     by_ref = {s["ref"]: s for s in uspto_pkg["sources"]}
     src = by_ref["pat-us20220123456a1"]
     assert src["published_at"] == "2022-04-12"
-    assert src["metadata"]["event_date"] == "2021-11-02"
+    # first-class event_date (0.1.10+); metadata copy optional
+    assert src.get("event_date") == "2021-11-02"
     obs = [o for o in uspto_pkg["observations"] if o["source_ref"] == src["ref"]]
     assert obs
     assert all(o["observed_at"] == "2021-11-02" for o in obs)

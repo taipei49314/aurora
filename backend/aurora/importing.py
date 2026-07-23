@@ -38,6 +38,14 @@ def _extract_family_id(row: dict, meta: dict) -> str:
     return (row.get("family_id") or meta.get("family_id") or "").strip()
 
 
+def _extract_event_date(row: dict, meta: dict) -> Optional[str]:
+    """First-class event_date (application/filing) with metadata fallback (0.1.10+)."""
+    raw = row.get("event_date") if row.get("event_date") not in (None, "") else meta.get("event_date")
+    if raw in (None, ""):
+        return None
+    return str(raw).strip()[:10] if str(raw).strip() else None
+
+
 def _derive_independence_group(row: dict, meta: dict, family_id: str = "") -> str:
     """When independence_group is empty, derive from wire/domain/family metadata."""
     wire = (meta.get("wire_id") or row.get("wire_id") or "").strip()
@@ -202,6 +210,12 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         if not _valid_date(row.get("published_at")):
             errors.append(RowError(i, "published_at", "SOURCE_DATE_MISSING",
                                    "unparseable published_at", str(row.get("published_at"))))
+        # Validate top-level or nested event_date early
+        meta_probe = dict(row.get("metadata") or {})
+        event_probe = row.get("event_date") if row.get("event_date") not in (None, "") else meta_probe.get("event_date")
+        if not _valid_date(event_probe):
+            errors.append(RowError(i, "event_date", "SOURCE_DATE_MISSING",
+                                   "unparseable event_date", str(event_probe)))
         chash = content_hash(row.get("source_type"), normalize_text(row["title"]),
                              normalize_text(row.get("excerpt", "")), row.get("publisher"))
         sid = prefixed_id("src", chash)
@@ -213,6 +227,9 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             # Prefer first-class field; drop duplicate from metadata when promoted
             if family_id and meta.get("family_id") == family_id:
                 meta.pop("family_id", None)
+            event_date = _extract_event_date(row, meta)
+            if event_date and str(meta.get("event_date") or "")[:10] == event_date:
+                meta.pop("event_date", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
                 indep = _derive_independence_group(row, meta, family_id=family_id)
@@ -221,7 +238,8 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=created_at,
                 url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
-                language=row.get("language", "en"), family_id=family_id, metadata=meta,
+                language=row.get("language", "en"), family_id=family_id,
+                event_date=event_date, metadata=meta,
             )
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid
@@ -289,17 +307,21 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             errors.append(RowError(i, "observed_at", "SOURCE_DATE_MISSING",
                                    "unparseable observed_at", str(row.get("observed_at"))))
         src = sources[sid]
+        # Dual-date fallback (0.1.10+): empty observed_at → source.event_date → published_at
+        observed_at = row.get("observed_at") or None
+        if observed_at in (None, ""):
+            observed_at = src.event_date or src.published_at or None
         meta["source_type"] = src.source_type
         meta["independence_group"] = resolved_group.get(sid, sid)
         meta.setdefault("reliability_tier", src.reliability_tier or "C")
         oid = prefixed_id(
             "obs", sid, row["observation_type"], subj, obj or "",
-            row.get("observed_at") or "",
+            observed_at or "",
             normalize_text(row.get("text_excerpt", "")),
         )
         if oid not in observations:
             observations[oid] = Observation(
-                observation_id=oid, source_id=sid, observed_at=(row.get("observed_at") or None),
+                observation_id=oid, source_id=sid, observed_at=observed_at,
                 observation_type=row["observation_type"], subject_entity=subj, object_entity=obj,
                 numeric_value=row.get("numeric_value"), unit=row.get("unit"),
                 text_excerpt=row.get("text_excerpt", ""), confidence=float(row.get("confidence", 0.7)),

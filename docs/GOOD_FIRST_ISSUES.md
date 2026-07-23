@@ -28,10 +28,14 @@ README **Language policy**: engine English-first; case honesty bilingual optiona
 `Source.family_id` on import (top-level or metadata), export, stats coverage,
 Data Explorer column; USPTO adapter emits top-level `family_id`.
 
+## 7. Dual dates: first-class `event_date` — **done (v0.1.10)**
+
+`Source.event_date` (app/filing) alongside `published_at` (grant/pub); metadata
+fallback; empty observation `observed_at` falls back to event_date; USPTO
+adapter emits top-level; Dashboard + stats coverage.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
-- Dual dates: first-class `event_date` vs `published_at` (app vs grant)
 - Schema: first-class `event_id` for event-level dedup
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Dashboard: surface `sources_with_family_id` from `/api/stats`
