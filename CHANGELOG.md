@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.10] — 2026-07-24
+
+### Added
+
+- First-class **`Source.event_date`** (application/filing) alongside `published_at` (grant/pub)
+- Empty observation `observed_at` falls back to `source.event_date` then `published_at`
+- `/api/stats.sources_with_event_date`; export includes `event_date`
+- Data Explorer sources columns: `event_date`, `published_at`
+- Dashboard cards for `family_id` and `event_date` coverage
+- USPTO adapter emits top-level `event_date`
+
+### Changed
+
+- Engine / feature → **0.1.10**
+- Import-schema dual-date gap marked done
+
 ## [0.1.9] — 2026-07-24
 
 ### Added

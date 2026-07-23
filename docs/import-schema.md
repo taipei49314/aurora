@@ -130,7 +130,8 @@ Without `ref`, observations cannot attach to the source.
 
 | Field | Type | Default | Engine use |
 |-------|------|---------|------------|
-| `published_at` | string \| null | null | Dating / audit |
+| `published_at` | string \| null | null | Publication / grant date (audit + source leakage filter) |
+| `event_date` | string \| null | null | **First-class** (engine 0.1.10+); activity / application / filing date. Metadata fallback accepted. Empty `observed_at` on observations falls back to `event_date` then `published_at` |
 | `excerpt` | string | `""` | **Part of content hash** + near-duplicate tokens (also stored in `metadata.excerpt`) |
 | `independence_group` | string | auto or `""` | Declared non-independence; if empty, engine derives from `metadata.wire_id` → `wire:…`, `outlet_domain` → `domain:…`, or `family_id` → `family:…` (0.1.1+) |
 | `family_id` | string | `""` | **First-class** (engine 0.1.8+); patent/document family. Metadata fallback still accepted; promoted onto `Source.family_id`. When `independence_group` empty → `family:<id>` |
@@ -319,7 +320,7 @@ Do **not** assume these exist as first-class fields:
 | Full document + span | short excerpt only | `documents[]` + `document_id`/`char_span` |
 | Unresolved mentions | must pre-resolve names | staging / `subject_raw` |
 | Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
-| Dual dates (app vs grant) | pick one; document in metadata | `event_date` vs `published_at` |
+| Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |
 | Outlet auto-independence | manual group | `outlet_domain`, `wire_id` |
 | Event-level dedup | `metadata.event_id` | `event_id` |
 | Geo / jurisdiction in model | metadata / unused country | first-class geo |

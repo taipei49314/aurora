@@ -66,6 +66,16 @@ export function Dashboard() {
             value={st.counts?.independent_source_count ?? "—"}
             sub={`of ${st.counts?.raw_source_count ?? "—"} raw`}
           />
+          <StatCard
+            label="family_id"
+            value={st.sources_with_family_id ?? "—"}
+            sub={`of ${st.sources_total ?? st.counts?.sources ?? "—"} sources`}
+          />
+          <StatCard
+            label="event_date"
+            value={st.sources_with_event_date ?? "—"}
+            sub="dual-date coverage"
+          />
         </div>
       )}
 

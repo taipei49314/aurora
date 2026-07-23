@@ -146,11 +146,10 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             source_meta["family_id"] = family
         if codes:
             source_meta["classification_codes"] = codes
-        if app_date:
-            source_meta["event_date"] = app_date
         if app_date and pub_date and app_date != pub_date:
             source_meta["date_policy"] = (
-                "observed_at=application_date; published_at=publication_date"
+                "observed_at=application_date; published_at=publication_date; "
+                "event_date=application_date"
             )
 
         src_row: Dict[str, Any] = {
@@ -169,6 +168,9 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
         if family:
             # First-class family_id (engine 0.1.8+); also kept in metadata for older tooling
             src_row["family_id"] = family
+        if event_date:
+            # First-class event_date (engine 0.1.10+): application/filing date
+            src_row["event_date"] = event_date
         sources.append(src_row)
 
         assignees = patent.get("assignees") or []

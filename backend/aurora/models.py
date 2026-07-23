@@ -79,6 +79,8 @@ class Source:
     language: str
     # Patent / document family for independence (also accepted under metadata.family_id)
     family_id: str = ""
+    # Activity / filing / application date (dual-date with published_at; metadata.event_date fallback)
+    event_date: Optional[str] = None
     metadata: dict = field(default_factory=dict)
 
 

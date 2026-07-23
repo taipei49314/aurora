@@ -63,9 +63,12 @@ def test_stats_endpoint(client):
     assert "source_type_counts" in body
     assert "sources_total" in body
     assert "sources_with_family_id" in body
+    assert "sources_with_event_date" in body
     assert body["sources_total"] > 0
     assert isinstance(body["sources_with_family_id"], int)
     assert body["sources_with_family_id"] >= 0
+    assert isinstance(body["sources_with_event_date"], int)
+    assert body["sources_with_event_date"] >= 0
     assert sum(body["source_type_counts"].values()) == body["sources_total"]
     assert "engine" in body
     assert isinstance(body["reliability_tier_counts"], dict)

@@ -54,6 +54,7 @@ export interface CorpusStats {
   entities_with_external_ids: number;
   sources_total?: number;
   sources_with_family_id?: number;
+  sources_with_event_date?: number;
   reliability_tier_counts: Record<string, number>;
   observation_type_counts: Record<string, number>;
   source_type_counts?: Record<string, number>;

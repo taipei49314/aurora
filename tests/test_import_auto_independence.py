@@ -151,3 +151,56 @@ def test_metadata_family_id_promoted_to_field():
     assert src.family_id == "fam-meta-9"
     assert src.independence_group == "family:fam-meta-9"
     assert "family_id" not in (src.metadata or {})
+
+
+@pytest.mark.unit
+def test_top_level_event_date_is_first_class():
+    """Engine 0.1.10+: event_date (app/filing) vs published_at (grant/pub)."""
+    pkg = _pkg([{
+        "ref": "p1",
+        "source_type": "PATENT",
+        "publisher": "USPTO",
+        "title": "Dual date patent",
+        "excerpt": "body",
+        "published_at": "2022-04-12",
+        "event_date": "2021-11-02",
+    }], [{
+        "source_ref": "p1",
+        "observation_type": "PATENT_ACTIVITY",
+        "subject": "Acme",
+        "observed_at": "2021-11-02",
+        "text_excerpt": "filed",
+    }])
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    src = snap.sources[0]
+    assert src.event_date == "2021-11-02"
+    assert src.published_at == "2022-04-12"
+    assert "event_date" not in (src.metadata or {})
+
+
+@pytest.mark.unit
+def test_metadata_event_date_promoted_and_observed_at_fallback():
+    """Metadata event_date promoted; missing observed_at falls back to event_date."""
+    pkg = _pkg([{
+        "ref": "p1",
+        "source_type": "PATENT",
+        "publisher": "USPTO",
+        "title": "Fallback date patent",
+        "excerpt": "body",
+        "published_at": "2023-01-15",
+        "metadata": {"event_date": "2020-06-01"},
+    }], [{
+        "source_ref": "p1",
+        "observation_type": "PATENT_ACTIVITY",
+        "subject": "Acme",
+        # no observed_at → engine uses source.event_date
+        "text_excerpt": "filed",
+    }])
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    src = snap.sources[0]
+    assert src.event_date == "2020-06-01"
+    assert "event_date" not in (src.metadata or {})
+    assert len(snap.observations) == 1
+    assert snap.observations[0].observed_at == "2020-06-01"

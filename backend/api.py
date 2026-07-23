@@ -94,6 +94,7 @@ def stats():
     tier_counts: dict = {}
     source_type_counts: dict = {}
     with_family = 0
+    with_event = 0
     for src in s.sources:
         t = (src.reliability_tier or "C").upper()
         tier_counts[t] = tier_counts.get(t, 0) + 1
@@ -101,6 +102,8 @@ def stats():
         source_type_counts[st] = source_type_counts.get(st, 0) + 1
         if getattr(src, "family_id", None) or (src.metadata or {}).get("family_id"):
             with_family += 1
+        if getattr(src, "event_date", None) or (src.metadata or {}).get("event_date"):
+            with_event += 1
     type_counts: dict = {}
     for o in s.observations:
         type_counts[o.observation_type] = type_counts.get(o.observation_type, 0) + 1
@@ -117,6 +120,7 @@ def stats():
         "entities_total": len(s.entities),
         "sources_total": len(s.sources),
         "sources_with_family_id": with_family,
+        "sources_with_event_date": with_event,
         "reliability_tier_counts": tier_counts,
         "source_type_counts": source_type_counts,
         "observation_type_counts": type_counts,
@@ -287,10 +291,14 @@ def export_package():
         family_id = getattr(src, "family_id", "") or meta.pop("family_id", "") or ""
         if family_id:
             meta.pop("family_id", None)
+        event_date = getattr(src, "event_date", None) or meta.pop("event_date", None) or None
+        if event_date:
+            meta.pop("event_date", None)
         sources.append({
             "ref": src.source_id, "source_type": src.source_type,
             "publisher": src.publisher, "title": src.title,
             "published_at": src.published_at,
+            "event_date": event_date,
             "url_or_local_path": src.url_or_local_path,
             "independence_group": src.independence_group,
             "reliability_tier": src.reliability_tier,
