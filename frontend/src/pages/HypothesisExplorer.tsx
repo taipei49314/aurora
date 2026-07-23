@@ -18,6 +18,7 @@ function Detail({ h }: { h: Hypothesis }) {
   const sim = h.existing_industry_similarity ?? {};
   const bns = h.score_explanation?.bottlenecks ?? [];
   const sc = h.score_explanation?.scoring ?? {};
+  const dq = h.score_explanation?.data_quality ?? {};
   return (
     <div style={{ borderTop: "1px solid #d0d7de", marginTop: 8, paddingTop: 10, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
       <div>
@@ -33,11 +34,27 @@ function Detail({ h }: { h: Hypothesis }) {
         <ScoreBar label="cluster stability" value={h.cluster_stability_score} />
         <ScoreBar label="hype risk (penalty)" value={h.hype_risk_score} />
         <ScoreBar label="contradiction (penalty)" value={h.contradiction_score} />
+        <ScoreBar label="data quality (penalty)" value={h.data_quality_penalty ?? dq.penalty ?? 0} />
         <div style={{ fontSize: 12, marginTop: 8, color: "#57606a" }}>
           formula: {sc.formula} · weighted sum {sc.weighted_sum} − penalties → <b>{h.overall_score.toFixed(1)}</b>
         </div>
+        {dq.factors && (
+          <div style={{ fontSize: 11, marginTop: 6, color: "#57606a" }}>
+            data_quality factors: date/conf {dq.factors.date_conf_penalty ?? "—"} · reliability{" "}
+            {dq.factors.reliability_penalty ?? "—"}
+            {dq.factors.tier_counts && (
+              <span>
+                {" "}
+                · tiers {JSON.stringify(dq.factors.tier_counts)}
+              </span>
+            )}
+          </div>
+        )}
         <div style={{ fontSize: 12, marginTop: 4 }}>
           nearest existing industry: <b>{sim.best_industry_name ?? "-"}</b> (sim {(sim.similarity ?? 0).toFixed(2)})
+        </div>
+        <div style={{ fontSize: 12, marginTop: 6 }}>
+          <b>entities in cluster</b> · {h.entity_ids?.length ?? 0}
         </div>
       </div>
       <div style={{ fontSize: 12 }}>

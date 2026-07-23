@@ -108,10 +108,25 @@ Living checklist for real-world AURORA evolution. Each loop is intentionally sma
 
 Local commits include 0.1.2 ER + Loop 10 tooling. Push/tag when ready as **v0.1.2**.
 
-## Loop 11 (next)
+## Loop 11 (done, local) — UI + dump guide + resolve API tests
 
-1. Frontend: show entity external_ids on entity detail
-2. Real PatentsView export drop-in (human data)
-3. Push v0.1.2 when batch feels complete
+- Data Explorer: external_ids column, filter, entity detail pane
+- Hypothesis Explorer: data_quality penalty / factors
+- `docs/real-dump-guide.md`
+- API tests for `POST /api/resolve`
+
+## Local backlog (still not pushed)
+
+Commits ahead of `origin/master` for **v0.1.2** batch:
+
+- ER external_ids + import merge
+- Multisource case, resolve CLI/API
+- Frontend external_ids + dump guide
+
+## Loop 12 (next)
+
+1. Push **v0.1.2** when you say so
+2. Optional: wire frontend resolve search box to `/api/resolve`
+3. Human: drop real PatentsView dump
 
 **Out of scope:** live crawl service, multi-tenant SaaS, stock outputs

@@ -28,6 +28,22 @@ def test_health_and_snapshot_listing(client):
     assert len(snaps) == 1 and snaps[0]["counts"]["entities"] > 0
 
 
+def test_resolve_entity_by_name(client):
+    ents = client.get("/api/entities?limit=50").json()
+    assert ents
+    name = ents[0]["canonical_name"]
+    r = client.post("/api/resolve", json={"ref": name})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["canonical_name"] == name
+    assert body["entity_id"] == ents[0]["entity_id"]
+
+
+def test_resolve_unknown_returns_404(client):
+    r = client.post("/api/resolve", json={"ref": "___no_such_entity_xyz___"})
+    assert r.status_code == 404
+
+
 def test_export_is_round_trippable_via_import_upload(client):
     pkg = client.get("/api/exports").json()
     assert set(pkg) == {"entities", "sources", "observations"}
