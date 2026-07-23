@@ -33,7 +33,12 @@ _REQUIRED_SOURCE = {"source_type", "publisher", "title"}
 _REQUIRED_OBS = {"source_ref", "observation_type", "subject"}
 
 
-def _derive_independence_group(row: dict, meta: dict) -> str:
+def _extract_family_id(row: dict, meta: dict) -> str:
+    """First-class family_id with metadata fallback (engine 0.1.8+)."""
+    return (row.get("family_id") or meta.get("family_id") or "").strip()
+
+
+def _derive_independence_group(row: dict, meta: dict, family_id: str = "") -> str:
     """When independence_group is empty, derive from wire/domain/family metadata."""
     wire = (meta.get("wire_id") or row.get("wire_id") or "").strip()
     if wire:
@@ -41,7 +46,7 @@ def _derive_independence_group(row: dict, meta: dict) -> str:
     domain = (meta.get("outlet_domain") or row.get("outlet_domain") or "").strip()
     if domain:
         return f"domain:{domain}"
-    family = (meta.get("family_id") or row.get("family_id") or "").strip()
+    family = (family_id or meta.get("family_id") or row.get("family_id") or "").strip()
     if family:
         return f"family:{family}"
     return ""
@@ -204,15 +209,19 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             meta = dict(row.get("metadata", {}))
             if "excerpt" in row:
                 meta["excerpt"] = row["excerpt"]
+            family_id = _extract_family_id(row, meta)
+            # Prefer first-class field; drop duplicate from metadata when promoted
+            if family_id and meta.get("family_id") == family_id:
+                meta.pop("family_id", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
-                indep = _derive_independence_group(row, meta)
+                indep = _derive_independence_group(row, meta, family_id=family_id)
             sources[sid] = Source(
                 source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
                 title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=created_at,
                 url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
-                language=row.get("language", "en"), metadata=meta,
+                language=row.get("language", "en"), family_id=family_id, metadata=meta,
             )
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid

@@ -77,6 +77,8 @@ class Source:
     independence_group: str              # sources sharing this id are NOT independent
     reliability_tier: str
     language: str
+    # Patent / document family for independence (also accepted under metadata.family_id)
+    family_id: str = ""
     metadata: dict = field(default_factory=dict)
 
 

@@ -153,7 +153,7 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
                 "observed_at=application_date; published_at=publication_date"
             )
 
-        sources.append({
+        src_row: Dict[str, Any] = {
             "ref": ref,
             "source_type": "PATENT",
             "publisher": patent.get("publisher") or publisher,
@@ -165,7 +165,11 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             "url_or_local_path": url,
             "language": patent.get("language") or "en",
             "metadata": source_meta,
-        })
+        }
+        if family:
+            # First-class family_id (engine 0.1.8+); also kept in metadata for older tooling
+            src_row["family_id"] = family
+        sources.append(src_row)
 
         assignees = patent.get("assignees") or []
         if not assignees and patent.get("assignee"):

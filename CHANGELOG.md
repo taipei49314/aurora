@@ -6,6 +6,18 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.8] — 2026-07-24
+
+### Added
+
+- `GET /api/sources?source_type=` filter; stats include `source_type_counts`
+- `scripts/lint_package.py` — structure + import + vocabulary lint
+- Scheduler mode A restored (20m autonomous slices) for hands-off progress
+
+### Changed
+
+- Engine → **0.1.8**
+
 ## [0.1.7] — 2026-07-24
 
 ### Added

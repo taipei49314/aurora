@@ -60,6 +60,13 @@ def test_stats_endpoint(client):
     body = r.json()
     assert body["entities_total"] > 0
     assert "reliability_tier_counts" in body
+    assert "source_type_counts" in body
+    assert "sources_total" in body
+    assert "sources_with_family_id" in body
+    assert body["sources_total"] > 0
+    assert isinstance(body["sources_with_family_id"], int)
+    assert body["sources_with_family_id"] >= 0
+    assert sum(body["source_type_counts"].values()) == body["sources_total"]
     assert "engine" in body
     assert isinstance(body["reliability_tier_counts"], dict)
     assert sum(body["reliability_tier_counts"].values()) > 0
