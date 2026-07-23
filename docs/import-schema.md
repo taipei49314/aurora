@@ -178,6 +178,11 @@ PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --public-
 
 # Fail when observation.document_id has no documents[] row (0.1.22+)
 PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --require-documents
+
+# Span policy (0.1.26+): every document_id obs must have char_span after import,
+# and/or overall span ratio must meet a floor
+PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --require-char-spans
+PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --min-char-span-ratio 0.5
 ```
 
 Suggested license strings (not an exhaustive legal list):

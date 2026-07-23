@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.25)
+## Shipped (through 0.1.26)
 
 | Ver | Highlights |
 |-----|------------|
@@ -33,12 +33,13 @@
 | 0.1.23 | All cases regenerated with documents[]; scorecard min_documents |
 | 0.1.24 | Progressive char_span align; retro 21/21 spans |
 | 0.1.25 | Scorecard min_observations_with_char_span / min_char_span_ratio |
+| 0.1.26 | lint_package --require-char-spans / --min-char-span-ratio |
 
 ## Next
 
 1. Real PatentsView dump (human data)
 2. Enable Actions with workflow-scoped PAT (human)
-3. Optional: lint_package --require-char-spans soft/hard policy
+3. Optional: Dashboard span coverage sparkline / quality panel
 
 ## Out of scope
 

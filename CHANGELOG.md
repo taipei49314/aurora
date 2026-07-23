@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.26] — 2026-07-24
+
+### Added
+
+- `lint_package --require-char-spans` — fail if document_id obs lack char_span
+- `lint_package --min-char-span-ratio R` — fail if overall span ratio below R
+- Soft lint fields: `char_span_ratio`, `observations_missing_char_span`
+- check_all: retro/openalex hard spans; mini/multisource/patentsview ratio floors
+
+### Changed
+
+- Engine / feature → **0.1.26**
+
 ## [0.1.25] — 2026-07-24
 
 ### Added
