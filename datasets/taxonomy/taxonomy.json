@@ -1,0 +1,77 @@
+{
+  "version": "2024.1",
+  "industries": [
+    {
+      "id": "data_center_services",
+      "name": "Data Center & Colocation Services",
+      "synonyms": ["colocation", "web hosting", "server hosting", "managed hosting"],
+      "description": "Operation of data center facilities providing server colocation, rack space, power, cooling and bandwidth to enterprise tenants.",
+      "capabilities": ["colocation", "rack", "server", "cooling", "uptime", "bandwidth", "hosting", "datacenter", "provisioning", "redundancy", "sla"],
+      "upstream": ["server", "networking", "power"],
+      "downstream": ["enterprise", "tenant"]
+    },
+    {
+      "id": "auto_components",
+      "name": "Automotive Components Manufacturing",
+      "synonyms": ["auto parts", "tier-one supplier", "vehicle components"],
+      "description": "Manufacture of automotive components such as powertrain, chassis, braking and interior assemblies supplied to vehicle OEMs.",
+      "capabilities": ["chassis", "brake", "powertrain", "assembly", "stamping", "tier-one", "oem", "drivetrain", "transmission", "axle", "casting"],
+      "upstream": ["steel", "aluminium"],
+      "downstream": ["oem", "dealership"]
+    },
+    {
+      "id": "semiconductor_foundry",
+      "name": "Semiconductor Foundry",
+      "synonyms": ["chip fab", "wafer foundry"],
+      "description": "Fabrication of integrated circuits on silicon wafers using photolithography and etch process nodes.",
+      "capabilities": ["wafer", "lithography", "etch", "photoresist", "node", "fab", "cleanroom", "yield", "cmos", "packaging"],
+      "upstream": ["silicon", "photoresist"],
+      "downstream": ["fabless", "electronics"]
+    },
+    {
+      "id": "lithium_battery",
+      "name": "Lithium-ion Battery Manufacturing",
+      "synonyms": ["li-ion cell", "ev battery"],
+      "description": "Manufacture of lithium-ion cells with cathode and anode chemistries for electric vehicles and consumer electronics.",
+      "capabilities": ["lithium", "cathode", "anode", "nmc", "gigafactory", "electric-vehicle", "cell", "separator", "electrolyte-carbonate", "pack"],
+      "upstream": ["lithium", "cobalt", "nickel"],
+      "downstream": ["automaker", "consumer-electronics"]
+    },
+    {
+      "id": "solar_pv",
+      "name": "Solar Photovoltaic Manufacturing",
+      "synonyms": ["solar panel", "pv module"],
+      "description": "Production of crystalline silicon photovoltaic cells and modules for solar power generation.",
+      "capabilities": ["photovoltaic", "silicon-wafer", "module", "cell-efficiency", "encapsulant", "inverter", "panel", "polysilicon"],
+      "upstream": ["polysilicon"],
+      "downstream": ["utility", "rooftop"]
+    },
+    {
+      "id": "pharma_biologics",
+      "name": "Biologics Pharmaceutical Manufacturing",
+      "synonyms": ["monoclonal antibody", "biopharma"],
+      "description": "Development and manufacture of biologic drugs such as monoclonal antibodies using mammalian cell culture and bioreactors.",
+      "capabilities": ["antibody", "bioreactor", "cell-culture", "purification", "chromatography", "gmp", "titre", "monoclonal", "fill-finish"],
+      "upstream": ["media", "resin"],
+      "downstream": ["hospital", "patient"]
+    },
+    {
+      "id": "telecom_equipment",
+      "name": "Telecommunications Equipment",
+      "synonyms": ["network equipment", "radio access"],
+      "description": "Manufacture of telecommunications infrastructure such as base stations, routers and optical transport for carrier networks.",
+      "capabilities": ["basestation", "router", "optical-transport", "radio-access", "backhaul", "spectrum", "carrier", "antenna-array"],
+      "upstream": ["rf-component"],
+      "downstream": ["carrier", "operator"]
+    },
+    {
+      "id": "oil_refining",
+      "name": "Petroleum Refining",
+      "synonyms": ["refinery", "downstream oil"],
+      "description": "Refining of crude oil into fuels and petrochemical feedstocks via distillation, cracking and reforming.",
+      "capabilities": ["distillation", "cracking", "reforming", "crude", "refinery", "hydrotreating", "feedstock", "throughput"],
+      "upstream": ["crude-oil"],
+      "downstream": ["fuel-retail", "petrochemical"]
+    }
+  ]
+}
