@@ -18,6 +18,7 @@ from typing import List, Optional
 from .doctor import run_doctor
 from .jobs import convert_jobs
 from .news import convert_news
+from .openalex import convert_openalex
 from .package_util import merge_packages, package_stats, strip_package
 from .patentsview import convert_patentsview
 from .uspto import convert_uspto
@@ -178,6 +179,22 @@ def _cmd_news(args: argparse.Namespace) -> int:
     )
 
 
+def _cmd_openalex(args: argparse.Namespace) -> int:
+    raw = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    pkg = convert_openalex(raw)
+    return _emit_convert(
+        "openalex",
+        pkg,
+        count_key="works_in",
+        count_val=pkg.get("_adapter", {}).get("work_count", 0),
+        output=args.output,
+        strip=args.strip,
+        validate=args.validate,
+        run=args.run,
+        strict=args.strict,
+    )
+
+
 def _cmd_merge(args: argparse.Namespace) -> int:
     packages: List[dict] = []
     for path in args.inputs:
@@ -232,6 +249,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     p_news.add_argument("input", help="Path to articles JSON")
     _add_io_flags(p_news)
     p_news.set_defaults(func=_cmd_news)
+
+    p_oa = sub.add_parser("openalex", help="Convert OpenAlex-shaped works JSON")
+    p_oa.add_argument("input", help="Path to OpenAlex works JSON")
+    _add_io_flags(p_oa)
+    p_oa.set_defaults(func=_cmd_openalex)
 
     p_merge = sub.add_parser("merge", help="Merge import packages")
     p_merge.add_argument(

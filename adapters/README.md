@@ -37,6 +37,7 @@ make patentsview-sample    # PatentsView-compatible dump case
 | `patentsview` | `patents[]` / `results[]` (PatentsView fields) | `PATENT` | same via normalize → uspto |
 | `jobs` | `postings[]` | `JOB_POSTING` | `HIRING_ACTIVITY` (+ weak tech edges) |
 | `news` | `articles[]` + `claims[]` | `NEWS` | whatever claims declare (`SUPPLIER_RELATIONSHIP`, …) |
+| `openalex` | `results[]` / `works[]` | `PAPER` | `RESEARCH_ACTIVITY` per institution |
 
 ### Independence conventions
 
