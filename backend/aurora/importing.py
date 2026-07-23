@@ -17,6 +17,7 @@ from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from .ids import prefixed_id, content_hash, normalize_text
+from .char_span import align_char_span
 from .models import (
     Source,
     Entity,
@@ -526,6 +527,9 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             metadata=dmeta,
         )
 
+    # Auto-align char_span from text_excerpt when missing (engine 0.1.20+)
+    auto_span_count = _auto_align_observation_spans(observations, documents)
+
     snap = make_snapshot(
         entities=sorted(entities.values(), key=lambda e: e.entity_id),
         sources=sorted(sources.values(), key=lambda s: s.source_id),
@@ -539,5 +543,39 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         "raw_source_count": indep["raw_source_count"],
         "deduplicated_source_count": indep["deduplicated_source_count"],
         "independent_source_count": indep["independent_source_count"],
+        "char_spans_auto_aligned": auto_span_count,
     })
     return snap
+
+
+def _auto_align_observation_spans(
+    observations: dict,
+    documents: dict,
+) -> int:
+    """Fill missing Observation.char_span by locating text_excerpt in document text.
+
+    Does not overwrite an existing char_span. Returns count of newly aligned rows.
+    """
+    if not documents or not observations:
+        return 0
+    n = 0
+    for obs in observations.values():
+        if getattr(obs, "char_span", None) is not None:
+            continue
+        did = (getattr(obs, "document_id", None) or "").strip()
+        if not did:
+            continue
+        doc = documents.get(did)
+        if doc is None:
+            continue
+        text = getattr(doc, "text", None) or ""
+        excerpt = getattr(obs, "text_excerpt", None) or ""
+        span = align_char_span(text, excerpt)
+        if span is None:
+            continue
+        obs.char_span = span
+        meta = dict(getattr(obs, "metadata", None) or {})
+        meta["char_span_auto"] = True
+        obs.metadata = meta
+        n += 1
+    return n

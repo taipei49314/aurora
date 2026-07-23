@@ -1,10 +1,81 @@
 """Helpers for composing AURORA import packages."""
 from __future__ import annotations
 
+import re
 from typing import Any, Dict, Iterable, List, Optional
 
 
 Package = Dict[str, Any]
+
+# Keep in sync with backend/aurora/char_span.py (adapters stay backend-independent).
+_MIN_EXCERPT_LEN = 4
+
+
+def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]]:
+    """Locate *text_excerpt* in *document_text*; return ``[start, end]`` or None.
+
+    Deterministic: exact → case-insensitive → whitespace-flexible regex.
+    Mirrors ``aurora.char_span.align_char_span`` so adapter packages ship spans
+    before import (engine 0.1.20+).
+    """
+    doc = document_text if isinstance(document_text, str) else ""
+    ex = (text_excerpt if isinstance(text_excerpt, str) else "").strip()
+    if not doc or not ex or len(ex) < _MIN_EXCERPT_LEN:
+        return None
+    idx = doc.find(ex)
+    if idx >= 0:
+        return [idx, idx + len(ex)]
+    idx = doc.lower().find(ex.lower())
+    if idx >= 0:
+        return [idx, idx + len(ex)]
+    tokens = [t for t in re.split(r"\s+", ex) if t]
+    if tokens:
+        pattern = r"\s+".join(re.escape(t) for t in tokens)
+        try:
+            m = re.search(pattern, doc, flags=re.IGNORECASE | re.DOTALL)
+        except re.error:
+            m = None
+        if m is not None:
+            return [m.start(), m.end()]
+    return None
+
+
+def align_observation_char_spans(pkg: Package) -> Package:
+    """Fill missing observation ``char_span`` from document text + text_excerpt."""
+    out = dict(pkg)
+    docs = {
+        (d.get("document_id") or d.get("id") or "").strip(): d
+        for d in (out.get("documents") or [])
+        if isinstance(d, dict) and (d.get("document_id") or d.get("id"))
+    }
+    if not docs:
+        return out
+    observations = []
+    for o in out.get("observations") or []:
+        if not isinstance(o, dict):
+            observations.append(o)
+            continue
+        row = dict(o)
+        if row.get("char_span") not in (None, ""):
+            observations.append(row)
+            continue
+        did = (row.get("document_id") or (row.get("metadata") or {}).get("document_id") or "").strip()
+        if not did or did not in docs:
+            observations.append(row)
+            continue
+        d = docs[did]
+        text = d.get("text") or d.get("body") or ""
+        excerpt = row.get("text_excerpt") or ""
+        span = align_char_span(text, excerpt)
+        if span is not None:
+            row["char_span"] = span
+            meta = dict(row.get("metadata") or {})
+            meta["char_span_auto"] = True
+            row["metadata"] = meta
+        observations.append(row)
+    out["observations"] = observations
+    return out
+
 
 
 def strip_package(raw: dict) -> Package:
@@ -190,8 +261,9 @@ def build_documents_from_sources(
 
 
 def ensure_documents(pkg: Package, **kwargs: Any) -> Package:
-    """Ensure package has ``documents[]`` derived from sources when useful."""
-    return build_documents_from_sources(pkg, **kwargs)
+    """Ensure package has ``documents[]`` and auto-aligned ``char_span`` when useful."""
+    out = build_documents_from_sources(pkg, **kwargs)
+    return align_observation_char_spans(out)
 
 
 def merge_packages(packages: Iterable[Package]) -> Package:
@@ -255,12 +327,17 @@ def package_stats(pkg: Package) -> dict:
         1 for d in docs
         if isinstance(d, dict) and (d.get("text") or d.get("body") or "").strip()
     )
+    obs_with_span = sum(
+        1 for o in clean["observations"]
+        if isinstance(o, dict) and o.get("char_span") not in (None, "")
+    )
     return {
         "entities": len(clean["entities"]),
         "sources": len(clean["sources"]),
         "observations": len(clean["observations"]),
         "documents": len(docs),
         "documents_with_text": docs_with_text,
+        "observations_with_char_span": obs_with_span,
         "orphan_observations": len(orphan_obs),
         "source_refs": len(refs),
     }

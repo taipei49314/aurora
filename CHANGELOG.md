@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.20] — 2026-07-24
+
+### Added
+
+- **char_span auto-align**: locate `text_excerpt` in document text when span missing
+  - Engine: `aurora.char_span.align_char_span` at import (`metadata.char_span_auto`)
+  - Adapters: `align_observation_char_spans` via `ensure_documents`
+  - Snapshot count `char_spans_auto_aligned`; stats `observations_with_char_span_auto`
+  - Dashboard shows auto span count
+
+### Changed
+
+- Engine / feature → **0.1.20**
+- Adapters package → 0.1.7
+
 ## [0.1.19] — 2026-07-24
 
 ### Added
