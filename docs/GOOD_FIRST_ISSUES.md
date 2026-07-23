@@ -23,9 +23,14 @@ Print adapter list, fixture paths, and one-line convert smoke for each fixture.
 
 README **Language policy**: engine English-first; case honesty bilingual optional.
 
+## 6. Schema: first-class `family_id` — **done (v0.1.8)**
+
+`Source.family_id` on import (top-level or metadata), export, stats coverage,
+Data Explorer column; USPTO adapter emits top-level `family_id`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
-- Adapter: company filings / 10-K style → `CAPEX_ACTIVITY` with tier `A`
-- API: `GET /api/observations?observation_type=` server filter
-- Schema: first-class `family_id` (today independence_group / metadata only)
+- Dual dates: first-class `event_date` vs `published_at` (app vs grant)
+- Schema: first-class `event_id` for event-level dedup
+- Enable GitHub Actions with a `workflow`-scoped PAT (human)

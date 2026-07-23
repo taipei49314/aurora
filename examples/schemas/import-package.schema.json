@@ -96,6 +96,10 @@
         "reliability_tier": { "$ref": "#/$defs/reliabilityTier" },
         "url_or_local_path": { "type": "string" },
         "language": { "type": "string" },
+        "family_id": {
+          "type": "string",
+          "description": "Patent/document family id; when set, independence_group defaults to family:<id> if empty"
+        },
         "metadata": { "type": "object" }
       }
     },

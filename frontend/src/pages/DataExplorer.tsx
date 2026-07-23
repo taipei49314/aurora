@@ -73,6 +73,7 @@ export function DataExplorer() {
   const [tab, setTab] = useState<Tab>("entities");
   const [q, setQ] = useState("");
   const [tierFilter, setTierFilter] = useState<"" | Tier>("");
+  const [sourceType, setSourceType] = useState("");
   const [obsType, setObsType] = useState("");
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
@@ -97,10 +98,11 @@ export function DataExplorer() {
     enabled: tab === "observations",
   });
   const sources = useQuery({
-    queryKey: ["sources", tierFilter, q],
+    queryKey: ["sources", tierFilter, sourceType, q],
     queryFn: () =>
       getSources({
         reliability_tier: tierFilter || undefined,
+        source_type: sourceType || undefined,
         q: q.trim() || undefined,
       }),
     enabled: tab === "sources",
@@ -228,7 +230,9 @@ export function DataExplorer() {
         />
         <span style={{ fontSize: 12, color: "#57606a" }}>
           {filtered.length} rows
-          {q || (tab === "sources" && tierFilter) || (tab === "observations" && obsType)
+          {q ||
+          (tab === "sources" && (tierFilter || sourceType)) ||
+          (tab === "observations" && obsType)
             ? " (filtered)"
             : ""}
         </span>
@@ -366,6 +370,63 @@ export function DataExplorer() {
           >
             import schema §6
           </a>
+        </div>
+      )}
+
+      {tab === "sources" && (
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#f6f8fa",
+            border: "1px solid #d0d7de",
+            borderRadius: 8,
+          }}
+        >
+          <b style={{ fontSize: 12 }}>source_type</b>
+          <button
+            type="button"
+            onClick={() => setSourceType("")}
+            style={{
+              fontWeight: sourceType === "" ? 700 : 400,
+              border: sourceType === "" ? "1px solid #0969da" : "1px solid #d0d7de",
+              borderRadius: 6,
+              padding: "2px 8px",
+              background: sourceType === "" ? "#ddf4ff" : "white",
+              cursor: "pointer",
+              fontSize: 11,
+            }}
+          >
+            All
+          </button>
+          {Object.entries(stats.data?.source_type_counts || {})
+            .sort((a, b) => b[1] - a[1])
+            .map(([t, n]) => {
+              const active = sourceType === t;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setSourceType(active ? "" : t)}
+                  style={{
+                    fontWeight: active ? 700 : 400,
+                    border: active ? "1px solid #0969da" : "1px solid #d0d7de",
+                    borderRadius: 6,
+                    padding: "2px 8px",
+                    background: active ? "#ddf4ff" : "white",
+                    cursor: "pointer",
+                    fontSize: 11,
+                  }}
+                >
+                  {t} ({n})
+                </button>
+              );
+            })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/sources?source_type=</span>
         </div>
       )}
 

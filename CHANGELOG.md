@@ -18,6 +18,20 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 - Engine → **0.1.8**
 
+## [0.1.8] — 2026-07-24
+
+### Added
+
+- First-class **`Source.family_id`** (import top-level or `metadata.family_id`; export + UI)
+- `/api/stats`: `source_type_counts`, `sources_total`, `sources_with_family_id`
+- Data Explorer sources table **family_id** column
+- USPTO adapter emits top-level `family_id` on patent sources
+
+### Changed
+
+- Engine / feature → **0.1.8**
+- Import-schema gap “Patent family” marked done; JSON Schema documents `family_id`
+
 ## [0.1.7] — 2026-07-24
 
 ### Added

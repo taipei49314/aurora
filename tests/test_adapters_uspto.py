@@ -66,6 +66,7 @@ def test_family_independence_group(uspto_pkg):
         if s["independence_group"] == "family:ironair-ferro-2022"
     ]
     assert len(ferro_family) == 2
+    assert all(s.get("family_id") == "ironair-ferro-2022" for s in ferro_family)
 
 
 @pytest.mark.unit
