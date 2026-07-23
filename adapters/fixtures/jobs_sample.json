@@ -1,0 +1,43 @@
+{
+  "_comment": "Offline job-board fixture aligned with iron-air mini case.",
+  "postings": [
+    {
+      "id": "ferro-2024-chem",
+      "company": "FerroGrid Power",
+      "title": "Electrochemical engineer — iron-air stack scale-up",
+      "description": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona. Skills: electrochemistry, alkaline systems, pilot manufacturing.",
+      "posted_at": "2024-03-01",
+      "closed_at": "2024-09-01",
+      "openings": 6,
+      "location": {"country": "US", "region": "AZ"},
+      "url": "https://ferrogrid.example/careers/ee-stack",
+      "domain": "ferrogrid.example",
+      "related_technologies": ["reversible iron oxidation"],
+      "related_components": ["porous iron electrode"]
+    },
+    {
+      "id": "oxa-2024-mfg",
+      "company": "OxaCell Systems",
+      "title": "Manufacturing technician — oxygen electrode lines",
+      "description": "Expand oxygen electrode manufacturing for multi-day iron-air storage customers.",
+      "posted_at": "2024-05-10",
+      "openings": 12,
+      "location": {"country": "DE", "region": "BY"},
+      "url": "https://oxacell.example/jobs/mfg-o2",
+      "domain": "oxacell.example",
+      "related_technologies": ["reversible iron oxidation"]
+    },
+    {
+      "id": "longhaul-2024-apps",
+      "company": "LongHaul Energy",
+      "title": "Applications engineer — utility firming pilots",
+      "description": "Support hundred-hour depth-discharge iron-air pilots with regional utility grid firming contracts.",
+      "posted_at": "2024-04-01",
+      "openings": 3,
+      "location": {"country": "US", "region": "TX"},
+      "url": "https://longhaul.example/jobs/apps",
+      "domain": "longhaul.example",
+      "related_technologies": ["reversible iron oxidation"]
+    }
+  ]
+}

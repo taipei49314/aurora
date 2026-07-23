@@ -1,84 +1,147 @@
-# AURORA — Unknown Industry Discovery Engine
+# AURORA
 
-Local-first research system that finds **industries that may be forming but are
-not yet named or widely understood**, from dispersed signals (patents, hiring,
-capex, supply chain, standards, news, research notes). It is **not** a stock
-tool: it never outputs BUY/SELL, target prices, or return forecasts.
+**Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
 
-> Design principles (spec §2): local-first · single-user · reproducible ·
-> evidence-grounded · time-aware · auditable · **no external API/LLM at runtime**
-> · no fabricated evidence · **no future-data leakage** · no forced industry
-> conclusion.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Engine](https://img.shields.io/badge/engine-0.1.1-blue.svg)](CHANGELOG.md)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](backend/requirements.txt)
 
-## Why this is not "summarize articles with an LLM"
+AURORA looks for **industries that may be forming but are not yet named**, from
+dispersed signals (patents, hiring, capex, supply chain, standards, news, notes).
+
+It is **not** a stock tool: it never outputs BUY/SELL, target prices, or return forecasts.
+
+> **Design principles:** local-first · single-user · reproducible · evidence-grounded ·
+> time-aware · auditable · **no external API / LLM at runtime** · no fabricated evidence ·
+> **no future-data leakage** · no forced industry conclusion.
+
+## Why this is not “summarize articles with an LLM”
+
 Every classification is a **deterministic, explainable function of the data**.
-The engine forms clusters from cross-source structure, compares them to a known
-industry taxonomy, actively hunts **counter**evidence, and can be re-run at a
-historical cutoff with a hard guarantee of no future-data leakage. If evidence
-is thin it says `INSUFFICIENT_EVIDENCE`; if a cluster is loud but hollow it says
-`HYPE_CLUSTER`; if it's a rebrand it says `EXISTING_INDUSTRY_VARIANT`. Only
-genuine, structurally-complete, demand-backed clusters reach `INDUSTRY_CANDIDATE`.
+The engine clusters cross-source structure, compares to a known taxonomy, hunts
+**counter**evidence, and can re-run at a historical cutoff with a hard leakage check.
 
-## Quick start (no third-party runtime deps for the core)
+| Status | Meaning |
+|--------|---------|
+| `INDUSTRY_CANDIDATE` | Structurally complete, demand-backed, not just narrative |
+| `EXISTING_INDUSTRY_VARIANT` | Looks like a rebrand of a known industry |
+| `HYPE_CLUSTER` | Loud but hollow |
+| `INSUFFICIENT_EVIDENCE` | Not enough independent signal |
+| `REJECTED` / `DORMANT` | Counterevidence dominates |
+
+## Quick start
+
+**Requirements:** Python **3.9+** (3.11+ recommended). Core engine is **stdlib-only**.
+
 ```bash
-# core engine + demo (pure standard-library Python 3.11+)
-make demo          # generate corpus -> run discovery -> print classified hypotheses
+git clone https://github.com/taipei49314/aurora.git
+cd aurora
 
-# tests (needs pytest + hypothesis)
-make install
-make test          # 78 tests (51 unit / 14 integration / 13 e2e)
+# optional: API + tests
+python -m pip install -r backend/requirements.txt
 
-# historical backtest (early-discovery lead time, leakage check)
-make backtest
+# Windows PowerShell
+$env:PYTHONPATH = "backend"
+# Unix
+# export PYTHONPATH=backend
 
-# measured per-stage performance
-make benchmark
-
-# API + minimal UI
-make api            # FastAPI on :8000
-make frontend       # Vite dev server on :5173 (needs npm install)
+python backend/aurora/cli.py          # demo: generate corpus → classify
+python -m pytest tests/ -q            # full suite
 ```
 
-## What one `make demo` shows
+With Make (if available):
+
+```bash
+make demo
+make test
+make backtest
+make api          # FastAPI :8000
+make frontend     # Vite :5173
+```
+
+### Demo output (Northstar synthetic corpus)
+
 ```
 STATUS                       OVERALL  HYPE CONTRA   SIM  NAME
-INDUSTRY_CANDIDATE              73.8     7      5  0.00  analog-inference-compute-in-memory ...   (neuromorphic edge sensing)
-INDUSTRY_CANDIDATE              73.5     7      5  0.01  dispatchable-firming-depth-discharge ... (iron-air long-duration storage)
-INDUSTRY_CANDIDATE              72.5     7      6  0.00  biofabricated-structural-panel ...       (mycelium materials)
-EXISTING_INDUSTRY_VARIANT       57.6    19      0  0.57  assembly-drivetrain-casting              (rebranded auto components)
-EXISTING_INDUSTRY_VARIANT       56.4    19      0  0.61  fabric-redundancy-bandwidth              (rebranded data centers)
-HYPE_CLUSTER                    27.9    89      0  0.00  quantum-mining-superposition-hash        ("quantum" does NOT inflate)
-HYPE_CLUSTER                    27.6    88      0  0.00  avatar-shopping-nft-checkout             (metaverse retail)
-INSUFFICIENT_EVIDENCE           25.0    73     55  0.00  volumetric-display-free-space-optics     (single-giant pseudo-cluster)
-REJECTED                        21.7    47    100  0.00  photobioreactor-triacylglycerol          (failed algae jet fuel)
+INDUSTRY_CANDIDATE              73.8     7      5  0.00  analog-inference-compute-in-memory ...
+HYPE_CLUSTER                    27.9    89      0  0.00  quantum-mining-superposition-hash
+INSUFFICIENT_EVIDENCE           25.0    73     55  0.00  volumetric-display-free-space-optics
+```
+
+## Bring your own data (import package)
+
+AURORA does **not** crawl the web. Feed a JSON package:
+
+```json
+{ "entities": [], "sources": [], "observations": [] }
+```
+
+| Resource | Purpose |
+|----------|---------|
+| [docs/import-schema.md](docs/import-schema.md) | Field contract, dates, independence, real-source mapping |
+| [examples/real_mini_package.json](examples/real_mini_package.json) | Multi-source hand-authored sample |
+| [examples/schemas/import-package.schema.json](examples/schemas/import-package.schema.json) | JSON Schema |
+| [adapters/](adapters/) | Offline converters (USPTO-shaped, PatentsView-compatible, jobs, news, merge) |
+| [cases/](cases/) | Scorecarded demos (merge, retro cutoffs, PatentsView sample) |
+
+```bash
+# validate a package
+PYTHONPATH=backend python scripts/validate_package.py examples/real_mini_package.json --run
+
+# offline PatentsView-shaped dump → package
+python -m adapters patentsview cases/patentsview-sample/dump.json --validate --strict
+
+# temporal honesty gates (curated timeline — not real-world lead-time proof)
+PYTHONPATH=backend python scripts/run_retro_case.py cases/iron-air-retro
 ```
 
 ## Architecture
-`docs/architecture.md` (data model, pipeline stages, determinism), plus model
-docs: `scoring-model`, `hype-filter`, `clustering-model`, `leakage-prevention`,
-and ADRs in `docs/adr/`.
 
 ```
-Research Snapshot -> Feature Construction -> Similarity Graph + Feature Clustering
--> Stability -> Taxonomy Comparison -> Naming Gap -> Value Chain -> Bottleneck
--> Evidence + Counterevidence -> Transparent Scoring -> Classification -> Research Run
+Snapshot → Features → Clustering → Taxonomy → Naming gap
+        → Value chain → Bottleneck → Hype + counterevidence
+        → Transparent scoring → Classification → Research run
 ```
 
-## Honesty
-See **`docs/self-audit.md`** for a per-requirement PASS/PARTIAL/NOT_IMPLEMENTED
-scorecard. This is a single-session vertical slice: the discovery engine, data
-foundation, historical validation, API and a minimal UI are done and verified;
-Docker-verified deploy, Alembic migrations, and API import-upload/export are
-tracked as PARTIAL.
+Docs: [architecture](docs/architecture.md) · [scoring](docs/scoring-model.md) ·
+[hype filter](docs/hype-filter.md) · [leakage](docs/leakage-prevention.md) ·
+[import schema](docs/import-schema.md) · [self-audit](docs/self-audit.md) ·
+[evolution loop](docs/evolution-loop.md)
+
+## Honesty (read before starring)
+
+- **Not investment advice.** No trading outputs.
+- **Northstar demo metrics** are on a **synthetic** corpus with ground truth.
+- **Retro case** (`cases/iron-air-retro`) tests **engine time behavior** on curated data —
+  it does **not** claim real-world early discovery of iron-air storage.
+- **PatentsView sample dump** is a **format-compatible fixture** by default; replace
+  `dump.json` with a real export without code changes.
+- See [docs/self-audit.md](docs/self-audit.md) for PASS / PARTIAL items (e.g. Docker not verified on all machines).
 
 ## Layout
+
 ```
 backend/aurora/   discovery engine (pure stdlib) + CLI
 backend/api.py    FastAPI layer
-datasets/         Northstar corpus generator + industry taxonomy
-frontend/         Vite + React + TS (8 pages: Dashboard, Hypothesis Explorer,
-                  Discovery Map, Timeline, Bottleneck Lab, Backtest Lab, Data Explorer, Run Comparison)
-tests/            pytest suite (unit / integration / e2e / property / quality)
-docs/             architecture, model docs, ADRs, self-audit
-benchmarks/ scripts/
+adapters/         offline source converters
+cases/            release demos + scorecards
+datasets/         Northstar generator + taxonomy
+docs/             architecture, models, import-schema, release notes
+examples/         import packages + JSON Schema
+frontend/         Vite + React + TS (8 pages)
+scripts/          validate / retro / scorecard helpers
+tests/            pytest (unit / integration / e2e)
 ```
+
+## Version
+
+- Engine: **0.1.1** — see [CHANGELOG.md](CHANGELOG.md)
+- License: **MIT** — see [LICENSE](LICENSE)
+- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Security: [SECURITY.md](SECURITY.md)
+- Release checklist: [docs/RELEASE.md](docs/RELEASE.md)
+
+## Citation
+
+If AURORA helps your research, please cite the repository URL and version tag
+(e.g. `v0.1.1`). A formal paper is not required for use.

@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aurora-discovery"
+version = "0.1.1"
+description = "Local-first unknown-industry discovery engine (deterministic, no LLM at runtime)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "taipei49314" }]
+keywords = [
+  "research",
+  "discovery",
+  "reproducible",
+  "local-first",
+  "deterministic",
+  "epistemic",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+# Core engine is stdlib-only; optional extras install API/test deps.
+dependencies = []
+
+[project.optional-dependencies]
+api = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "pydantic>=2.6",
+  "sqlalchemy>=2.0",
+]
+test = [
+  "pytest>=8.0",
+  "hypothesis>=6.100",
+  "httpx>=0.27",
+  "fastapi>=0.110",
+  "pydantic>=2.6",
+  "sqlalchemy>=2.0",
+]
+dev = [
+  "aurora-discovery[api,test]",
+]
+
+[project.urls]
+Homepage = "https://github.com/taipei49314/aurora"
+Repository = "https://github.com/taipei49314/aurora"
+Issues = "https://github.com/taipei49314/aurora/issues"
+Changelog = "https://github.com/taipei49314/aurora/blob/master/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["aurora*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend", "."]
