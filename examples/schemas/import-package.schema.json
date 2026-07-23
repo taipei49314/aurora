@@ -104,6 +104,10 @@
           "type": "string",
           "description": "Patent/document family id; when set, independence_group defaults to family:<id> if empty"
         },
+        "event_id": {
+          "type": "string",
+          "description": "Real-world event key; sources sharing event_id are not independent (0.1.11+)"
+        },
         "metadata": { "type": "object" }
       }
     },
@@ -120,6 +124,10 @@
         },
         "observed_at": {
           "type": ["string", "null"]
+        },
+        "event_id": {
+          "type": "string",
+          "description": "Real-world event key; inherits from source when empty"
         },
         "text_excerpt": { "type": "string" },
         "confidence": {

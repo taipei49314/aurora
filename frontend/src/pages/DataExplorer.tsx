@@ -57,6 +57,9 @@ function cellValue(tab: Tab, col: string, row: any): ReactNode {
   if (tab === "sources" && (col === "event_date" || col === "published_at")) {
     return String(row[col] || (col === "event_date" ? row.metadata?.event_date : "") || "—");
   }
+  if (col === "event_id") {
+    return String(row.event_id || row.metadata?.event_id || "—");
+  }
   const v = row[col];
   if (v == null || v === "") return "—";
   if (typeof v === "object") return JSON.stringify(v);
@@ -116,8 +119,8 @@ export function DataExplorer() {
     tab === "entities"
       ? ["entity_type", "canonical_name", "country", "external_ids", "entity_id"]
       : tab === "observations"
-        ? ["observation_type", "subject_entity", "observed_at", "confidence", "observation_id"]
-        : ["source_type", "publisher", "reliability_tier", "event_date", "published_at", "family_id", "independence_group", "source_id"];
+        ? ["observation_type", "subject_entity", "observed_at", "event_id", "confidence", "observation_id"]
+        : ["source_type", "publisher", "reliability_tier", "event_date", "published_at", "event_id", "family_id", "independence_group", "source_id"];
 
   // entities / sources / observations use server-side filters when possible
   const filtered = useMemo(() => {

@@ -183,7 +183,6 @@ def convert_jobs(raw: dict) -> Package:
             "document_id": ref,
             "extractor_id": ADAPTER_ID,
             "extractor_version": ADAPTER_VERSION,
-            "event_id": f"evt_hire_{job_id}",
         }
         if posted:
             obs_meta["valid_from"] = posted
@@ -197,6 +196,7 @@ def convert_jobs(raw: dict) -> Package:
             "observation_type": "HIRING_ACTIVITY",
             "subject": company,
             "object": obj,
+            "event_id": f"evt_hire_{job_id}",
             "observed_at": posted,
             "text_excerpt": (desc or title)[:400],
             "confidence": float(row.get("confidence") or 0.8),
@@ -216,6 +216,7 @@ def convert_jobs(raw: dict) -> Package:
                 "observed_at": posted,
                 "text_excerpt": f"Hiring for skills related to {tech}: {title}",
                 "confidence": 0.55,
+                "event_id": f"evt_hire_{job_id}",
                 "metadata": dict(obs_meta),
             })
 

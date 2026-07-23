@@ -95,6 +95,7 @@ def stats():
     source_type_counts: dict = {}
     with_family = 0
     with_event = 0
+    with_event_id = 0
     for src in s.sources:
         t = (src.reliability_tier or "C").upper()
         tier_counts[t] = tier_counts.get(t, 0) + 1
@@ -104,9 +105,17 @@ def stats():
             with_family += 1
         if getattr(src, "event_date", None) or (src.metadata or {}).get("event_date"):
             with_event += 1
+        if getattr(src, "event_id", None) or (src.metadata or {}).get("event_id"):
+            with_event_id += 1
     type_counts: dict = {}
+    obs_with_event_id = 0
+    unique_event_ids: set = set()
     for o in s.observations:
         type_counts[o.observation_type] = type_counts.get(o.observation_type, 0) + 1
+        eid = getattr(o, "event_id", None) or (o.metadata or {}).get("event_id")
+        if eid:
+            obs_with_event_id += 1
+            unique_event_ids.add(str(eid))
     with_ext = sum(1 for e in s.entities if e.external_ids)
     ext_systems: dict = {}
     for e in s.entities:
@@ -121,6 +130,9 @@ def stats():
         "sources_total": len(s.sources),
         "sources_with_family_id": with_family,
         "sources_with_event_date": with_event,
+        "sources_with_event_id": with_event_id,
+        "observations_with_event_id": obs_with_event_id,
+        "unique_event_ids": len(unique_event_ids),
         "reliability_tier_counts": tier_counts,
         "source_type_counts": source_type_counts,
         "observation_type_counts": type_counts,
@@ -294,11 +306,15 @@ def export_package():
         event_date = getattr(src, "event_date", None) or meta.pop("event_date", None) or None
         if event_date:
             meta.pop("event_date", None)
+        event_id = getattr(src, "event_id", "") or meta.pop("event_id", "") or ""
+        if event_id:
+            meta.pop("event_id", None)
         sources.append({
             "ref": src.source_id, "source_type": src.source_type,
             "publisher": src.publisher, "title": src.title,
             "published_at": src.published_at,
             "event_date": event_date,
+            "event_id": event_id,
             "url_or_local_path": src.url_or_local_path,
             "independence_group": src.independence_group,
             "reliability_tier": src.reliability_tier,
@@ -310,13 +326,16 @@ def export_package():
     for o in s.observations:
         meta = {k: v for k, v in o.metadata.items()
                 if k not in ("source_type", "independence_group")}
+        event_id = getattr(o, "event_id", "") or meta.pop("event_id", "") or ""
+        if event_id:
+            meta.pop("event_id", None)
         observations.append({
             "source_ref": o.source_id, "observation_type": o.observation_type,
             "subject": name_by_id.get(o.subject_entity, o.subject_entity),
             "object": name_by_id.get(o.object_entity, "") if o.object_entity else "",
             "observed_at": o.observed_at, "numeric_value": o.numeric_value,
             "unit": o.unit, "text_excerpt": o.text_excerpt,
-            "confidence": o.confidence, "metadata": meta,
+            "confidence": o.confidence, "event_id": event_id, "metadata": meta,
         })
     return {"entities": entities, "sources": sources, "observations": observations}
 

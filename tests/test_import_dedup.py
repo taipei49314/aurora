@@ -50,12 +50,32 @@ def test_exact_duplicate_sources_collapse():
 
 def test_declared_independence_group_merges():
     class S:
-        def __init__(self, sid, chash, grp, title):
+        def __init__(self, sid, chash, grp, title, event_id=""):
             self.source_id, self.content_hash, self.independence_group = sid, chash, grp
             self.title, self.metadata = title, {}
+            self.event_id = event_id
     srcs = [S("s1", "h1", "wire", "a"), S("s2", "h2", "wire", "b"), S("s3", "h3", "", "c")]
     res = resolve_independence(srcs)
     assert res["independent_source_count"] == 2  # wire group collapses s1,s2
+
+
+def test_shared_event_id_merges_independence():
+    """Sources with the same event_id collapse even when independence_group differs."""
+    class S:
+        def __init__(self, sid, chash, grp, title, event_id=""):
+            self.source_id, self.content_hash, self.independence_group = sid, chash, grp
+            self.title, self.metadata = title, {}
+            self.event_id = event_id
+    # Distinct multi-token titles so near-dup LSH does not merge unrelated events
+    srcs = [
+        S("s1", "h1", "wire:a", "ferrogrid signs purechitin supply deal", event_id="evt_supply"),
+        S("s2", "h2", "wire:b", "regional daily covers powder feedstock pact", event_id="evt_supply"),
+        S("s3", "h3", "wire:c", "longhaul pilots hundred hour iron air modules", event_id="evt_other"),
+    ]
+    res = resolve_independence(srcs)
+    assert res["independent_source_count"] == 2
+    assert res["resolved_group"]["s1"] == res["resolved_group"]["s2"]
+    assert res["resolved_group"]["s3"] != res["resolved_group"]["s1"]
 
 
 def test_near_duplicate_detection():

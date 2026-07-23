@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.11] — 2026-07-24
+
+### Added
+
+- First-class **`event_id`** on `Source` and `Observation` (metadata fallback; obs inherits source)
+- Dedup layer 2b: sources sharing `event_id` are not independent
+- Empty independence_group may derive `event:<id>` (after wire/domain/family)
+- Stats: `sources_with_event_id`, `observations_with_event_id`, `unique_event_ids`
+- Data Explorer `event_id` column; Dashboard event coverage card
+- USPTO / news / jobs / filings adapters emit top-level `event_id`
+
+### Changed
+
+- Engine / feature → **0.1.11**
+- Import-schema event-level dedup gap marked done
+
 ## [0.1.10] — 2026-07-24
 
 ### Added

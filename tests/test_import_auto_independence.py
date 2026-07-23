@@ -204,3 +204,52 @@ def test_metadata_event_date_promoted_and_observed_at_fallback():
     assert "event_date" not in (src.metadata or {})
     assert len(snap.observations) == 1
     assert snap.observations[0].observed_at == "2020-06-01"
+
+
+@pytest.mark.unit
+def test_event_id_first_class_and_source_independence():
+    """Engine 0.1.11+: event_id on sources collapses independence; obs inherits."""
+    pkg = _pkg([
+        {
+            "ref": "a",
+            "source_type": "NEWS",
+            "publisher": "Wire A",
+            "title": "Supply deal",
+            "excerpt": "body a",
+            "published_at": "2024-01-01",
+            "event_id": "evt_supply_2024",
+        },
+        {
+            "ref": "b",
+            "source_type": "NEWS",
+            "publisher": "Wire B",
+            "title": "Different headline same deal",
+            "excerpt": "body b different",
+            "published_at": "2024-01-02",
+            "event_id": "evt_supply_2024",
+        },
+    ], [
+        {
+            "source_ref": "a",
+            "observation_type": "SUPPLIER_RELATIONSHIP",
+            "subject": "Acme",
+            "observed_at": "2024-01-01",
+            "text_excerpt": "deal a",
+            # no event_id → inherit from source
+        },
+        {
+            "source_ref": "b",
+            "observation_type": "SUPPLIER_RELATIONSHIP",
+            "subject": "Acme",
+            "observed_at": "2024-01-02",
+            "text_excerpt": "deal b",
+            "event_id": "evt_supply_2024",
+        },
+    ])
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    assert all(s.event_id == "evt_supply_2024" for s in snap.sources)
+    # empty independence_group derives event:… OR dedup layer 2b merges
+    assert snap.counts["independent_source_count"] == 1
+    assert snap.counts["raw_source_count"] == 2
+    assert all(o.event_id == "evt_supply_2024" for o in snap.observations)
