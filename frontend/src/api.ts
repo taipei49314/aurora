@@ -52,8 +52,12 @@ export interface CorpusStats {
   counts: Record<string, number>;
   entities_total: number;
   entities_with_external_ids: number;
+  sources_total?: number;
+  sources_with_family_id?: number;
   reliability_tier_counts: Record<string, number>;
   observation_type_counts: Record<string, number>;
+  source_type_counts?: Record<string, number>;
+  external_id_systems?: Record<string, number>;
 }
 
 export const getStats = () => j<CorpusStats>(`/api/stats`);
@@ -67,9 +71,14 @@ export const getObservations = (opts?: { observation_type?: string; q?: string }
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/observations?${params.toString()}`);
 };
-export const getSources = (opts?: { reliability_tier?: string; q?: string }) => {
+export const getSources = (opts?: {
+  reliability_tier?: string;
+  source_type?: string;
+  q?: string;
+}) => {
   const params = new URLSearchParams({ limit: "500" });
   if (opts?.reliability_tier) params.set("reliability_tier", opts.reliability_tier);
+  if (opts?.source_type) params.set("source_type", opts.source_type);
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/sources?${params.toString()}`);
 };

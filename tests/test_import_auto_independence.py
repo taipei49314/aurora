@@ -86,3 +86,68 @@ def test_outlet_domain_derives_domain_group():
     }])
     snap = import_package(pkg)
     assert snap.sources[0].independence_group == "domain:gridtech.example"
+
+
+@pytest.mark.unit
+def test_top_level_family_id_is_first_class():
+    """Engine 0.1.8+: family_id on the source row is first-class, not only metadata."""
+    pkg = _pkg([
+        {
+            "ref": "p1",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "Iron-air cell A",
+            "excerpt": "abstract a",
+            "published_at": "2020-01-01",
+            "family_id": "fam-iron-1",
+        },
+        {
+            "ref": "p2",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "Iron-air cell B",
+            "excerpt": "abstract b",
+            "published_at": "2021-01-01",
+            "family_id": "fam-iron-1",
+        },
+    ], [
+        {
+            "source_ref": "p1",
+            "observation_type": "PATENT_ACTIVITY",
+            "subject": "Acme",
+            "observed_at": "2020-01-01",
+            "text_excerpt": "a",
+        },
+        {
+            "source_ref": "p2",
+            "observation_type": "PATENT_ACTIVITY",
+            "subject": "Acme",
+            "observed_at": "2021-01-01",
+            "text_excerpt": "b",
+        },
+    ])
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    assert all(s.family_id == "fam-iron-1" for s in snap.sources)
+    assert {s.independence_group for s in snap.sources} == {"family:fam-iron-1"}
+    assert snap.counts["independent_source_count"] == 1
+    assert snap.counts["raw_source_count"] == 2
+    # promoted out of metadata when only top-level was provided
+    assert all("family_id" not in (s.metadata or {}) for s in snap.sources)
+
+
+@pytest.mark.unit
+def test_metadata_family_id_promoted_to_field():
+    pkg = _pkg([{
+        "ref": "a",
+        "source_type": "PATENT",
+        "publisher": "USPTO",
+        "title": "T",
+        "excerpt": "E",
+        "metadata": {"family_id": "fam-meta-9"},
+    }])
+    snap = import_package(pkg)
+    src = snap.sources[0]
+    assert src.family_id == "fam-meta-9"
+    assert src.independence_group == "family:fam-meta-9"
+    assert "family_id" not in (src.metadata or {})

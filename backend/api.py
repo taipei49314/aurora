@@ -92,9 +92,15 @@ def stats():
     """Snapshot corpus stats for dashboards (external_ids coverage, tier mix)."""
     s = REPO.snapshot
     tier_counts: dict = {}
+    source_type_counts: dict = {}
+    with_family = 0
     for src in s.sources:
         t = (src.reliability_tier or "C").upper()
         tier_counts[t] = tier_counts.get(t, 0) + 1
+        st = src.source_type or "?"
+        source_type_counts[st] = source_type_counts.get(st, 0) + 1
+        if getattr(src, "family_id", None) or (src.metadata or {}).get("family_id"):
+            with_family += 1
     type_counts: dict = {}
     for o in s.observations:
         type_counts[o.observation_type] = type_counts.get(o.observation_type, 0) + 1
@@ -109,7 +115,10 @@ def stats():
         "counts": dict(s.counts or {}),
         "entities_with_external_ids": with_ext,
         "entities_total": len(s.entities),
+        "sources_total": len(s.sources),
+        "sources_with_family_id": with_family,
         "reliability_tier_counts": tier_counts,
+        "source_type_counts": source_type_counts,
         "observation_type_counts": type_counts,
         "external_id_systems": ext_systems,
         "engine": DEFAULT_CONFIG.engine_version,
@@ -169,11 +178,13 @@ def entity(entity_id: str):
 def sources(
     limit: int = 200,
     reliability_tier: Optional[str] = None,
+    source_type: Optional[str] = None,
     q: Optional[str] = None,
 ):
     """List sources. Optional filters:
 
     - ``reliability_tier``: single letter or comma list (``A``, ``B,C``)
+    - ``source_type``: e.g. ``PATENT``, ``NEWS`` (comma list ok)
     - ``q``: case-insensitive substring over the serialized row
     """
     rows = [to_dict(s) for s in REPO.snapshot.sources]
@@ -189,6 +200,12 @@ def sources(
         rows = [
             r for r in rows
             if str(r.get("reliability_tier") or "C").upper() in tiers
+        ]
+    if source_type:
+        types = {t.strip().upper() for t in source_type.split(",") if t.strip()}
+        rows = [
+            r for r in rows
+            if str(r.get("source_type") or "").upper() in types
         ]
     if q:
         needle = q.strip().lower()
@@ -267,6 +284,9 @@ def export_package():
     for src in s.sources:
         meta = dict(src.metadata)
         excerpt = meta.pop("excerpt", "")
+        family_id = getattr(src, "family_id", "") or meta.pop("family_id", "") or ""
+        if family_id:
+            meta.pop("family_id", None)
         sources.append({
             "ref": src.source_id, "source_type": src.source_type,
             "publisher": src.publisher, "title": src.title,
@@ -274,7 +294,9 @@ def export_package():
             "url_or_local_path": src.url_or_local_path,
             "independence_group": src.independence_group,
             "reliability_tier": src.reliability_tier,
-            "language": src.language, "excerpt": excerpt, "metadata": meta,
+            "language": src.language,
+            "family_id": family_id,
+            "excerpt": excerpt, "metadata": meta,
         })
     observations = []
     for o in s.observations:
