@@ -185,6 +185,59 @@ def test_documents_endpoint_lists(client):
     assert isinstance(r.json(), list)
 
 
+def test_documents_include_stubs_from_observation_document_ids(client):
+    """0.1.18+: stubs for observation.document_id when no full documents[] row."""
+    # Import a package with document_id on observations but no documents[]
+    pkg = {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
+        "sources": [{
+            "ref": "s1",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "Cell",
+            "excerpt": "abstract body",
+        }],
+        "observations": [{
+            "source_ref": "s1",
+            "observation_type": "PATENT_ACTIVITY",
+            "subject": "Acme",
+            "observed_at": "2020-01-01",
+            "text_excerpt": "abstract",
+            "document_id": "doc-stub-1",
+            "char_span": [0, 8],
+        }],
+    }
+    up = client.post(
+        "/api/imports",
+        files={"file": ("pkg.json", json.dumps(pkg).encode("utf-8"), "application/json")},
+    )
+    assert up.status_code == 200, up.text
+    docs = client.get("/api/documents?include_stubs=true").json()
+    assert any(d.get("document_id") == "doc-stub-1" for d in docs)
+    stub = next(d for d in docs if d.get("document_id") == "doc-stub-1")
+    assert stub.get("stub") is True
+    assert stub.get("observation_count", 0) >= 1
+    one = client.get("/api/documents/doc-stub-1").json()
+    assert one["document_id"] == "doc-stub-1"
+    linked = client.get("/api/observations?document_id=doc-stub-1").json()
+    assert linked
+    assert all(
+        (o.get("document_id") or (o.get("metadata") or {}).get("document_id")) == "doc-stub-1"
+        for o in linked
+    )
+    # without stubs, empty for this package (no full documents[])
+    only_full = client.get("/api/documents?include_stubs=false").json()
+    assert not any(d.get("document_id") == "doc-stub-1" for d in only_full)
+
+
+def test_stats_document_ids_referenced(client):
+    r = client.get("/api/stats")
+    assert r.status_code == 200
+    body = r.json()
+    assert "document_ids_referenced" in body
+    assert isinstance(body["document_ids_referenced"], int)
+
+
 def test_import_upload_rejects_non_json(client):
     r = client.post("/api/imports", files={"file": ("x.bin", b"\xff\xfe not json", "application/octet-stream")})
     assert r.status_code == 400

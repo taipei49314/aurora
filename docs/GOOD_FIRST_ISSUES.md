@@ -69,8 +69,13 @@ Data Explorer observation detail loads document text and highlights `char_span`.
 OpenAlex adapter emits PERSON from authorships (orcid/openalex_author ids);
 `GET /api/entities?entity_type=`; Data Explorer entity_type chips from stats.
 
+## 15. Documents tab in Data Explorer — **done (v0.1.18)**
+
+Documents tab with stubs from observation.document_id; linked observations via
+`?document_id=`; stats `document_ids_referenced`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Documents tab in Data Explorer
+- Auto-build documents[] from adapter source excerpts
