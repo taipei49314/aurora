@@ -1,5 +1,5 @@
 {
-  "_comment": "Multi-adapter iron-air demo with shared LEI/domain external_ids. Built by scripts/build_multisource_case.py from offline fixtures.",
+  "_comment": "Multi-adapter iron-air demo: patentsview + jobs + news + filings + openalex. Shared LEI/domain external_ids. Built by scripts/build_multisource_case.py.",
   "entities": [
     {
       "entity_type": "MATERIAL",
@@ -127,6 +127,23 @@
       }
     },
     {
+      "entity_type": "UNIVERSITY",
+      "canonical_name": "European Electrochemistry Institute",
+      "aliases": [],
+      "description": "",
+      "country": "DE",
+      "external_ids": [
+        {
+          "system": "openalex_org",
+          "id": "I9002"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
       "entity_type": "COMPANY",
       "canonical_name": "OxaCell Systems",
       "aliases": [],
@@ -155,6 +172,35 @@
       }
     },
     {
+      "entity_type": "RESEARCH_INSTITUTE",
+      "canonical_name": "Grid Storage Research Lab",
+      "aliases": [],
+      "description": "",
+      "country": "US",
+      "external_ids": [
+        {
+          "system": "openalex_org",
+          "id": "I9001"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "FACILITY",
+      "canonical_name": "FerroGrid Arizona pilot plant",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [],
+      "metadata": {
+        "extractor_id": "filings-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
       "entity_type": "COMPONENT",
       "canonical_name": "porous iron electrode",
       "aliases": [],
@@ -168,6 +214,32 @@
     }
   ],
   "sources": [
+    {
+      "ref": "src_0a4f27f43f5db3f1",
+      "source_type": "COMPANY_FILING",
+      "publisher": "FerroGrid Power",
+      "title": "[8-K] Capacity expansion detail for multi-day firming modules",
+      "published_at": "2024-06-20",
+      "url_or_local_path": "local://filings/fg-8k-2024-0620-cap",
+      "independence_group": "domain:ferrogrid.example",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "Pilot plant capacity expansion for multi-day grid firming modules; utility interest cited.",
+      "metadata": {
+        "extractor_id": "filings-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "filing_id",
+            "id": "fg-8k-2024-0620-cap"
+          }
+        ],
+        "form": "8-K",
+        "outlet_domain": "ferrogrid.example",
+        "currency": "pct",
+        "amount_original": 40
+      }
+    },
     {
       "ref": "src_33428391eeb853f0",
       "source_type": "PATENT",
@@ -232,6 +304,59 @@
       }
     },
     {
+      "ref": "src_3d77db16270421f0",
+      "source_type": "PAPER",
+      "publisher": "Journal of Power Sources Concepts",
+      "title": "Oxygen electrode stacks for long-duration iron-air cells",
+      "published_at": "2021-03-12",
+      "url_or_local_path": "https://doi.org/10.1234/oa.ironair.2021",
+      "independence_group": "doi:10.1234/oa.ironair.2021",
+      "reliability_tier": "B",
+      "language": "en",
+      "excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0",
+        "source_format": "openalex-works-v1",
+        "external_ids": [
+          {
+            "system": "openalex_work",
+            "id": "W9000000002"
+          },
+          {
+            "system": "doi",
+            "id": "10.1234/oa.ironair.2021"
+          }
+        ]
+      }
+    },
+    {
+      "ref": "src_4ec11f2210944dbb",
+      "source_type": "COMPANY_FILING",
+      "publisher": "FerroGrid Power",
+      "title": "[8-K] Material event: Arizona pilot plant capacity expansion",
+      "published_at": "2024-06-20",
+      "url_or_local_path": "local://filings/ferrogrid-2024-06-20.html",
+      "independence_group": "domain:ferrogrid.example",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.",
+      "metadata": {
+        "extractor_id": "filings-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "filing_id",
+            "id": "fg-8k-2024-0620"
+          }
+        ],
+        "form": "8-K",
+        "outlet_domain": "ferrogrid.example",
+        "currency": "USD",
+        "amount_original": 120000000
+      }
+    },
+    {
       "ref": "src_793b0dc5a70aa830",
       "source_type": "NEWS",
       "publisher": "Example Reuter Wire",
@@ -254,6 +379,30 @@
         "outlet_domain": "news.example",
         "wire_id": "example-reuter",
         "event_id": "evt_ferro_purechitin_supply_2024"
+      }
+    },
+    {
+      "ref": "src_9c8a918c2d11d0cc",
+      "source_type": "COMPANY_FILING",
+      "publisher": "OxaCell Systems",
+      "title": "[annual] Strategic investment in oxygen electrode manufacturing line",
+      "published_at": "2023-11-01",
+      "url_or_local_path": "local://filings/oxa-annual-2023",
+      "independence_group": "domain:oxacell.example",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "OxaCell Systems announced strategic investment to expand oxygen electrode manufacturing for multi-day iron-air customers.",
+      "metadata": {
+        "extractor_id": "filings-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "filing_id",
+            "id": "oxa-annual-2023"
+          }
+        ],
+        "form": "annual",
+        "outlet_domain": "oxacell.example"
       }
     },
     {
@@ -328,6 +477,33 @@
         "source_format": "patentsview-compatible-v1",
         "inventors": [
           "A. Researcher"
+        ]
+      }
+    },
+    {
+      "ref": "src_c0479d0f02b942aa",
+      "source_type": "PAPER",
+      "publisher": "Energy Storage Materials Letters",
+      "title": "Reversible iron oxidation pathways for multi-day storage",
+      "published_at": "2019-06-01",
+      "url_or_local_path": "https://doi.org/10.1234/esml.ironair.2019",
+      "independence_group": "doi:10.1234/esml.ironair.2019",
+      "reliability_tier": "B",
+      "language": "en",
+      "excerpt": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.0",
+        "source_format": "openalex-works-v1",
+        "external_ids": [
+          {
+            "system": "openalex_work",
+            "id": "W9000000001"
+          },
+          {
+            "system": "doi",
+            "id": "10.1234/esml.ironair.2019"
+          }
         ]
       }
     },
@@ -518,6 +694,23 @@
           "region": "BY"
         },
         "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_9c8a918c2d11d0cc",
+      "observation_type": "STRATEGIC_INVESTMENT",
+      "subject": "OxaCell Systems",
+      "object": "",
+      "observed_at": "2023-11-01",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "OxaCell Systems announced strategic investment to expand oxygen electrode manufacturing for multi-day iron-air customers.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "filing-oxa-annual-2023",
+        "extractor_id": "filings-offline",
+        "event_id": "evt_oxa-annual-2023",
+        "reliability_tier": "A"
       }
     },
     {
@@ -718,6 +911,41 @@
       }
     },
     {
+      "source_ref": "src_c0479d0f02b942aa",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "Grid Storage Research Lab",
+      "object": "",
+      "observed_at": "2019-06-01",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "oa-w9000000001",
+        "extractor_id": "openalex-offline",
+        "work_id": "W9000000001",
+        "doi": "10.1234/esml.ironair.2019",
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_4ec11f2210944dbb",
+      "observation_type": "CAPEX_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "FerroGrid Arizona pilot plant",
+      "observed_at": "2024-06-20",
+      "numeric_value": 120000000.0,
+      "unit": "USD",
+      "text_excerpt": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "filing-fg-8k-2024-0620",
+        "extractor_id": "filings-offline",
+        "event_id": "evt_fg-8k-2024-0620",
+        "reliability_tier": "A"
+      }
+    },
+    {
       "source_ref": "src_bf2873a2fbf1bd9e",
       "observation_type": "TECHNICAL_DEPENDENCY",
       "subject": "LongHaul Energy",
@@ -759,6 +987,41 @@
           "country": "DE",
           "region": "BY"
         },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_0a4f27f43f5db3f1",
+      "observation_type": "CAPACITY_EXPANSION",
+      "subject": "FerroGrid Power",
+      "object": "grid firming",
+      "observed_at": "2024-06-20",
+      "numeric_value": 40.0,
+      "unit": "pct",
+      "text_excerpt": "Pilot plant capacity expansion for multi-day grid firming modules; utility interest cited.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "filing-fg-8k-2024-0620-cap",
+        "extractor_id": "filings-offline",
+        "event_id": "evt_fg-8k-2024-0620-cap",
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_3d77db16270421f0",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "European Electrochemistry Institute",
+      "object": "",
+      "observed_at": "2021-03-12",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "oa-w9000000002",
+        "extractor_id": "openalex-offline",
+        "work_id": "W9000000002",
+        "doi": "10.1234/oa.ironair.2021",
         "reliability_tier": "B"
       }
     },
@@ -967,6 +1230,24 @@
           "H01M4/02"
         ],
         "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_3d77db16270421f0",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "Grid Storage Research Lab",
+      "object": "",
+      "observed_at": "2021-03-12",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "oa-w9000000002",
+        "extractor_id": "openalex-offline",
+        "work_id": "W9000000002",
+        "doi": "10.1234/oa.ironair.2021",
+        "reliability_tier": "B"
       }
     },
     {
