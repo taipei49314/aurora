@@ -86,8 +86,13 @@ When `char_span` is missing but `document_id` + `text_excerpt` and document
 text are present, locate the excerpt (exact → casefold → whitespace-flexible)
 and set `[start, end]` with `metadata.char_span_auto`. Engine import + adapters.
 
+## 18. Data Explorer auto-span badge + filters — **done (v0.1.21)**
+
+Yellow **auto** badge on char_span column and observation detail; filter chips
+All / with span / auto / no span. API: `?has_char_span=` and `?char_span_auto=`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: Data Explorer badge for auto-aligned spans
+- Optional: lint_package check for document_id without documents[] row

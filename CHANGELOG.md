@@ -6,6 +6,18 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.21] — 2026-07-24
+
+### Added
+
+- Data Explorer **auto** badge on char_span (table + observation detail + document highlight)
+- Observation **char_span** filter chips: All / with span / auto / no span
+- `GET /api/observations?has_char_span=` and `?char_span_auto=` filters
+
+### Changed
+
+- Engine / feature → **0.1.21**
+
 ## [0.1.20] — 2026-07-24
 
 ### Added
