@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.hypothesis/
+node_modules/
+frontend/dist/
+backend/aurora.db
+aurora.db

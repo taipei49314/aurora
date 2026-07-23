@@ -1,0 +1,23 @@
+# --- runtime (API layer) ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+
+# --- persistence (optional store; core runs without it) ---
+sqlalchemy>=2.0        # SQLite persistence layer (aurora.store_sql)
+
+# --- tests ---
+pytest>=8.0
+hypothesis>=6.100
+httpx>=0.27            # FastAPI TestClient
+
+# --- OPTIONAL production accelerators (NOT required at runtime) ---
+# The core discovery engine is pure standard-library Python for determinism and
+# offline operation. These are optional swap-ins documented in the ADRs and are
+# intentionally left commented so the base install stays light and works on
+# restricted networks.
+# scikit-learn>=1.4    # alternative clustering / TF-IDF
+# networkx>=3.2        # alternative graph community detection
+# scipy>=1.12
+# polars>=0.20
+# alembic>=1.13        # migrations for the SQLite store

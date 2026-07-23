@@ -1,0 +1,347 @@
+"""AURORA HTTP API (spec §26).
+
+FastAPI layer over the discovery engine. State is held in an in-memory
+repository seeded from the Northstar corpus at startup; runs are immutable once
+created. Side-effecting operations use POST; errors use the structured error
+model with proper status codes (never a bare 500).
+
+Run:  uvicorn api:app --app-dir backend --reload
+"""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "datasets" / "northstar"))
+
+from typing import Optional
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from aurora import import_package, Taxonomy, run_pipeline, DEFAULT_CONFIG
+from aurora.models import to_dict
+from aurora.errors import AuroraError
+from aurora.backtest import run_backtest
+from aurora import divergence
+import generate
+
+app = FastAPI(title="AURORA", version="0.1.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+TAXONOMY_PATH = ROOT / "datasets" / "taxonomy" / "taxonomy.json"
+
+
+class _Repo:
+    def __init__(self):
+        pkg, _gt = generate.generate()
+        self.snapshot = import_package(pkg)
+        self.taxonomy = Taxonomy.load(TAXONOMY_PATH)
+        self.runs: dict[str, object] = {}
+        self.backtests: dict[str, dict] = {}
+        # seed one full run
+        self.create_run(None)
+
+    def create_run(self, cutoff):
+        run = run_pipeline(self.snapshot, self.taxonomy, DEFAULT_CONFIG, cutoff_date=cutoff)
+        self.runs[run.run_id] = run
+        return run
+
+    def hyp(self, run_id, hyp_id):
+        run = self.runs.get(run_id)
+        if not run:
+            for r in self.runs.values():
+                for h in r.hypotheses:
+                    if h.hypothesis_id == hyp_id:
+                        return h
+            return None
+        for h in run.hypotheses:
+            if h.hypothesis_id == hyp_id:
+                return h
+        return None
+
+    def find_hyp(self, hyp_id):
+        for r in self.runs.values():
+            for h in r.hypotheses:
+                if h.hypothesis_id == hyp_id:
+                    return h
+        return None
+
+
+REPO = _Repo()
+
+
+@app.exception_handler(AuroraError)
+async def aurora_error_handler(_request, exc: AuroraError):
+    from fastapi.responses import JSONResponse
+    status = 422 if exc.error_code in {"INVALID_CUTOFF_DATE", "SCHEMA_VALIDATION_FAILED"} else 400
+    return JSONResponse(status_code=status, content=exc.to_dict())
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "engine": DEFAULT_CONFIG.engine_version,
+            "snapshot": REPO.snapshot.snapshot_id, "runs": len(REPO.runs)}
+
+
+@app.get("/api/entities")
+def entities(limit: int = 200):
+    return [to_dict(e) for e in REPO.snapshot.entities[:limit]]
+
+
+@app.get("/api/entities/{entity_id}")
+def entity(entity_id: str):
+    for e in REPO.snapshot.entities:
+        if e.entity_id == entity_id:
+            return to_dict(e)
+    raise HTTPException(404, "entity not found")
+
+
+@app.get("/api/sources")
+def sources(limit: int = 200):
+    return [to_dict(s) for s in REPO.snapshot.sources[:limit]]
+
+
+@app.get("/api/observations")
+def observations(limit: int = 500):
+    return [to_dict(o) for o in REPO.snapshot.observations[:limit]]
+
+
+@app.get("/api/snapshots")
+def snapshots():
+    s = REPO.snapshot
+    return [{"snapshot_id": s.snapshot_id, "created_at": s.created_at, "counts": s.counts}]
+
+
+@app.post("/api/imports")
+async def import_upload(file: UploadFile = File(...)):
+    """Upload a JSON package {entities, sources, observations}; it becomes the
+    current snapshot. Existing runs are immutable and keep their old snapshot."""
+    try:
+        raw = json.loads((await file.read()).decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        raise HTTPException(400, "file must be UTF-8 JSON")
+    if not isinstance(raw, dict):
+        raise HTTPException(400, "package must be a JSON object with entities/sources/observations")
+    snap = import_package(raw)
+    REPO.snapshot = snap
+    return {"snapshot_id": snap.snapshot_id, "counts": snap.counts,
+            "import_errors": len(snap.import_errors)}
+
+
+@app.get("/api/exports")
+def export_package():
+    """Package in the raw import format — feed it back to /api/imports.
+
+    Internal objects store resolved ids; the import format wants source refs and
+    entity *names*, so this maps back: excerpt is lifted out of metadata so the
+    source content hash (and thus every derived id) recomputes identically."""
+    s = REPO.snapshot
+    name_by_id = {e.entity_id: e.canonical_name for e in s.entities}
+    sources = []
+    for src in s.sources:
+        meta = dict(src.metadata)
+        excerpt = meta.pop("excerpt", "")
+        sources.append({
+            "ref": src.source_id, "source_type": src.source_type,
+            "publisher": src.publisher, "title": src.title,
+            "published_at": src.published_at,
+            "url_or_local_path": src.url_or_local_path,
+            "independence_group": src.independence_group,
+            "reliability_tier": src.reliability_tier,
+            "language": src.language, "excerpt": excerpt, "metadata": meta,
+        })
+    observations = []
+    for o in s.observations:
+        meta = {k: v for k, v in o.metadata.items()
+                if k not in ("source_type", "independence_group")}
+        observations.append({
+            "source_ref": o.source_id, "observation_type": o.observation_type,
+            "subject": name_by_id.get(o.subject_entity, o.subject_entity),
+            "object": name_by_id.get(o.object_entity, "") if o.object_entity else "",
+            "observed_at": o.observed_at, "numeric_value": o.numeric_value,
+            "unit": o.unit, "text_excerpt": o.text_excerpt,
+            "confidence": o.confidence, "metadata": meta,
+        })
+    entities = [{"entity_type": e.entity_type, "canonical_name": e.canonical_name,
+                 "aliases": e.aliases, "description": e.description,
+                 "country": e.country, "metadata": e.metadata} for e in s.entities]
+    return {"entities": entities, "sources": sources, "observations": observations}
+
+
+@app.post("/api/snapshots")
+def persist_snapshot():
+    """Persist the current snapshot to the SQLite store (backend/aurora.db).
+    Content-addressed and idempotent: re-posting the same snapshot is a no-op."""
+    from aurora import store_sql
+    engine = store_sql.make_engine(f"sqlite:///{ROOT / 'backend' / 'aurora.db'}")
+    store_sql.save_snapshot(engine, REPO.snapshot)
+    return {"snapshot_id": REPO.snapshot.snapshot_id,
+            "persisted_to": "backend/aurora.db"}
+
+
+class RunRequest(BaseModel):
+    cutoff_date: Optional[str] = None  # Optional (not X|Y): must eval on Python 3.9
+
+
+@app.post("/api/research-runs")
+def create_run(req: RunRequest):
+    run = REPO.create_run(req.cutoff_date)
+    return {"run_id": run.run_id, "status": run.status, "cutoff_date": run.cutoff_date}
+
+
+@app.get("/api/research-runs")
+def list_runs():
+    return [{"run_id": r.run_id, "cutoff_date": r.cutoff_date, "status": r.status,
+             "created_at": r.created_at, "n_hypotheses": len(r.hypotheses)} for r in REPO.runs.values()]
+
+
+@app.get("/api/research-runs/{run_id}")
+def get_run(run_id: str):
+    r = REPO.runs.get(run_id)
+    if not r:
+        raise HTTPException(404, "run not found")
+    return r.to_dict()
+
+
+@app.get("/api/research-runs/{run_id}/status")
+def run_status(run_id: str):
+    r = REPO.runs.get(run_id)
+    if not r:
+        raise HTTPException(404, "run not found")
+    return {"run_id": r.run_id, "status": r.status, "stage_timings": r.stage_timings}
+
+
+@app.get("/api/research-runs/{run_id}/hypotheses")
+def run_hypotheses(run_id: str):
+    r = REPO.runs.get(run_id)
+    if not r:
+        raise HTTPException(404, "run not found")
+    return [to_dict(h) for h in r.hypotheses]
+
+
+@app.get("/api/hypotheses/{hyp_id}")
+def get_hyp(hyp_id: str):
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    return to_dict(h)
+
+
+class HumanName(BaseModel):
+    human_name: str
+
+
+@app.patch("/api/hypotheses/{hyp_id}/human-name")
+def set_human_name(hyp_id: str, body: HumanName):
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    # human name is a label only; it does not alter evidence or scores (spec §13)
+    h.human_name = body.human_name
+    return {"hypothesis_id": hyp_id, "human_name": h.human_name}
+
+
+@app.get("/api/hypotheses/{hyp_id}/evidence")
+def hyp_evidence(hyp_id: str):
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    return {"supporting": h.strongest_supporting_evidence, "observation_ids": h.observation_ids}
+
+
+@app.get("/api/hypotheses/{hyp_id}/counterevidence")
+def hyp_counter(hyp_id: str):
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    return {"counterevidence": h.strongest_counterevidence, "missing_evidence": h.missing_evidence,
+            "disconfirmation_conditions": h.disconfirmation_conditions,
+            "contradiction_score": h.contradiction_score}
+
+
+@app.get("/api/hypotheses/{hyp_id}/value-chain")
+def hyp_value_chain(hyp_id: str):
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    return h.score_explanation.get("value_chain", {})
+
+
+@app.get("/api/hypotheses/{hyp_id}/bottlenecks")
+def hyp_bottlenecks(hyp_id: str):
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    return h.score_explanation.get("bottlenecks", [])
+
+
+@app.get("/api/hypotheses/{hyp_id}/graph")
+def hyp_graph(hyp_id: str):
+    """Nodes (value-chain roles) + edges + bottleneck flags for the Discovery Map."""
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    vc = h.score_explanation.get("value_chain", {})
+    bn_ids = {b["entity_id"]: b["bottleneck_score"] for b in h.score_explanation.get("bottlenecks", [])}
+    name_by_id = {e.entity_id: e.canonical_name for e in REPO.snapshot.entities}
+    nodes = [{"id": n["entity_id"], "name": name_by_id.get(n["entity_id"], n["entity_id"]),
+              "role": n["role"], "bottleneck_score": bn_ids.get(n["entity_id"], 0.0)}
+             for n in vc.get("nodes", [])]
+    return {"nodes": nodes, "edges": vc.get("edges", [])}
+
+
+@app.get("/api/hypotheses/{hyp_id}/timeline")
+def hyp_timeline(hyp_id: str):
+    """Observation activity over time, grouped by year and observation type."""
+    h = REPO.find_hyp(hyp_id)
+    if not h:
+        raise HTTPException(404, "hypothesis not found")
+    ents = set(h.entity_ids)
+    buckets: dict[str, dict[str, int]] = {}
+    for o in REPO.snapshot.observations:
+        if o.subject_entity in ents and o.observed_at:
+            year = o.observed_at[:4]
+            buckets.setdefault(year, {}).setdefault(o.observation_type, 0)
+            buckets[year][o.observation_type] += 1
+    return {"timeline": [{"year": y, "by_type": buckets[y],
+                          "total": sum(buckets[y].values())} for y in sorted(buckets)]}
+
+
+class BacktestRequest(BaseModel):
+    cutoffs: list[str]
+
+
+@app.post("/api/backtests")
+def create_backtest(req: BacktestRequest):
+    bt = run_backtest(REPO.snapshot, REPO.taxonomy, req.cutoffs, DEFAULT_CONFIG)
+    bt_id = f"bt_{abs(hash(tuple(req.cutoffs)))}"
+    REPO.backtests[bt_id] = bt
+    return {"backtest_id": bt_id, **bt}  # includes tracks so the UI can render them
+
+
+@app.get("/api/backtests/{bt_id}")
+def get_backtest(bt_id: str):
+    bt = REPO.backtests.get(bt_id)
+    if not bt:
+        raise HTTPException(404, "backtest not found")
+    return bt
+
+
+@app.get("/api/research-runs/{run_id}/compare/{other_id}")
+def compare_runs(run_id: str, other_id: str):
+    a, b = REPO.runs.get(run_id), REPO.runs.get(other_id)
+    if not a or not b:
+        raise HTTPException(404, "run not found")
+    return divergence.compare(a, b)
+
+
+@app.get("/api/research-runs/{run_id}/divergence/{other_id}")
+def divergence_runs(run_id: str, other_id: str):
+    a, b = REPO.runs.get(run_id), REPO.runs.get(other_id)
+    if not a or not b:
+        raise HTTPException(404, "run not found")
+    return divergence.first_divergence(a, b)

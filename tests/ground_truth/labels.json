@@ -1,0 +1,95 @@
+{
+  "clusters": {
+    "iron_air_storage": [
+      "reversible iron oxidation",
+      "porous iron electrode",
+      "food-grade iron powder",
+      "grid firming",
+      "FerroPore Labs",
+      "FerroGrid Power",
+      "LongHaul Energy",
+      "OxaCell Systems",
+      "IronField Storage",
+      "MegaHour Grid",
+      "TerraDurance"
+    ],
+    "mycelium_materials": [
+      "solid-state fungal fermentation",
+      "chitin binder",
+      "agricultural substrate",
+      "green construction",
+      "PureChitin Bio",
+      "MycoStructural",
+      "FungiForm Materials",
+      "HyphaeBuild",
+      "RootLattice",
+      "SporeWorks"
+    ],
+    "neuromorphic_sensing": [
+      "analog compute-in-memory",
+      "memristor crossbar",
+      "phase-change film",
+      "always-on vision",
+      "CrossbarFab",
+      "SpikeEdge",
+      "MemSense",
+      "NeuroPixel",
+      "AnalogCortex",
+      "EventSight",
+      "SynapseIC"
+    ],
+    "cloud_synergy_fabric": [
+      "enterprise hosting",
+      "SynergyCloud Fabric",
+      "NextGen Colo",
+      "HyperRack Systems",
+      "UptimeFabric",
+      "CloudNative Halls"
+    ],
+    "next_gen_mobility": [
+      "vehicle assembly",
+      "MobilityForge",
+      "NextAxle Systems",
+      "DriveCore Solutions",
+      "ChassisWorks Mobility",
+      "BrakeNova"
+    ],
+    "metaverse_retail": [
+      "MetaMart",
+      "AvatarAisle",
+      "ImmersaShop",
+      "VirtualBoutique",
+      "SpatialCart"
+    ],
+    "quantum_blockchain": [
+      "QubitChain",
+      "EntangleLedger",
+      "QuantumMint",
+      "SuperposePay",
+      "QChainWorks"
+    ],
+    "algae_jet_fuel": [
+      "AlgaJet",
+      "GreenLipid Fuels",
+      "PhycoWing",
+      "PondToPlane",
+      "BioKerosene"
+    ],
+    "ambient_holographics": [
+      "Monolith Corp",
+      "free-space lightfield engine",
+      "ambient holographic wall"
+    ]
+  },
+  "expected_status": {
+    "iron_air_storage": "EMERGING_OR_CANDIDATE",
+    "mycelium_materials": "EMERGING_OR_CANDIDATE",
+    "neuromorphic_sensing": "EMERGING_OR_CANDIDATE",
+    "cloud_synergy_fabric": "EXISTING_INDUSTRY_VARIANT",
+    "next_gen_mobility": "EXISTING_INDUSTRY_VARIANT",
+    "metaverse_retail": "HYPE_CLUSTER",
+    "quantum_blockchain": "HYPE_CLUSTER",
+    "algae_jet_fuel": "DORMANT_OR_REJECTED",
+    "ambient_holographics": "INSUFFICIENT_EVIDENCE"
+  }
+}
