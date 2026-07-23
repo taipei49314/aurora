@@ -1,0 +1,48 @@
+{
+  "_comment": "Synthetic company filings (tier A) for CI.",
+  "filings": [
+    {
+      "id": "fg-8k-2024-0620",
+      "company": "FerroGrid Power",
+      "title": "Material event: Arizona pilot plant capacity expansion",
+      "body": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.",
+      "filed_at": "2024-06-20",
+      "form": "8-K",
+      "observation_type": "CAPEX_ACTIVITY",
+      "amount": 120000000,
+      "currency": "USD",
+      "object": "FerroGrid Arizona pilot plant",
+      "object_type": "FACILITY",
+      "domain": "ferrogrid.example",
+      "lei": "LEI-FERRO-DEMO",
+      "url": "local://filings/ferrogrid-2024-06-20.html"
+    },
+    {
+      "id": "fg-8k-2024-0620-cap",
+      "company": "FerroGrid Power",
+      "title": "Capacity expansion detail for multi-day firming modules",
+      "body": "Pilot plant capacity expansion for multi-day grid firming modules; utility interest cited.",
+      "filed_at": "2024-06-20",
+      "form": "8-K",
+      "observation_type": "CAPACITY_EXPANSION",
+      "amount": 40,
+      "currency": "pct",
+      "object": "grid firming",
+      "object_type": "APPLICATION",
+      "domain": "ferrogrid.example",
+      "lei": "LEI-FERRO-DEMO"
+    },
+    {
+      "id": "oxa-annual-2023",
+      "company": "OxaCell Systems",
+      "title": "Strategic investment in oxygen electrode manufacturing line",
+      "body": "OxaCell Systems announced strategic investment to expand oxygen electrode manufacturing for multi-day iron-air customers.",
+      "filed_at": "2023-11-01",
+      "form": "annual",
+      "observation_type": "STRATEGIC_INVESTMENT",
+      "domain": "oxacell.example",
+      "lei": "LEI-OXA-DEMO",
+      "country": "DE"
+    }
+  ]
+}

@@ -4,6 +4,7 @@ Adapters never call the network and never invent evidence. They only reshape
 caller-supplied JSON into the contract in ``docs/import-schema.md``.
 """
 
+from .filings import convert_filings
 from .jobs import convert_jobs
 from .news import convert_news
 from .openalex import convert_openalex
@@ -17,7 +18,8 @@ __all__ = [
     "convert_jobs",
     "convert_news",
     "convert_openalex",
+    "convert_filings",
     "merge_packages",
     "strip_package",
 ]
-__version__ = "0.1.3"
+__version__ = "0.1.5"
