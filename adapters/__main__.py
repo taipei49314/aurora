@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
+from .doctor import run_doctor
 from .jobs import convert_jobs
 from .news import convert_news
 from .package_util import merge_packages, package_stats, strip_package
@@ -240,6 +241,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     _add_io_flags(p_merge)
     p_merge.set_defaults(func=_cmd_merge)
+
+    p_doc = sub.add_parser("doctor", help="List adapters/fixtures and smoke-convert")
+    p_doc.add_argument(
+        "--no-smoke",
+        action="store_true",
+        help="Only list fixtures, do not convert",
+    )
+    p_doc.set_defaults(func=lambda a: run_doctor(smoke=not a.no_smoke))
 
     args = parser.parse_args(argv)
     return args.func(args)

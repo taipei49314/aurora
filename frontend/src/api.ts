@@ -44,9 +44,11 @@ async function j<T>(url: string, init?: RequestInit): Promise<T> {
   return r.json();
 }
 
+export const getHealth = () => j<{ status: string; engine: string; snapshot: string; runs: number }>(`/api/health`);
 export const getRuns = () => j<RunSummary[]>(`/api/research-runs`);
 export const getHypotheses = (runId: string) => j<Hypothesis[]>(`/api/research-runs/${runId}/hypotheses`);
-export const getEntities = () => j<any[]>(`/api/entities?limit=500`);
+export const getEntities = (q?: string) =>
+  j<any[]>(`/api/entities?limit=500${q ? `&q=${encodeURIComponent(q)}` : ""}`);
 export const getObservations = () => j<any[]>(`/api/observations?limit=800`);
 export const getSources = () => j<any[]>(`/api/sources?limit=500`);
 export const getGraph = (id: string) => j<{ nodes: any[]; edges: any[] }>(`/api/hypotheses/${id}/graph`);

@@ -2,6 +2,14 @@
 
 Use this for each public tag.
 
+## Enable GitHub Actions (one-time)
+
+OAuth tokens without the `workflow` scope cannot push `.github/workflows/*`.
+To enable CI on GitHub:
+
+1. Copy `docs/ci-github-actions.yml` → `.github/workflows/ci.yml`
+2. Push with a credential that has the **workflow** scope (classic PAT or SSH + UI paste)
+
 ## Pre-flight
 
 - [ ] `make check-all` (or `python scripts/check_all.py`) green

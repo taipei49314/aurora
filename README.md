@@ -3,7 +3,8 @@
 **Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Engine](https://img.shields.io/badge/engine-0.1.2-blue.svg)](CHANGELOG.md)
+[![Engine](https://img.shields.io/badge/engine-0.1.3-blue.svg)](CHANGELOG.md)
+
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](backend/requirements.txt)
 
 AURORA looks for **industries that may be forming but are not yet named**, from
@@ -139,7 +140,7 @@ tests/            pytest (unit / integration / e2e)
 
 ## Version
 
-- Engine: **0.1.2** — see [CHANGELOG.md](CHANGELOG.md)
+- Engine: **0.1.3** — see [CHANGELOG.md](CHANGELOG.md)
 - License: **MIT** — see [LICENSE](LICENSE)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security: [SECURITY.md](SECURITY.md)
