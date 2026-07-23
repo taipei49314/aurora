@@ -114,6 +114,7 @@ export function DataExplorer() {
   const [q, setQ] = useState("");
   const [tierFilter, setTierFilter] = useState<"" | Tier>("");
   const [sourceType, setSourceType] = useState("");
+  const [entityType, setEntityType] = useState("");
   const [obsType, setObsType] = useState("");
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
@@ -121,11 +122,11 @@ export function DataExplorer() {
 
   const stats = useQuery({ queryKey: ["stats"], queryFn: getStats, staleTime: 30_000 });
 
-  // Server-side filter for entities (?q=); client filter for other tabs
+  // Server-side filter for entities (?q= / ?entity_type=)
   const serverQ = tab === "entities" && q.trim() && !looksLikeResolveRef(q) ? q.trim() : undefined;
   const entities = useQuery({
-    queryKey: ["entities", serverQ ?? ""],
-    queryFn: () => getEntities(serverQ),
+    queryKey: ["entities", serverQ ?? "", entityType],
+    queryFn: () => getEntities(serverQ, entityType || undefined),
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
@@ -272,11 +273,69 @@ export function DataExplorer() {
           {filtered.length} rows
           {q ||
           (tab === "sources" && (tierFilter || sourceType)) ||
-          (tab === "observations" && obsType)
+          (tab === "observations" && obsType) ||
+          (tab === "entities" && entityType)
             ? " (filtered)"
             : ""}
         </span>
       </div>
+
+      {tab === "entities" && (
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#f6f8fa",
+            border: "1px solid #d0d7de",
+            borderRadius: 8,
+          }}
+        >
+          <b style={{ fontSize: 12 }}>entity_type</b>
+          <button
+            type="button"
+            onClick={() => setEntityType("")}
+            style={{
+              fontWeight: entityType === "" ? 700 : 400,
+              border: entityType === "" ? "1px solid #0969da" : "1px solid #d0d7de",
+              borderRadius: 6,
+              padding: "2px 8px",
+              background: entityType === "" ? "#ddf4ff" : "white",
+              cursor: "pointer",
+              fontSize: 11,
+            }}
+          >
+            All
+          </button>
+          {Object.entries(stats.data?.entity_type_counts || {})
+            .sort((a, b) => b[1] - a[1])
+            .map(([t, n]) => {
+              const active = entityType === t;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setEntityType(active ? "" : t)}
+                  style={{
+                    fontWeight: active ? 700 : 400,
+                    border: active ? "1px solid #0969da" : "1px solid #d0d7de",
+                    borderRadius: 6,
+                    padding: "2px 8px",
+                    background: active ? "#ddf4ff" : "white",
+                    cursor: "pointer",
+                    fontSize: 11,
+                  }}
+                >
+                  {t} ({n})
+                </button>
+              );
+            })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/entities?entity_type=</span>
+        </div>
+      )}
 
       {tab === "observations" && (
         <div

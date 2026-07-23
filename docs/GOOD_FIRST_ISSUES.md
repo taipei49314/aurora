@@ -64,9 +64,13 @@ API `/api/documents`; adapters emit top-level `document_id`.
 Optional `PERSON` type (not industry-clusterable); patent adapters emit inventors;
 Data Explorer observation detail loads document text and highlights `char_span`.
 
+## 14. OpenAlex authors → PERSON + entity_type chips — **done (v0.1.17)**
+
+OpenAlex adapter emits PERSON from authorships (orcid/openalex_author ids);
+`GET /api/entities?entity_type=`; Data Explorer entity_type chips from stats.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Author PERSON entities from OpenAlex authorships
-- Entity-type filter chips in Data Explorer
+- Documents tab in Data Explorer

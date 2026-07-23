@@ -69,6 +69,7 @@ export interface CorpusStats {
   observation_country_counts?: Record<string, number>;
   entities_with_country?: number;
   entity_country_counts?: Record<string, number>;
+  entity_type_counts?: Record<string, number>;
   unique_event_ids?: number;
   reliability_tier_counts: Record<string, number>;
   observation_type_counts: Record<string, number>;
@@ -79,8 +80,12 @@ export interface CorpusStats {
 export const getStats = () => j<CorpusStats>(`/api/stats`);
 export const getRuns = () => j<RunSummary[]>(`/api/research-runs`);
 export const getHypotheses = (runId: string) => j<Hypothesis[]>(`/api/research-runs/${runId}/hypotheses`);
-export const getEntities = (q?: string) =>
-  j<any[]>(`/api/entities?limit=500${q ? `&q=${encodeURIComponent(q)}` : ""}`);
+export const getEntities = (q?: string, entityType?: string) => {
+  const params = new URLSearchParams({ limit: "500" });
+  if (q) params.set("q", q);
+  if (entityType) params.set("entity_type", entityType);
+  return j<any[]>(`/api/entities?${params.toString()}`);
+};
 export const getObservations = (opts?: { observation_type?: string; q?: string }) => {
   const params = new URLSearchParams({ limit: "800" });
   if (opts?.observation_type) params.set("observation_type", opts.observation_type);

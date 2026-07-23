@@ -148,10 +148,13 @@ def stats():
     with_ext = sum(1 for e in s.entities if e.external_ids)
     entities_with_country = sum(1 for e in s.entities if (e.country or "").strip())
     entity_country_counts: dict = {}
+    entity_type_counts: dict = {}
     for e in s.entities:
         c = (e.country or "").strip()
         if c:
             entity_country_counts[c] = entity_country_counts.get(c, 0) + 1
+        et = e.entity_type or "?"
+        entity_type_counts[et] = entity_type_counts.get(et, 0) + 1
     ext_systems: dict = {}
     for e in s.entities:
         for x in e.external_ids or []:
@@ -164,6 +167,7 @@ def stats():
         "entities_total": len(s.entities),
         "entities_with_country": entities_with_country,
         "entity_country_counts": entity_country_counts,
+        "entity_type_counts": entity_type_counts,
         "sources_total": len(s.sources),
         "sources_with_family_id": with_family,
         "sources_with_event_date": with_event,
@@ -215,9 +219,19 @@ def resolve_entity(body: ResolveBody):
 
 
 @app.get("/api/entities")
-def entities(limit: int = 200, q: Optional[str] = None):
-    """List entities; optional ``q`` filters name/aliases/external_ids/id."""
+def entities(
+    limit: int = 200,
+    q: Optional[str] = None,
+    entity_type: Optional[str] = None,
+):
+    """List entities; optional ``q`` and ``entity_type`` (comma list) filters."""
     rows = [to_dict(e) for e in REPO.snapshot.entities]
+    if entity_type:
+        types = {t.strip().upper() for t in entity_type.split(",") if t.strip()}
+        rows = [
+            r for r in rows
+            if str(r.get("entity_type") or "").upper() in types
+        ]
     if q:
         needle = q.strip().lower()
         filtered = []
