@@ -90,7 +90,7 @@ def test_merge_packages_dedupes_entities(uspto_pkg):
     ]
     assert len(ferro) == 1
     assert "FerroGrid" in ferro[0]["aliases"]
-    ids = ferro[0]["metadata"]["external_ids"]
+    ids = ferro[0].get("external_ids") or ferro[0].get("metadata", {}).get("external_ids") or []
     systems = {x["system"] for x in ids}
     assert "lei" in systems
     assert "uspto_assignee_name" in systems

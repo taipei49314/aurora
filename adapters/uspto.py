@@ -81,22 +81,20 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
         if not key:
             raise ValueError("entity name must be non-empty")
         if key not in entities:
-            meta: Dict[str, Any] = {
-                "extractor_id": ADAPTER_ID,
-                "extractor_version": ADAPTER_VERSION,
-            }
-            if external_ids:
-                meta["external_ids"] = external_ids
             entities[key] = {
                 "entity_type": entity_type,
                 "canonical_name": key,
                 "aliases": list(aliases or []),
                 "description": description,
                 "country": country or "",
-                "metadata": meta,
+                "external_ids": list(external_ids or []),
+                "metadata": {
+                    "extractor_id": ADAPTER_ID,
+                    "extractor_version": ADAPTER_VERSION,
+                },
             }
         else:
-            # merge aliases / country if later rows enrich
+            # merge aliases / country / external_ids if later rows enrich
             ent = entities[key]
             for a in aliases or []:
                 if a not in ent["aliases"]:
@@ -104,14 +102,14 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             if country and not ent.get("country"):
                 ent["country"] = country
             if external_ids:
-                ids = list(ent["metadata"].get("external_ids") or [])
-                seen = {(x.get("system"), x.get("id")) for x in ids}
+                ids = list(ent.get("external_ids") or [])
+                seen = {(x.get("system"), x.get("id")) for x in ids if isinstance(x, dict)}
                 for x in external_ids:
                     k = (x.get("system"), x.get("id"))
                     if k not in seen:
                         ids.append(x)
                         seen.add(k)
-                ent["metadata"]["external_ids"] = ids
+                ent["external_ids"] = ids
         return key
 
     for i, patent in enumerate(patents):
@@ -195,11 +193,20 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             if not name:
                 continue
             country = (asg.get("country") or "").strip()
+            asg_ext = [{"system": "uspto_assignee_name", "id": name}]
+            # optional stable ids from enriched dumps
+            for x in asg.get("external_ids") or []:
+                if isinstance(x, dict) and x.get("system") and x.get("id"):
+                    asg_ext.append(x)
+            if asg.get("lei"):
+                asg_ext.append({"system": "lei", "id": str(asg["lei"])})
+            if asg.get("domain"):
+                asg_ext.append({"system": "domain", "id": str(asg["domain"])})
             ensure_entity(
                 name,
                 "COMPANY",
                 country=country,
-                external_ids=[{"system": "uspto_assignee_name", "id": name}],
+                external_ids=asg_ext,
             )
             obs_meta: Dict[str, Any] = {
                 "document_id": ref,

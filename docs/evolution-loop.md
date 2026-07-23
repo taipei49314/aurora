@@ -98,10 +98,20 @@ Living checklist for real-world AURORA evolution. Each loop is intentionally sma
 - Import merges entities sharing an external id; `EXTERNAL_ID_COLLISION` reported
 - Engine **0.1.2**; tests `test_external_id_resolution.py`
 
-## Loop 10 (next)
+## Loop 10 (done, local) — adapters external_ids + multisource case + resolve CLI/API
 
-1. Tag/push v0.1.2 release notes
-2. Human: real PatentsView export drop-in
-3. Optional: ER API endpoint for dry-run resolve
+- Adapters first-class external_ids; merge util unions them
+- `cases/multisource-iron-air` + `build_multisource_case.py`
+- `scripts/resolve_entities.py`, `POST /api/resolve`
+
+## Accumulated (not pushed yet)
+
+Local commits include 0.1.2 ER + Loop 10 tooling. Push/tag when ready as **v0.1.2**.
+
+## Loop 11 (next)
+
+1. Frontend: show entity external_ids on entity detail
+2. Real PatentsView export drop-in (human data)
+3. Push v0.1.2 when batch feels complete
 
 **Out of scope:** live crawl service, multi-tenant SaaS, stock outputs

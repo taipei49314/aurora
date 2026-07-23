@@ -81,12 +81,14 @@ def convert_news(raw: dict) -> Package:
                 "extractor_version": ADAPTER_VERSION,
             }
             meta.update(extra.get("metadata") or {})
+            ext = list(extra.get("external_ids") or [])
             entities[key] = {
                 "entity_type": extra.get("entity_type") or etype,
                 "canonical_name": key,
                 "aliases": list(extra.get("aliases") or []),
                 "description": extra.get("description") or "",
                 "country": extra.get("country") or "",
+                "external_ids": ext,
                 "metadata": meta,
             }
         return key
@@ -189,15 +191,22 @@ def convert_news(raw: dict) -> Package:
                 raise ValueError(f"articles[{i}].claims[{j}] missing subject")
             obj = (claim.get("object") or "").strip() or None
             subj_type = type_hints.get(subject) or claim.get("subject_type") or _DEFAULT_ENTITY_TYPE
-            ensure(subject, subj_type)
+            ensure(
+                subject,
+                subj_type,
+                external_ids=list(claim.get("subject_external_ids") or []),
+            )
             if obj:
                 obj_type = type_hints.get(obj) or claim.get("object_type") or (
                     "COMPANY" if otype in _RELATIONAL else "TECHNOLOGY"
                 )
-                # materials / applications often non-company
                 if claim.get("object_type"):
                     obj_type = claim["object_type"]
-                ensure(obj, obj_type)
+                ensure(
+                    obj,
+                    obj_type,
+                    external_ids=list(claim.get("object_external_ids") or []),
+                )
 
             obs_meta: Dict[str, Any] = {
                 "document_id": ref,

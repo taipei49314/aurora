@@ -1,0 +1,20 @@
+{
+  "case_id": "multisource-iron-air",
+  "loop": 10,
+  "purpose": "Multi-adapter merge with shared LEI/domain external_ids",
+  "gates": {
+    "import_errors_max": 0,
+    "require_observation_types": [
+      "PATENT_ACTIVITY",
+      "HIRING_ACTIVITY",
+      "SUPPLIER_RELATIONSHIP"
+    ],
+    "independent_lt_raw": true,
+    "min_sources": 8
+  },
+  "honesty": [
+    "Built from offline fixtures + demo LEI crosswalk keys.",
+    "Not a live patent/jobs/news crawl.",
+    "LEI values are synthetic join keys (LEI-*-DEMO), not real registry ids."
+  ]
+}
