@@ -2,6 +2,9 @@
 
 Used at import (engine 0.1.20+) when an observation has document_id + text_excerpt
 but no explicit char_span. Keeps span-level provenance without manual offsets.
+
+0.1.24+: progressive prefix match (word then char) for near-prefix excerpts
+that differ only by a trailing clause or punctuation.
 """
 from __future__ import annotations
 
@@ -10,6 +13,9 @@ from typing import List, Optional
 
 # Ignore very short excerpts — too many false positives
 _MIN_EXCERPT_LEN = 4
+# Progressive prefix must keep at least this many characters / words
+_MIN_PREFIX_LEN = 12
+_MIN_PREFIX_WORDS = 3
 
 
 def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]]:
@@ -19,6 +25,8 @@ def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]
       1. Exact substring
       2. Case-insensitive substring (span covers original casing length)
       3. Whitespace-flexible regex (collapsed runs of whitespace)
+      4. Progressive word-prefix (drop trailing words until match)
+      5. Progressive character-prefix (rstrip punct; drop tail)
 
     Offsets are half-open ``[start, end)`` into the original document string.
     Returns ``None`` when no confident match is found.
@@ -50,6 +58,35 @@ def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]
             m = None
         if m is not None:
             return [m.start(), m.end()]
+
+    # 4. Progressive word-prefix (drop trailing words)
+    if len(tokens) >= _MIN_PREFIX_WORDS:
+        for n in range(len(tokens) - 1, _MIN_PREFIX_WORDS - 1, -1):
+            cand = " ".join(tokens[:n]).rstrip(".,;:!?\"'")
+            if len(cand) < _MIN_PREFIX_LEN:
+                continue
+            idx = doc.find(cand)
+            if idx >= 0:
+                return [idx, idx + len(cand)]
+            idx = lower_doc.find(cand.lower())
+            if idx >= 0:
+                # Map to original casing length of candidate
+                return [idx, idx + len(cand)]
+
+    # 5. Progressive character-prefix (handles trailing punctuation drift)
+    for end in range(len(ex) - 1, _MIN_PREFIX_LEN - 1, -1):
+        cand = ex[:end].rstrip(".,;:!?\"' \t")
+        if len(cand) < _MIN_PREFIX_LEN:
+            continue
+        # Prefer word boundary when possible
+        if end < len(ex) and ex[end - 1 : end].isalnum() and ex[end : end + 1].isalnum():
+            continue
+        idx = doc.find(cand)
+        if idx >= 0:
+            return [idx, idx + len(cand)]
+        idx = lower_doc.find(cand.lower())
+        if idx >= 0:
+            return [idx, idx + len(cand)]
 
     return None
 

@@ -102,8 +102,13 @@ Regenerated iron-air-mini / openalex / patentsview via adapters; retro stamped
 document_id + ensure_documents. Scorecard gates `min_documents` +
 `require_no_orphan_document_ids`. check_all lints all packages hard.
 
+## 21. Progressive char_span + retro full coverage — **done (v0.1.24)**
+
+align_char_span adds progressive word/char prefix match. Curated packages may
+`append_unmatched` excerpts into document text. iron-air-retro: 21/21 spans.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: align more retro text_excerpts so char_span auto fills
+- Optional: scorecard gate min_observations_with_char_span
