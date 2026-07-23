@@ -170,8 +170,8 @@ def convert_filings(raw: dict) -> Package:
             "text_excerpt": (body or title)[:400],
             "confidence": float(row.get("confidence") or 0.9),
             "event_id": f"evt_{fid}",
+            "document_id": ref,  # first-class 0.1.15+
             "metadata": {
-                "document_id": ref,
                 "extractor_id": ADAPTER_ID,
             },
         }

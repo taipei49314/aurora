@@ -210,10 +210,8 @@ def convert_news(raw: dict) -> Package:
                 )
 
             obs_meta: Dict[str, Any] = {
-                "document_id": ref,
                 "extractor_id": ADAPTER_ID,
                 "extractor_version": ADAPTER_VERSION,
-                "char_span": claim.get("char_span"),
             }
             if reprint_of:
                 obs_meta["is_reprint_of"] = reprint_of
@@ -228,8 +226,12 @@ def convert_news(raw: dict) -> Package:
                 "observed_at": _date(claim.get("observed_at")) or published,
                 "text_excerpt": text,
                 "confidence": conf,
+                "document_id": ref,  # first-class 0.1.15+
                 "metadata": {k: v for k, v in obs_meta.items() if v is not None},
             }
+            span = claim.get("char_span")
+            if span is not None:
+                obs_row["char_span"] = span
             if event_id:
                 obs_row["event_id"] = event_id
             observations.append(obs_row)

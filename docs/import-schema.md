@@ -217,11 +217,30 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 | `observed_at` | string \| null | null | Temporal signals, leakage, fade |
 | `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event. Metadata fallback; inherits `Source.event_id` when empty |
 | `geo` | object | `{}` | **First-class** (engine 0.1.13+); location/jurisdiction. Inherits `Source.geo` when empty. Accepts `location` / `country` / `jurisdiction` aliases |
+| `document_id` | string | `""` | **First-class** (engine 0.1.15+); links to optional `documents[]` row or source-as-document id. Metadata fallback |
+| `char_span` | `[start, end]` \| null | null | **First-class** (engine 0.1.15+); character offsets into document text. Also accepts `{start, end}` |
 | `text_excerpt` | string | `""` | **Primary feature text** (TF-IDF / naming) |
 | `confidence` | number 0..1 | `0.7` | Edge weights for relational types |
 | `numeric_value` | number \| null | null | Lead-time / capacity heuristics |
 | `unit` | string \| null | null | Free string today; see §8 |
 | `metadata` | object | `{}` | Import merges `source_type` + resolved independence |
+
+### Optional `documents[]` (engine 0.1.15+)
+
+Full-text / path records. Observations point here via `document_id` (+ optional `char_span`).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `document_id` | string | Required stable id |
+| `source_ref` | string | Optional link to a source `ref` |
+| `title` | string | Document title |
+| `text` / `body` | string | Optional full text (may be empty if only a path) |
+| `url_or_local_path` | string | File or URL provenance |
+| `language` | string | Default `en` |
+| `license` | string | Redistribution terms for this document |
+| `metadata` | object | Opaque |
+
+Not required for scoring; enables span-level provenance for real dumps.
 
 ### Resolution rules
 
@@ -232,10 +251,9 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 ### Real-data conventions (metadata)
 
 ```json
+"document_id": "doc_us2024123456a1",
+"char_span": [120, 480],
 "metadata": {
-  "document_id": "doc_us2024123456a1",
-  "char_span": [120, 480],
-  "event_id": "evt_ferrogrid_plant_2024q2",
   "classification_codes": ["H01M-10/054", "H01M-4/58"],
   "currency": "USD",
   "amount_original": 120000000,
@@ -344,7 +362,7 @@ Do **not** assume these exist as first-class fields:
 | Gap | Workaround today | Candidate future field |
 |-----|------------------|------------------------|
 | External IDs | **done** first-class `external_ids[]` (+ metadata fallback) | use in ER join rules |
-| Full document + span | short excerpt only | `documents[]` + `document_id`/`char_span` |
+| Full document + span | **done** `documents[]` + first-class `document_id` / `char_span` | text may still be empty (path-only) |
 | Unresolved mentions | must pre-resolve names | staging / `subject_raw` |
 | Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
 | Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |

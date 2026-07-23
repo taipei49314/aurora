@@ -217,7 +217,6 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             )
             evt_id = f"evt_{family or pub}"
             obs_meta: Dict[str, Any] = {
-                "document_id": ref,
                 "extractor_id": ADAPTER_ID,
                 "extractor_version": ADAPTER_VERSION,
             }
@@ -234,6 +233,7 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
                     "text_excerpt": text,
                     "confidence": conf,
                     "event_id": evt_id,  # first-class (engine 0.1.11+)
+                    "document_id": ref,  # first-class (engine 0.1.15+)
                     "metadata": dict(obs_meta),
                 }
 

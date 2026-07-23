@@ -11,7 +11,7 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
 from .ids import content_hash
-from .models import Source, Entity, Observation, to_dict
+from .models import Source, Entity, Observation, Document, to_dict
 
 
 @dataclass
@@ -24,30 +24,60 @@ class Snapshot:
     resolved_group: dict
     import_errors: list = field(default_factory=list)
     counts: dict = field(default_factory=dict)
+    documents: list = field(default_factory=list)  # Document rows (engine 0.1.15+)
 
     def input_manifest_hash(self) -> str:
-        return content_hash(
+        parts = [
             sorted(e.entity_id for e in self.entities),
             sorted(s.source_id for s in self.sources),
             sorted(o.observation_id for o in self.observations),
-        )
+        ]
+        docs = self.documents or []
+        if docs:
+            parts.append(
+                sorted(
+                    (d.document_id if hasattr(d, "document_id") else d.get("document_id", ""))
+                    for d in docs
+                )
+            )
+        return content_hash(*parts)
 
 
-def make_snapshot(entities, sources, observations, resolved_group, import_errors, created_at) -> Snapshot:
-    sid = content_hash(
+def make_snapshot(
+    entities,
+    sources,
+    observations,
+    resolved_group,
+    import_errors,
+    created_at,
+    documents=None,
+) -> Snapshot:
+    documents = list(documents or [])
+    # Keep snapshot_id stable when no documents are present (pre-0.1.15 packages)
+    hash_parts = [
         sorted(e.entity_id for e in entities),
         sorted(s.source_id for s in sources),
         sorted(o.observation_id for o in observations),
-    )
+    ]
+    if documents:
+        hash_parts.append(
+            sorted(
+                (d.document_id if hasattr(d, "document_id") else d.get("document_id", ""))
+                for d in documents
+            )
+        )
+    sid = content_hash(*hash_parts)
     counts = {
         "entities": len(entities),
         "sources": len(sources),
         "observations": len(observations),
+        "documents": len(documents),
         "import_errors": len(import_errors),
     }
     return Snapshot(
         snapshot_id=f"snap_{sid}", created_at=created_at, entities=entities, sources=sources,
-        observations=observations, resolved_group=resolved_group, import_errors=import_errors, counts=counts,
+        observations=observations, resolved_group=resolved_group, import_errors=import_errors,
+        counts=counts, documents=documents,
     )
 
 

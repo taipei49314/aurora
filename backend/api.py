@@ -125,6 +125,8 @@ def stats():
     type_counts: dict = {}
     obs_with_event_id = 0
     obs_with_geo = 0
+    obs_with_document_id = 0
+    obs_with_char_span = 0
     unique_event_ids: set = set()
     country_counts: dict = {}
     for o in s.observations:
@@ -139,6 +141,10 @@ def stats():
             c = (g.get("country") if isinstance(g, dict) else None) or ""
             if c:
                 country_counts[c] = country_counts.get(c, 0) + 1
+        if getattr(o, "document_id", None) or (o.metadata or {}).get("document_id"):
+            obs_with_document_id += 1
+        if getattr(o, "char_span", None) or (o.metadata or {}).get("char_span"):
+            obs_with_char_span += 1
     with_ext = sum(1 for e in s.entities if e.external_ids)
     entities_with_country = sum(1 for e in s.entities if (e.country or "").strip())
     entity_country_counts: dict = {}
@@ -169,6 +175,9 @@ def stats():
         "license_counts": license_counts,
         "observations_with_event_id": obs_with_event_id,
         "observations_with_geo": obs_with_geo,
+        "observations_with_document_id": obs_with_document_id,
+        "observations_with_char_span": obs_with_char_span,
+        "documents_total": len(getattr(s, "documents", None) or []),
         "observation_country_counts": country_counts,
         "unique_event_ids": len(unique_event_ids),
         "reliability_tier_counts": tier_counts,
@@ -226,6 +235,24 @@ def entity(entity_id: str):
         if e.entity_id == entity_id:
             return to_dict(e)
     raise HTTPException(404, "entity not found")
+
+
+@app.get("/api/documents")
+def documents(limit: int = 200, q: Optional[str] = None):
+    """List optional full-document records (engine 0.1.15+)."""
+    rows = [to_dict(d) for d in (getattr(REPO.snapshot, "documents", None) or [])]
+    if q:
+        needle = q.strip().lower()
+        rows = [r for r in rows if needle in json.dumps(r, ensure_ascii=False).lower()]
+    return rows[:limit]
+
+
+@app.get("/api/documents/{document_id}")
+def document(document_id: str):
+    for d in getattr(REPO.snapshot, "documents", None) or []:
+        if d.document_id == document_id:
+            return to_dict(d)
+    raise HTTPException(404, "document not found")
 
 
 @app.get("/api/sources")
@@ -389,6 +416,14 @@ def export_package():
         if geo:
             meta.pop("geo", None)
             meta.pop("location", None)
+        document_id = getattr(o, "document_id", "") or meta.pop("document_id", "") or ""
+        if document_id:
+            meta.pop("document_id", None)
+        char_span = getattr(o, "char_span", None)
+        if char_span is None:
+            char_span = meta.pop("char_span", None)
+        else:
+            meta.pop("char_span", None)
         observations.append({
             "source_ref": o.source_id, "observation_type": o.observation_type,
             "subject": name_by_id.get(o.subject_entity, o.subject_entity),
@@ -396,9 +431,26 @@ def export_package():
             "observed_at": o.observed_at, "numeric_value": o.numeric_value,
             "unit": o.unit, "text_excerpt": o.text_excerpt,
             "confidence": o.confidence, "event_id": event_id, "geo": geo,
+            "document_id": document_id,
+            "char_span": char_span,
             "metadata": meta,
         })
-    return {"entities": entities, "sources": sources, "observations": observations}
+    documents = []
+    for d in getattr(s, "documents", None) or []:
+        documents.append({
+            "document_id": d.document_id,
+            "source_ref": d.source_id,
+            "title": d.title,
+            "text": d.text,
+            "url_or_local_path": d.url_or_local_path,
+            "language": d.language,
+            "license": d.license,
+            "metadata": dict(d.metadata or {}),
+        })
+    out = {"entities": entities, "sources": sources, "observations": observations}
+    if documents:
+        out["documents"] = documents
+    return out
 
 
 @app.post("/api/snapshots")

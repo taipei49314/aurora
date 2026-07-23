@@ -63,6 +63,9 @@ export interface CorpusStats {
   license_counts?: Record<string, number>;
   observations_with_event_id?: number;
   observations_with_geo?: number;
+  observations_with_document_id?: number;
+  observations_with_char_span?: number;
+  documents_total?: number;
   observation_country_counts?: Record<string, number>;
   entities_with_country?: number;
   entity_country_counts?: Record<string, number>;

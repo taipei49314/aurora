@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.15] — 2026-07-24
+
+### Added
+
+- First-class **`Observation.document_id`** and **`char_span`** (metadata fallback; `[start,end]` or `{start,end}`)
+- Optional package **`documents[]`** (`Document` model: text/path, license, source link)
+- `GET /api/documents` (+ `/{document_id}`); export includes documents when present
+- Stats: `observations_with_document_id`, `observations_with_char_span`, `documents_total`
+- Data Explorer document columns; Dashboard documents card
+- Adapters (USPTO/news/jobs/filings/openalex) emit top-level `document_id`
+
+### Changed
+
+- Engine / feature → **0.1.15**
+- Snapshot may carry `documents`; snapshot_id stable when documents empty
+
 ## [0.1.14] — 2026-07-24
 
 ### Added

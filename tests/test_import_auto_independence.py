@@ -376,3 +376,54 @@ def test_license_first_class_and_package_default():
     assert by_title["Explicit license"].license == "public-patent-text"
     assert by_title["Metadata license"].license == "cc0-1.0"
     assert all("license" not in (s.metadata or {}) for s in snap.sources)
+
+
+@pytest.mark.unit
+def test_document_id_and_char_span_first_class():
+    """Engine 0.1.15+: document_id + char_span on observations; optional documents[]."""
+    pkg = {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
+        "sources": [{
+            "ref": "src1",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "Iron-air cell",
+            "excerpt": "Full abstract of the iron-air invention goes here.",
+            "published_at": "2022-01-01",
+        }],
+        "documents": [{
+            "document_id": "doc-pat-1",
+            "source_ref": "src1",
+            "title": "Iron-air cell full text",
+            "text": "Full abstract of the iron-air invention goes here. More claims.",
+            "license": "public-patent-text",
+        }],
+        "observations": [{
+            "source_ref": "src1",
+            "observation_type": "PATENT_ACTIVITY",
+            "subject": "Acme",
+            "observed_at": "2021-06-01",
+            "text_excerpt": "iron-air invention",
+            "document_id": "doc-pat-1",
+            "char_span": [0, 40],
+        }, {
+            "source_ref": "src1",
+            "observation_type": "TECHNICAL_DEPENDENCY",
+            "subject": "Acme",
+            "observed_at": "2021-06-01",
+            "text_excerpt": "More claims",
+            "metadata": {"document_id": "doc-pat-1", "char_span": [40, 55]},
+        }],
+    }
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    assert len(snap.documents) == 1
+    assert snap.documents[0].document_id == "doc-pat-1"
+    assert "iron-air" in snap.documents[0].text
+    by_type = {o.observation_type: o for o in snap.observations}
+    assert by_type["PATENT_ACTIVITY"].document_id == "doc-pat-1"
+    assert by_type["PATENT_ACTIVITY"].char_span == [0, 40]
+    assert by_type["TECHNICAL_DEPENDENCY"].document_id == "doc-pat-1"
+    assert by_type["TECHNICAL_DEPENDENCY"].char_span == [40, 55]
+    assert "document_id" not in (by_type["PATENT_ACTIVITY"].metadata or {})
+    assert "char_span" not in (by_type["PATENT_ACTIVITY"].metadata or {})

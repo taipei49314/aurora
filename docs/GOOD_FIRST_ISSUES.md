@@ -54,9 +54,14 @@ jobs adapter emits top-level geo; stats country histograms; Data Explorer column
 `Source.license` (metadata + package default); stats/UI; USPTO/OpenAlex emit
 license; `lint_package --public-corpus` / `--require-license`.
 
+## 12. Full document + span — **done (v0.1.15)**
+
+`Observation.document_id` + `char_span`; optional package `documents[]`;
+API `/api/documents`; adapters emit top-level `document_id`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Full document + span (`documents[]`)
 - PERSON entities optional type
+- Document text retrieval UI (open document + highlight span)

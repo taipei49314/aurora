@@ -72,6 +72,9 @@ def test_stats_endpoint(client):
     assert "license_counts" in body
     assert "observations_with_event_id" in body
     assert "observations_with_geo" in body
+    assert "observations_with_document_id" in body
+    assert "observations_with_char_span" in body
+    assert "documents_total" in body
     assert "observation_country_counts" in body
     assert "entities_with_country" in body
     assert "unique_event_ids" in body
@@ -87,6 +90,8 @@ def test_stats_endpoint(client):
     assert isinstance(body["sources_with_license"], int)
     assert body["sources_with_license"] >= 0
     assert isinstance(body["license_counts"], dict)
+    assert isinstance(body["documents_total"], int)
+    assert body["documents_total"] >= 0
     assert isinstance(body["unique_event_ids"], int)
     assert body["unique_event_ids"] >= 0
     assert sum(body["source_type_counts"].values()) == body["sources_total"]
@@ -145,7 +150,7 @@ def test_observations_type_filter(client):
 
 def test_export_is_round_trippable_via_import_upload(client):
     pkg = client.get("/api/exports").json()
-    assert set(pkg) == {"entities", "sources", "observations"}
+    assert {"entities", "sources", "observations"} <= set(pkg)
     before = client.get("/api/snapshots").json()[0]["counts"]
 
     up = client.post(
@@ -157,6 +162,12 @@ def test_export_is_round_trippable_via_import_upload(client):
     # re-importing the exported package reproduces the same corpus size
     assert body["counts"]["entities"] == before["entities"]
     assert body["counts"]["observations"] == before["observations"]
+
+
+def test_documents_endpoint_lists(client):
+    r = client.get("/api/documents")
+    assert r.status_code == 200
+    assert isinstance(r.json(), list)
 
 
 def test_import_upload_rejects_non_json(client):

@@ -22,6 +22,11 @@
     "observations": {
       "type": "array",
       "items": { "$ref": "#/$defs/observation" }
+    },
+    "documents": {
+      "type": "array",
+      "description": "Optional full-document records linked by observation.document_id (0.1.15+)",
+      "items": { "$ref": "#/$defs/document" }
     }
   },
   "$defs": {
@@ -165,6 +170,28 @@
         },
         "country": { "type": "string" },
         "jurisdiction": { "type": "string" },
+        "document_id": {
+          "type": "string",
+          "description": "Link to documents[] or source-as-document id (0.1.15+)"
+        },
+        "char_span": {
+          "description": "Character offsets [start, end] into document text",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            {
+              "type": "object",
+              "properties": {
+                "start": { "type": "integer" },
+                "end": { "type": "integer" }
+              }
+            }
+          ]
+        },
         "text_excerpt": { "type": "string" },
         "confidence": {
           "type": "number",
@@ -177,6 +204,23 @@
         "unit": {
           "type": ["string", "null"]
         },
+        "metadata": { "type": "object" }
+      }
+    },
+    "document": {
+      "type": "object",
+      "required": ["document_id"],
+      "additionalProperties": true,
+      "properties": {
+        "document_id": { "type": "string", "minLength": 1 },
+        "source_ref": { "type": "string" },
+        "title": { "type": "string" },
+        "text": { "type": "string" },
+        "body": { "type": "string" },
+        "url_or_local_path": { "type": "string" },
+        "url": { "type": "string" },
+        "language": { "type": "string" },
+        "license": { "type": "string" },
         "metadata": { "type": "object" }
       }
     }
