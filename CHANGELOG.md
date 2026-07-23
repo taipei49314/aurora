@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.17] — 2026-07-24
+
+### Added
+
+- OpenAlex adapter emits **`PERSON`** entities from authorships (`openalex_author`, `orcid`)
+- Author names stamped on institution research-activity metadata
+- `GET /api/entities?entity_type=` (comma lists); stats `entity_type_counts`
+- Data Explorer **entity_type** chips
+
+### Changed
+
+- Engine / feature → **0.1.17**
+- OpenAlex adapter version → 0.1.1
+
 ## [0.1.16] — 2026-07-24
 
 ### Added

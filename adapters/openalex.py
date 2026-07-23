@@ -23,15 +23,16 @@ Offline only. Accepts a simplified OpenAlex works export::
 Mapping:
   * source_type = PAPER, reliability_tier = B
   * observation RESEARCH_ACTIVITY on institution entities (and optional topic keywords in text)
+  * authorships → PERSON entities (engine 0.1.17+) when author display_name present
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from .package_util import Package
 
 ADAPTER_ID = "openalex-offline"
-ADAPTER_VERSION = "0.1.0"
+ADAPTER_VERSION = "0.1.1"
 
 
 def _date(value: Optional[str]) -> Optional[str]:
@@ -112,6 +113,72 @@ def convert_openalex(raw: dict) -> Package:
                     ent["external_ids"] = ids
         return key
 
+    def ensure_person(name: str, *, openalex_id: str = "", orcid: str = "") -> str:
+        """PERSON entities for authors (engine 0.1.17+); not industry-clusterable."""
+        key = name.strip()
+        if not key:
+            raise ValueError("author name empty")
+        if key not in entities:
+            ext: List[dict] = [{"system": "person_name", "id": key}]
+            if openalex_id:
+                ext.append({"system": "openalex_author", "id": _openalex_id_tail(openalex_id)})
+            if orcid:
+                oid = orcid.replace("https://orcid.org/", "").strip()
+                if oid:
+                    ext.append({"system": "orcid", "id": oid})
+            entities[key] = {
+                "entity_type": "PERSON",
+                "canonical_name": key,
+                "aliases": [],
+                "description": "Author / researcher",
+                "country": "",
+                "external_ids": ext,
+                "metadata": {
+                    "extractor_id": ADAPTER_ID,
+                    "extractor_version": ADAPTER_VERSION,
+                },
+            }
+        else:
+            ent = entities[key]
+            # upgrade free-text / prior type only if still PERSON or missing
+            if ent.get("entity_type") not in ("PERSON",):
+                # keep institutional names that collided; skip author dual-type
+                return key
+            ids = list(ent.get("external_ids") or [])
+            seen = {(x.get("system"), x.get("id")) for x in ids if isinstance(x, dict)}
+            for x in (
+                [{"system": "person_name", "id": key}]
+                + (
+                    [{"system": "openalex_author", "id": _openalex_id_tail(openalex_id)}]
+                    if openalex_id
+                    else []
+                )
+                + (
+                    [{"system": "orcid", "id": orcid.replace("https://orcid.org/", "").strip()}]
+                    if orcid
+                    else []
+                )
+            ):
+                k = (x.get("system"), x.get("id"))
+                if k[1] and k not in seen:
+                    ids.append(x)
+                    seen.add(k)
+            ent["external_ids"] = ids
+        return key
+
+    def _author_name(auth: dict) -> Tuple[str, str, str]:
+        """Return (display_name, openalex_author_id, orcid)."""
+        author = auth.get("author") if isinstance(auth.get("author"), dict) else {}
+        name = (
+            (author.get("display_name") if author else None)
+            or auth.get("raw_author_name")
+            or ""
+        )
+        name = str(name).strip()
+        oa_id = (author.get("id") if author else "") or ""
+        orcid = (author.get("orcid") if author else "") or auth.get("orcid") or ""
+        return name, str(oa_id).strip(), str(orcid).strip()
+
     for i, w in enumerate(works):
         if not isinstance(w, dict):
             raise ValueError(f"works[{i}] must be an object")
@@ -175,9 +242,17 @@ def convert_openalex(raw: dict) -> Package:
         })
 
         institutions = []
+        author_names: List[str] = []
         for auth in w.get("authorships") or []:
             if not isinstance(auth, dict):
                 continue
+            aname, a_oa, a_orcid = _author_name(auth)
+            if aname:
+                try:
+                    ensure_person(aname, openalex_id=a_oa, orcid=a_orcid)
+                    author_names.append(aname)
+                except ValueError:
+                    pass
             for inst in auth.get("institutions") or []:
                 if not isinstance(inst, dict):
                     continue
@@ -188,7 +263,7 @@ def convert_openalex(raw: dict) -> Package:
                 oid = (inst.get("id") or "").strip()
                 institutions.append((name, country, oid))
 
-        if not institutions:
+        if not institutions and not author_names:
             # still emit research activity under a synthetic holder so the paper is not lost
             institutions.append((f"Authors of {wid}", "", ""))
 
@@ -198,6 +273,13 @@ def convert_openalex(raw: dict) -> Package:
                 continue
             seen_inst.add(name)
             ensure_inst(name, country=country, openalex_id=oid)
+            obs_meta: Dict[str, Any] = {
+                "extractor_id": ADAPTER_ID,
+                "work_id": wid,
+                "doi": doi_id or None,
+            }
+            if author_names:
+                obs_meta["authors"] = author_names
             observations.append({
                 "source_ref": ref,
                 "observation_type": "RESEARCH_ACTIVITY",
@@ -207,12 +289,28 @@ def convert_openalex(raw: dict) -> Package:
                 "text_excerpt": (abstract or title)[:400],
                 "confidence": 0.75,
                 "document_id": ref,  # first-class 0.1.15+
-                "metadata": {
-                    "extractor_id": ADAPTER_ID,
-                    "work_id": wid,
-                    "doi": doi_id or None,
-                },
+                "metadata": obs_meta,
             })
+
+        # Author-level research activity when institutions missing but authors present
+        if not institutions and author_names:
+            for aname in author_names:
+                observations.append({
+                    "source_ref": ref,
+                    "observation_type": "RESEARCH_ACTIVITY",
+                    "subject": aname,
+                    "object": None,
+                    "observed_at": pub_date,
+                    "text_excerpt": (abstract or title)[:400],
+                    "confidence": 0.65,
+                    "document_id": ref,
+                    "metadata": {
+                        "extractor_id": ADAPTER_ID,
+                        "work_id": wid,
+                        "doi": doi_id or None,
+                        "author_role": "authorship",
+                    },
+                })
 
     return {
         "entities": list(entities.values()),

@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.16)
+## Shipped (through 0.1.17)
 
 | Ver | Highlights |
 |-----|------------|
@@ -24,10 +24,11 @@
 | 0.1.14 | first-class `license` + public-corpus lint policy |
 | 0.1.15 | `documents[]` + first-class `document_id` / `char_span` |
 | 0.1.16 | `PERSON` entity type; document span highlight UI |
+| 0.1.17 | OpenAlex authors → PERSON; entity_type API/UI chips |
 
 ## Next
 
-1. OpenAlex author → PERSON entities
+1. Documents tab in Data Explorer
 2. Real PatentsView dump (human data)
 3. Enable Actions with workflow-scoped PAT (human)
 

@@ -35,6 +35,26 @@ def test_openalex_fixture_shape():
     assert "Grid Storage Research Lab" in names
 
 
+@pytest.mark.unit
+def test_openalex_authors_are_person_entities():
+    raw = json.loads(FIX.read_text(encoding="utf-8"))
+    pkg = convert_openalex(raw)
+    people = [e for e in pkg["entities"] if e.get("entity_type") == "PERSON"]
+    names = {e["canonical_name"] for e in people}
+    assert "Alex Chen" in names
+    assert "M. Schneider" in names
+    # ORCID preserved when present
+    alex = next(e for e in people if e["canonical_name"] == "Alex Chen")
+    systems = {x.get("system") for x in alex.get("external_ids") or []}
+    assert "orcid" in systems
+    assert "openalex_author" in systems
+    # institution observations still carry author list in metadata
+    assert any(
+        "Alex Chen" in (o.get("metadata") or {}).get("authors", [])
+        for o in pkg["observations"]
+    )
+
+
 @pytest.mark.integration
 def test_openalex_imports_clean():
     raw = json.loads(FIX.read_text(encoding="utf-8"))

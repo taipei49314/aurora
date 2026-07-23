@@ -54,6 +54,18 @@ def test_entities_query_filter(client):
     assert miss == []
 
 
+def test_entities_entity_type_filter(client):
+    all_ents = client.get("/api/entities?limit=500").json()
+    assert all_ents
+    et = all_ents[0].get("entity_type")
+    assert et
+    filtered = client.get(f"/api/entities?entity_type={et}&limit=500").json()
+    assert filtered
+    assert all(str(e.get("entity_type") or "").upper() == str(et).upper() for e in filtered)
+    multi = client.get("/api/entities?entity_type=COMPANY,PERSON&limit=500").json()
+    assert all(str(e.get("entity_type") or "").upper() in {"COMPANY", "PERSON"} for e in multi)
+
+
 def test_stats_endpoint(client):
     r = client.get("/api/stats")
     assert r.status_code == 200, r.text
@@ -77,6 +89,9 @@ def test_stats_endpoint(client):
     assert "documents_total" in body
     assert "observation_country_counts" in body
     assert "entities_with_country" in body
+    assert "entity_type_counts" in body
+    assert isinstance(body["entity_type_counts"], dict)
+    assert sum(body["entity_type_counts"].values()) == body["entities_total"]
     assert "unique_event_ids" in body
     assert body["sources_total"] > 0
     assert isinstance(body["sources_with_family_id"], int)

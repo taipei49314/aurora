@@ -280,7 +280,8 @@ Not required for scoring; enables span-level provenance for real dumps.
 
 `PERSON` is for inventors, authors, and founders. They are **not** industry-clusterable
 (`CLUSTERABLE_TYPES` excludes them) so they do not form industry hypotheses alone.
-USPTO / PatentsView adapters emit `PERSON` entities from inventor lists.
+USPTO / PatentsView adapters emit `PERSON` from inventor lists; OpenAlex emits
+`PERSON` from authorships (engine 0.1.17+) with optional `orcid` / `openalex_author` ids.
 
 ### `observation_type`
 
