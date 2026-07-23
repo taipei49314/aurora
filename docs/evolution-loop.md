@@ -128,10 +128,15 @@ Commits ahead of `origin/master` for **v0.1.2** batch:
 - Data Explorer Resolve bar → `POST /api/resolve`
 - `scripts/check_all.py` / `make check-all` pre-push gate
 
-## Loop 13 (next)
+## Loop 13 (done) — CI + doctor + autonomous push policy
 
-1. Push **v0.1.2** when you say so
-2. Human: real PatentsView dump
-3. Optional: CI workflow file (GitHub Actions) when ready to push
+- GitHub Actions CI, issue templates, adapters doctor, entities `?q=`, UI engine badge
+- User authorized continuous push; releases tagged when a slice lands
+
+## Loop 14 (next)
+
+1. Real PatentsView dump (human data)
+2. OpenAlex paper adapter (good first issue)
+3. Optional: frontend uses `entities?q=` for filter
 
 **Out of scope:** live crawl service, multi-tenant SaaS, stock outputs

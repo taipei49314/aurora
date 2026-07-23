@@ -101,6 +101,7 @@ def main(argv=None) -> int:
             "ext:lei:LEI-FERRO-DEMO",
         ],
     )
+    run("adapters-doctor", [py, "-m", "adapters", "doctor"])
     print("=" * 72)
     print("ALL OK")
     return 0

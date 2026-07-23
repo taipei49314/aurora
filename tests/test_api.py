@@ -44,6 +44,16 @@ def test_resolve_unknown_returns_404(client):
     assert r.status_code == 404
 
 
+def test_entities_query_filter(client):
+    ents = client.get("/api/entities?limit=50").json()
+    assert ents
+    name = ents[0]["canonical_name"]
+    hit = client.get(f"/api/entities?q={name[: min(6, len(name))]}&limit=50").json()
+    assert any(e["canonical_name"] == name for e in hit)
+    miss = client.get("/api/entities?q=___no_match_xyz___&limit=50").json()
+    assert miss == []
+
+
 def test_export_is_round_trippable_via_import_upload(client):
     pkg = client.get("/api/exports").json()
     assert set(pkg) == {"entities", "sources", "observations"}

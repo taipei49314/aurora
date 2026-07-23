@@ -114,8 +114,18 @@ def resolve_entity(body: ResolveBody):
 
 
 @app.get("/api/entities")
-def entities(limit: int = 200):
-    return [to_dict(e) for e in REPO.snapshot.entities[:limit]]
+def entities(limit: int = 200, q: Optional[str] = None):
+    """List entities; optional ``q`` filters name/aliases/external_ids/id."""
+    rows = [to_dict(e) for e in REPO.snapshot.entities]
+    if q:
+        needle = q.strip().lower()
+        filtered = []
+        for r in rows:
+            blob = json.dumps(r, ensure_ascii=False).lower()
+            if needle in blob:
+                filtered.append(r)
+        rows = filtered
+    return rows[:limit]
 
 
 @app.get("/api/entities/{entity_id}")

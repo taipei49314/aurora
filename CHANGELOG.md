@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.3] — 2026-07-24
+
+### Added
+
+- GitHub Actions **CI template** (`docs/ci-github-actions.yml` → copy to `.github/workflows/ci.yml`; runs `scripts/check_all.py`)
+- Issue templates + `docs/GOOD_FIRST_ISSUES.md`
+- `python -m adapters doctor` fixture/smoke check
+- `GET /api/entities?q=` server-side filter
+- Frontend header shows **engine version** from `/api/health`
+
+### Changed
+
+- Engine / package version → **0.1.3**
+
 ## [0.1.2] — 2026-07-24
 
 ### Added
