@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.14] — 2026-07-24
+
+### Added
+
+- First-class **`Source.license`** (metadata + package-level default via `license` / `package.license` / `meta.license`)
+- Stats: `sources_with_license`, `license_counts`
+- Data Explorer license column; Dashboard license card
+- `lint_package --require-license` / `--public-corpus` fails when any source lacks license
+- USPTO / OpenAlex adapters emit top-level `license`
+- Import-schema public-corpus license policy section
+
+### Changed
+
+- Engine / feature → **0.1.14**
+- Import-schema license gap marked done
+
 ## [0.1.13] — 2026-07-24
 
 ### Added

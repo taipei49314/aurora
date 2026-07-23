@@ -88,6 +88,8 @@ class Source:
     wire_id: str = ""
     # Geo / jurisdiction (country, region, city, raw, jurisdiction); metadata.geo fallback
     geo: dict = field(default_factory=dict)
+    # Redistribution license SPDX-ish string (metadata.license fallback; engine 0.1.14+)
+    license: str = ""
     metadata: dict = field(default_factory=dict)
 
 

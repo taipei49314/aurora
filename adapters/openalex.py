@@ -146,6 +146,19 @@ def convert_openalex(raw: dict) -> Package:
         if doi_id:
             source_meta["external_ids"].append({"system": "doi", "id": doi_id})
 
+        # OpenAlex works are often OA; prefer work-level license when present
+        license_s = ""
+        for key in ("license", "open_access"):
+            val = w.get(key)
+            if isinstance(val, dict):
+                license_s = (val.get("license") or val.get("oa_status") or "").strip()
+            elif isinstance(val, str):
+                license_s = val.strip()
+            if license_s:
+                break
+        if not license_s:
+            license_s = "openalex-unknown"
+
         sources.append({
             "ref": ref,
             "source_type": "PAPER",
@@ -157,6 +170,7 @@ def convert_openalex(raw: dict) -> Package:
             "reliability_tier": "B",
             "url_or_local_path": doi or w.get("id") or f"local://openalex/{wid}",
             "language": "en",
+            "license": license_s,  # first-class 0.1.14+
             "metadata": source_meta,
         })
 

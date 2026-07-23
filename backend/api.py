@@ -99,6 +99,8 @@ def stats():
     with_outlet = 0
     with_wire = 0
     with_geo = 0
+    with_license = 0
+    license_counts: dict = {}
     for src in s.sources:
         t = (src.reliability_tier or "C").upper()
         tier_counts[t] = tier_counts.get(t, 0) + 1
@@ -116,6 +118,10 @@ def stats():
             with_wire += 1
         if getattr(src, "geo", None) or (src.metadata or {}).get("geo"):
             with_geo += 1
+        lic = (getattr(src, "license", None) or (src.metadata or {}).get("license") or "").strip()
+        if lic:
+            with_license += 1
+            license_counts[lic] = license_counts.get(lic, 0) + 1
     type_counts: dict = {}
     obs_with_event_id = 0
     obs_with_geo = 0
@@ -159,6 +165,8 @@ def stats():
         "sources_with_outlet_domain": with_outlet,
         "sources_with_wire_id": with_wire,
         "sources_with_geo": with_geo,
+        "sources_with_license": with_license,
+        "license_counts": license_counts,
         "observations_with_event_id": obs_with_event_id,
         "observations_with_geo": obs_with_geo,
         "observation_country_counts": country_counts,
@@ -350,6 +358,9 @@ def export_package():
         if geo:
             meta.pop("geo", None)
             meta.pop("location", None)
+        license_s = getattr(src, "license", "") or meta.pop("license", "") or ""
+        if license_s:
+            meta.pop("license", None)
         sources.append({
             "ref": src.source_id, "source_type": src.source_type,
             "publisher": src.publisher, "title": src.title,
@@ -359,6 +370,7 @@ def export_package():
             "outlet_domain": outlet_domain,
             "wire_id": wire_id,
             "geo": geo,
+            "license": license_s,
             "url_or_local_path": src.url_or_local_path,
             "independence_group": src.independence_group,
             "reliability_tier": src.reliability_tier,

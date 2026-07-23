@@ -61,6 +61,11 @@ def _extract_wire_id(row: dict, meta: dict) -> str:
     return (row.get("wire_id") or meta.get("wire_id") or "").strip()
 
 
+def _extract_license(row: dict, meta: dict, default: str = "") -> str:
+    """First-class license with metadata + package default fallback (engine 0.1.14+)."""
+    return (row.get("license") or meta.get("license") or default or "").strip()
+
+
 def _normalize_geo(raw) -> dict:
     """Normalize location/geo payloads into a stable dict of known keys."""
     if raw in (None, "", {}):
@@ -164,6 +169,13 @@ def _merge_entity_row(existing: Entity, *, aliases, description, country, ext_id
 def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
     created_at = created_at or _now()
     errors: list[RowError] = []
+
+    # Optional package-level default license for public corpora (0.1.14+)
+    package_license = (raw.get("license") or "").strip()
+    if not package_license and isinstance(raw.get("package"), dict):
+        package_license = (raw["package"].get("license") or "").strip()
+    if not package_license and isinstance(raw.get("meta"), dict):
+        package_license = (raw["meta"].get("license") or "").strip()
 
     # --- 1. build entities (deterministic ids; merge on shared external_ids) ---
     entities: dict[str, Entity] = {}
@@ -317,6 +329,9 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 meta.pop("location", None)
                 meta.pop("country", None)
                 meta.pop("jurisdiction", None)
+            license_s = _extract_license(row, meta, default=package_license)
+            if license_s:
+                meta.pop("license", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
                 indep = _derive_independence_group(
@@ -334,7 +349,8 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), family_id=family_id,
                 event_date=event_date, event_id=event_id,
-                outlet_domain=outlet_domain, wire_id=wire_id, geo=geo, metadata=meta,
+                outlet_domain=outlet_domain, wire_id=wire_id, geo=geo,
+                license=license_s, metadata=meta,
             )
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid

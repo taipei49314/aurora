@@ -7,6 +7,10 @@
   "required": ["entities", "sources", "observations"],
   "additionalProperties": true,
   "properties": {
+    "license": {
+      "type": "string",
+      "description": "Package-level default redistribution license applied to sources missing license (0.1.14+)"
+    },
     "entities": {
       "type": "array",
       "items": { "$ref": "#/$defs/entity" }
@@ -128,6 +132,10 @@
         "jurisdiction": {
           "type": "string",
           "description": "Shorthand for geo.jurisdiction"
+        },
+        "license": {
+          "type": "string",
+          "description": "Redistribution license (SPDX-ish); required for public corpora (0.1.14+)"
         },
         "metadata": { "type": "object" }
       }

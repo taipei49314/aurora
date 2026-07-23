@@ -68,6 +68,8 @@ def test_stats_endpoint(client):
     assert "sources_with_outlet_domain" in body
     assert "sources_with_wire_id" in body
     assert "sources_with_geo" in body
+    assert "sources_with_license" in body
+    assert "license_counts" in body
     assert "observations_with_event_id" in body
     assert "observations_with_geo" in body
     assert "observation_country_counts" in body
@@ -82,6 +84,9 @@ def test_stats_endpoint(client):
     assert body["sources_with_outlet_domain"] >= 0
     assert isinstance(body["sources_with_geo"], int)
     assert body["sources_with_geo"] >= 0
+    assert isinstance(body["sources_with_license"], int)
+    assert body["sources_with_license"] >= 0
+    assert isinstance(body["license_counts"], dict)
     assert isinstance(body["unique_event_ids"], int)
     assert body["unique_event_ids"] >= 0
     assert sum(body["source_type_counts"].values()) == body["sources_total"]

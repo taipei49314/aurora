@@ -59,6 +59,8 @@ export interface CorpusStats {
   sources_with_outlet_domain?: number;
   sources_with_wire_id?: number;
   sources_with_geo?: number;
+  sources_with_license?: number;
+  license_counts?: Record<string, number>;
   observations_with_event_id?: number;
   observations_with_geo?: number;
   observation_country_counts?: Record<string, number>;
