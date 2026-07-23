@@ -76,6 +76,11 @@ export function Dashboard() {
             value={st.sources_with_event_date ?? "—"}
             sub="dual-date coverage"
           />
+          <StatCard
+            label="event_id"
+            value={st.unique_event_ids ?? "—"}
+            sub={`${st.observations_with_event_id ?? 0} obs tagged`}
+          />
         </div>
       )}
 

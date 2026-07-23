@@ -81,6 +81,8 @@ class Source:
     family_id: str = ""
     # Activity / filing / application date (dual-date with published_at; metadata.event_date fallback)
     event_date: Optional[str] = None
+    # Real-world event key for event-level independence (metadata.event_id fallback)
+    event_id: str = ""
     metadata: dict = field(default_factory=dict)
 
 
@@ -110,6 +112,8 @@ class Observation:
     unit: Optional[str]
     text_excerpt: str
     confidence: float
+    # Real-world event key (top-level or metadata; may inherit from Source.event_id)
+    event_id: str = ""
     metadata: dict = field(default_factory=dict)
 
 

@@ -157,10 +157,7 @@ def convert_news(raw: dict) -> Package:
         if reprint_of:
             source_meta["is_reprint_of"] = reprint_of
             source_meta["primary_ref"] = id_to_ref.get(reprint_of)
-        if event_id:
-            source_meta["event_id"] = event_id
-
-        sources.append({
+        src_row: Dict[str, Any] = {
             "ref": ref,
             "source_type": "NEWS",
             "publisher": publisher,
@@ -172,7 +169,11 @@ def convert_news(raw: dict) -> Package:
             "url_or_local_path": art.get("url") or f"local://news/{art_id}",
             "language": art.get("language") or "en",
             "metadata": source_meta,
-        })
+        }
+        if event_id:
+            # First-class event_id (engine 0.1.11+) for event-level independence
+            src_row["event_id"] = event_id
+        sources.append(src_row)
 
         claims = art.get("claims") or []
         if not isinstance(claims, list):
@@ -214,14 +215,12 @@ def convert_news(raw: dict) -> Package:
                 "extractor_version": ADAPTER_VERSION,
                 "char_span": claim.get("char_span"),
             }
-            if event_id:
-                obs_meta["event_id"] = event_id
             if reprint_of:
                 obs_meta["is_reprint_of"] = reprint_of
 
             text = (claim.get("text_excerpt") or body or title)[:400]
             conf = float(claim.get("confidence") or (0.7 if reprint_of else 0.8))
-            observations.append({
+            obs_row: Dict[str, Any] = {
                 "source_ref": ref,
                 "observation_type": otype,
                 "subject": subject,
@@ -230,7 +229,10 @@ def convert_news(raw: dict) -> Package:
                 "text_excerpt": text,
                 "confidence": conf,
                 "metadata": {k: v for k, v in obs_meta.items() if v is not None},
-            })
+            }
+            if event_id:
+                obs_row["event_id"] = event_id
+            observations.append(obs_row)
 
     return {
         "entities": list(entities.values()),

@@ -135,6 +135,7 @@ Without `ref`, observations cannot attach to the source.
 | `excerpt` | string | `""` | **Part of content hash** + near-duplicate tokens (also stored in `metadata.excerpt`) |
 | `independence_group` | string | auto or `""` | Declared non-independence; if empty, engine derives from `metadata.wire_id` → `wire:…`, `outlet_domain` → `domain:…`, or `family_id` → `family:…` (0.1.1+) |
 | `family_id` | string | `""` | **First-class** (engine 0.1.8+); patent/document family. Metadata fallback still accepted; promoted onto `Source.family_id`. When `independence_group` empty → `family:<id>` |
+| `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event key. Sources sharing `event_id` are not independent (dedup layer 2b). When `independence_group` empty → `event:<id>` (after wire/domain/family) |
 | `reliability_tier` | `"A"\|"B"\|"C"\|"D"` | `"C"` | **Scored** via data_quality_penalty (engine 0.1.1+); stamped onto observation metadata at import |
 | `url_or_local_path` | string | `""` | Provenance |
 | `language` | string | `"en"` | **Stored only** today |
@@ -170,6 +171,7 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 | `wire:<name>` | Same news wire / syndication family |
 | `domain:<host>` | Same digital outlet |
 | `family:<patent_family_id>` | Same patent family |
+| `event:<event_id>` | Same real-world event (engine 0.1.11+) |
 | `reprint:<hash>` | Known republication of identical body |
 
 ---
@@ -190,6 +192,7 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 |-------|------|---------|------------|
 | `object` | string \| null | null | Other entity name for relational edges |
 | `observed_at` | string \| null | null | Temporal signals, leakage, fade |
+| `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event. Metadata fallback; inherits `Source.event_id` when empty |
 | `text_excerpt` | string | `""` | **Primary feature text** (TF-IDF / naming) |
 | `confidence` | number 0..1 | `0.7` | Edge weights for relational types |
 | `numeric_value` | number \| null | null | Lead-time / capacity heuristics |
@@ -322,7 +325,7 @@ Do **not** assume these exist as first-class fields:
 | Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
 | Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |
 | Outlet auto-independence | manual group | `outlet_domain`, `wire_id` |
-| Event-level dedup | `metadata.event_id` | `event_id` |
+| Event-level dedup | **done** first-class `event_id` on Source + Observation | independence layer 2b |
 | Geo / jurisdiction in model | metadata / unused country | first-class geo |
 | reliability in score | **done (engine 0.1.1)** via data_quality_penalty | optional: tier-weighted independence |
 | License for redistribution | metadata.license | required for public corpora |

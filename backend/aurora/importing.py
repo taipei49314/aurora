@@ -46,8 +46,15 @@ def _extract_event_date(row: dict, meta: dict) -> Optional[str]:
     return str(raw).strip()[:10] if str(raw).strip() else None
 
 
-def _derive_independence_group(row: dict, meta: dict, family_id: str = "") -> str:
-    """When independence_group is empty, derive from wire/domain/family metadata."""
+def _extract_event_id(row: dict, meta: dict) -> str:
+    """First-class event_id with metadata fallback (engine 0.1.11+)."""
+    return (row.get("event_id") or meta.get("event_id") or "").strip()
+
+
+def _derive_independence_group(
+    row: dict, meta: dict, family_id: str = "", event_id: str = ""
+) -> str:
+    """When independence_group is empty, derive from wire/domain/family/event metadata."""
     wire = (meta.get("wire_id") or row.get("wire_id") or "").strip()
     if wire:
         return f"wire:{wire}"
@@ -57,6 +64,9 @@ def _derive_independence_group(row: dict, meta: dict, family_id: str = "") -> st
     family = (family_id or meta.get("family_id") or row.get("family_id") or "").strip()
     if family:
         return f"family:{family}"
+    event = (event_id or meta.get("event_id") or row.get("event_id") or "").strip()
+    if event:
+        return f"event:{event}"
     return ""
 
 
@@ -230,16 +240,21 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             event_date = _extract_event_date(row, meta)
             if event_date and str(meta.get("event_date") or "")[:10] == event_date:
                 meta.pop("event_date", None)
+            event_id = _extract_event_id(row, meta)
+            if event_id and meta.get("event_id") == event_id:
+                meta.pop("event_id", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
-                indep = _derive_independence_group(row, meta, family_id=family_id)
+                indep = _derive_independence_group(
+                    row, meta, family_id=family_id, event_id=event_id
+                )
             sources[sid] = Source(
                 source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
                 title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=created_at,
                 url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), family_id=family_id,
-                event_date=event_date, metadata=meta,
+                event_date=event_date, event_id=event_id, metadata=meta,
             )
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid
@@ -311,6 +326,10 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         observed_at = row.get("observed_at") or None
         if observed_at in (None, ""):
             observed_at = src.event_date or src.published_at or None
+        # First-class event_id (0.1.11+): top-level / metadata / inherit from source
+        event_id = _extract_event_id(row, meta) or (src.event_id or "")
+        if event_id and meta.get("event_id") == event_id:
+            meta.pop("event_id", None)
         meta["source_type"] = src.source_type
         meta["independence_group"] = resolved_group.get(sid, sid)
         meta.setdefault("reliability_tier", src.reliability_tier or "C")
@@ -325,7 +344,7 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 observation_type=row["observation_type"], subject_entity=subj, object_entity=obj,
                 numeric_value=row.get("numeric_value"), unit=row.get("unit"),
                 text_excerpt=row.get("text_excerpt", ""), confidence=float(row.get("confidence", 0.7)),
-                metadata=meta,
+                event_id=event_id, metadata=meta,
             )
 
     snap = make_snapshot(

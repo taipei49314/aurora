@@ -128,6 +128,18 @@ def resolve_independence(sources) -> dict:
         for other in ids[1:]:
             uf.union(ids[0], other)
 
+    # layer 2b: shared event_id → same real-world event (event-level dedup, 0.1.11+)
+    by_event: dict[str, list[str]] = defaultdict(list)
+    for s in sources:
+        eid = (getattr(s, "event_id", None) or "").strip()
+        if not eid:
+            eid = str((s.metadata or {}).get("event_id") or "").strip()
+        if eid:
+            by_event[eid].append(s.source_id)
+    for ids in by_event.values():
+        for other in ids[1:]:
+            uf.union(ids[0], other)
+
     # layer 3: near-duplicate shingles via MinHash-LSH. We only compute exact
     # jaccard for LSH-candidate pairs, keeping this near-linear at scale.
     # Token-less titles produce no signature and are never near-duplicates.

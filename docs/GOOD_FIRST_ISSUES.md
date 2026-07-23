@@ -34,8 +34,13 @@ Data Explorer column; USPTO adapter emits top-level `family_id`.
 fallback; empty observation `observed_at` falls back to event_date; USPTO
 adapter emits top-level; Dashboard + stats coverage.
 
+## 8. Schema: first-class `event_id` — **done (v0.1.11)**
+
+`Source.event_id` + `Observation.event_id`; shared event_id collapses source
+independence; obs inherits from source; adapters emit top-level; stats/UI.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
-- Schema: first-class `event_id` for event-level dedup
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
+- First-class `outlet_domain` / `wire_id` (today metadata-only derivation)

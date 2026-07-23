@@ -214,64 +214,53 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
                 country=country,
                 external_ids=asg_ext,
             )
+            evt_id = f"evt_{family or pub}"
             obs_meta: Dict[str, Any] = {
                 "document_id": ref,
-                "event_id": f"evt_{family or pub}",
                 "extractor_id": ADAPTER_ID,
                 "extractor_version": ADAPTER_VERSION,
             }
             if codes:
                 obs_meta["classification_codes"] = codes
 
+            def _obs(otype: str, subject: str, obj, text: str, conf: float) -> Dict[str, Any]:
+                return {
+                    "source_ref": ref,
+                    "observation_type": otype,
+                    "subject": subject,
+                    "object": obj,
+                    "observed_at": event_date,
+                    "text_excerpt": text,
+                    "confidence": conf,
+                    "event_id": evt_id,  # first-class (engine 0.1.11+)
+                    "metadata": dict(obs_meta),
+                }
+
             # Primary activity: company filed/published patent
             object_name = tech_names[0] if tech_names else (comp_names[0] if comp_names else None)
-            observations.append({
-                "source_ref": ref,
-                "observation_type": "PATENT_ACTIVITY",
-                "subject": name,
-                "object": object_name,
-                "observed_at": event_date,
-                "text_excerpt": abstract[:400] if abstract else title,
-                "confidence": 0.9,
-                "metadata": obs_meta,
-            })
+            observations.append(_obs(
+                "PATENT_ACTIVITY", name, object_name,
+                abstract[:400] if abstract else title, 0.9,
+            ))
 
             # Structural edges when adapter was given explicit ontology hooks
             for tech in tech_names:
-                observations.append({
-                    "source_ref": ref,
-                    "observation_type": "TECHNICAL_DEPENDENCY",
-                    "subject": name,
-                    "object": tech,
-                    "observed_at": event_date,
-                    "text_excerpt": f"{name} discloses {tech}: {title}",
-                    "confidence": 0.8,
-                    "metadata": dict(obs_meta),
-                })
+                observations.append(_obs(
+                    "TECHNICAL_DEPENDENCY", name, tech,
+                    f"{name} discloses {tech}: {title}", 0.8,
+                ))
             for comp in comp_names:
-                observations.append({
-                    "source_ref": ref,
-                    "observation_type": "TECHNICAL_DEPENDENCY",
-                    "subject": name,
-                    "object": comp,
-                    "observed_at": event_date,
-                    "text_excerpt": f"{title} — component {comp}",
-                    "confidence": 0.75,
-                    "metadata": dict(obs_meta),
-                })
+                observations.append(_obs(
+                    "TECHNICAL_DEPENDENCY", name, comp,
+                    f"{title} — component {comp}", 0.75,
+                ))
             for mat in mat_names:
                 # component/tech depends on material when both present; else company→material
                 subj = comp_names[0] if comp_names else name
-                observations.append({
-                    "source_ref": ref,
-                    "observation_type": "TECHNICAL_DEPENDENCY",
-                    "subject": subj,
-                    "object": mat,
-                    "observed_at": event_date,
-                    "text_excerpt": f"Depends on material {mat}",
-                    "confidence": 0.7,
-                    "metadata": dict(obs_meta),
-                })
+                observations.append(_obs(
+                    "TECHNICAL_DEPENDENCY", subj, mat,
+                    f"Depends on material {mat}", 0.7,
+                ))
 
     pkg = {
         "entities": list(entities.values()),
