@@ -6,26 +6,28 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
-## [0.1.8] — 2026-07-24
+## [0.1.9] — 2026-07-24
 
 ### Added
 
-- `GET /api/sources?source_type=` filter; stats include `source_type_counts`
-- `scripts/lint_package.py` — structure + import + vocabulary lint
-- Scheduler mode A restored (20m autonomous slices) for hands-off progress
+- Data Explorer **source_type** chips (from `/api/stats.source_type_counts`)
+- `scripts/check_all.py` runs `lint_package` on example + multisource packages
+- API test for `GET /api/sources?source_type=`
 
 ### Changed
 
-- Engine → **0.1.8**
+- Engine / feature → **0.1.9**
 
 ## [0.1.8] — 2026-07-24
 
 ### Added
 
 - First-class **`Source.family_id`** (import top-level or `metadata.family_id`; export + UI)
-- `/api/stats`: `source_type_counts`, `sources_total`, `sources_with_family_id`
+- `GET /api/sources?source_type=` filter; stats include `source_type_counts`, `sources_total`, `sources_with_family_id`
 - Data Explorer sources table **family_id** column
 - USPTO adapter emits top-level `family_id` on patent sources
+- `scripts/lint_package.py` — structure + import + vocabulary lint
+- Scheduler mode A restored (20m autonomous slices) for hands-off progress
 
 ### Changed
 
