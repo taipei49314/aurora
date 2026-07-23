@@ -70,6 +70,14 @@ def main(argv=None) -> int:
         "validate-example",
         [py, "scripts/validate_package.py", "examples/real_mini_package.json", "--strict"],
     )
+    run(
+        "lint-example",
+        [py, "scripts/lint_package.py", "examples/real_mini_package.json", "--strict"],
+    )
+    run(
+        "lint-multisource",
+        [py, "scripts/lint_package.py", "cases/multisource-iron-air/package.json", "--strict"],
+    )
     run("retro-case", [py, "scripts/run_retro_case.py", "cases/iron-air-retro"])
     run("multisource-case", [py, "scripts/build_multisource_case.py"])
     run(

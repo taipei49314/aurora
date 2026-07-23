@@ -87,6 +87,18 @@ def test_sources_reliability_tier_filter(client):
     assert bad.status_code == 422
 
 
+def test_sources_source_type_filter(client):
+    all_src = client.get("/api/sources?limit=500").json()
+    assert all_src
+    st = all_src[0].get("source_type")
+    assert st
+    filtered = client.get(f"/api/sources?source_type={st}&limit=500").json()
+    assert filtered
+    assert all(str(s.get("source_type") or "").upper() == str(st).upper() for s in filtered)
+    multi = client.get("/api/sources?source_type=PATENT,NEWS&limit=500").json()
+    assert all(str(s.get("source_type") or "").upper() in {"PATENT", "NEWS"} for s in multi)
+
+
 def test_sources_query_filter(client):
     all_src = client.get("/api/sources?limit=50").json()
     assert all_src

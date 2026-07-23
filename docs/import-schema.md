@@ -133,6 +133,7 @@ Without `ref`, observations cannot attach to the source.
 | `published_at` | string \| null | null | Dating / audit |
 | `excerpt` | string | `""` | **Part of content hash** + near-duplicate tokens (also stored in `metadata.excerpt`) |
 | `independence_group` | string | auto or `""` | Declared non-independence; if empty, engine derives from `metadata.wire_id` → `wire:…`, `outlet_domain` → `domain:…`, or `family_id` → `family:…` (0.1.1+) |
+| `family_id` | string | `""` | **First-class** (engine 0.1.8+); patent/document family. Metadata fallback still accepted; promoted onto `Source.family_id`. When `independence_group` empty → `family:<id>` |
 | `reliability_tier` | `"A"\|"B"\|"C"\|"D"` | `"C"` | **Scored** via data_quality_penalty (engine 0.1.1+); stamped onto observation metadata at import |
 | `url_or_local_path` | string | `""` | Provenance |
 | `language` | string | `"en"` | **Stored only** today |
@@ -317,7 +318,7 @@ Do **not** assume these exist as first-class fields:
 | External IDs | **done** first-class `external_ids[]` (+ metadata fallback) | use in ER join rules |
 | Full document + span | short excerpt only | `documents[]` + `document_id`/`char_span` |
 | Unresolved mentions | must pre-resolve names | staging / `subject_raw` |
-| Patent family | independence_group / metadata | `family_id` |
+| Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
 | Dual dates (app vs grant) | pick one; document in metadata | `event_date` vs `published_at` |
 | Outlet auto-independence | manual group | `outlet_domain`, `wire_id` |
 | Event-level dedup | `metadata.event_id` | `event_id` |
