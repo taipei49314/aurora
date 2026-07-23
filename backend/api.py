@@ -87,6 +87,30 @@ def health():
             "snapshot": REPO.snapshot.snapshot_id, "runs": len(REPO.runs)}
 
 
+@app.get("/api/stats")
+def stats():
+    """Corpus summary for Dashboard: counts, tier mix, external_ids coverage."""
+    s = REPO.snapshot
+    tier_counts: dict[str, int] = {}
+    for src in s.sources:
+        t = str(getattr(src, "reliability_tier", None) or "C").upper()
+        tier_counts[t] = tier_counts.get(t, 0) + 1
+    obs_type_counts: dict[str, int] = {}
+    for o in s.observations:
+        ot = str(o.observation_type or "UNKNOWN")
+        obs_type_counts[ot] = obs_type_counts.get(ot, 0) + 1
+    with_ext = sum(1 for e in s.entities if e.external_ids)
+    return {
+        "engine": DEFAULT_CONFIG.engine_version,
+        "snapshot_id": s.snapshot_id,
+        "counts": dict(s.counts or {}),
+        "entities_total": len(s.entities),
+        "entities_with_external_ids": with_ext,
+        "reliability_tier_counts": tier_counts,
+        "observation_type_counts": obs_type_counts,
+    }
+
+
 class ResolveBody(BaseModel):
     ref: str
     external_ids: Optional[list] = None
@@ -172,8 +196,53 @@ def sources(
 
 
 @app.get("/api/observations")
-def observations(limit: int = 500):
-    return [to_dict(o) for o in REPO.snapshot.observations[:limit]]
+def observations(
+    limit: int = 500,
+    observation_type: Optional[str] = None,
+    q: Optional[str] = None,
+):
+    """List observations. Optional ``observation_type`` (comma list) and ``q``."""
+    rows = [to_dict(o) for o in REPO.snapshot.observations]
+    if observation_type:
+        types = {t.strip() for t in observation_type.split(",") if t.strip()}
+        rows = [r for r in rows if str(r.get("observation_type") or "") in types]
+    if q:
+        needle = q.strip().lower()
+        if needle:
+            rows = [
+                r for r in rows
+                if needle in json.dumps(r, ensure_ascii=False).lower()
+            ]
+    return rows[:limit]
+
+
+@app.get("/api/stats")
+def stats():
+    """Snapshot corpus stats for dashboards (external_ids coverage, tier mix)."""
+    s = REPO.snapshot
+    tier_counts: dict = {}
+    for src in s.sources:
+        t = (src.reliability_tier or "C").upper()
+        tier_counts[t] = tier_counts.get(t, 0) + 1
+    type_counts: dict = {}
+    for o in s.observations:
+        type_counts[o.observation_type] = type_counts.get(o.observation_type, 0) + 1
+    with_ext = sum(1 for e in s.entities if e.external_ids)
+    ext_systems: dict = {}
+    for e in s.entities:
+        for x in e.external_ids or []:
+            sys = (x.get("system") if isinstance(x, dict) else None) or "?"
+            ext_systems[sys] = ext_systems.get(sys, 0) + 1
+    return {
+        "snapshot_id": s.snapshot_id,
+        "counts": dict(s.counts),
+        "entities_with_external_ids": with_ext,
+        "entities_total": len(s.entities),
+        "reliability_tier_counts": tier_counts,
+        "observation_type_counts": type_counts,
+        "external_id_systems": ext_systems,
+        "engine": DEFAULT_CONFIG.engine_version,
+    }
 
 
 @app.get("/api/snapshots")
