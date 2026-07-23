@@ -104,6 +104,11 @@ export function Dashboard() {
                 : "coverage"
             }
           />
+          <StatCard
+            label="documents"
+            value={st.documents_total ?? "—"}
+            sub={`${st.observations_with_document_id ?? 0} obs · ${st.observations_with_char_span ?? 0} spans`}
+          />
         </div>
       )}
 

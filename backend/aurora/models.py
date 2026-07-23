@@ -123,6 +123,26 @@ class Observation:
     event_id: str = ""
     # Geo / jurisdiction for the observation (may inherit from Source.geo)
     geo: dict = field(default_factory=dict)
+    # Provenance into a full document (engine 0.1.15+)
+    document_id: str = ""
+    char_span: Optional[list] = None  # [start, end] character offsets into document text
+    metadata: dict = field(default_factory=dict)
+
+
+@dataclass
+class Document:
+    """Optional full-document record linked by document_id (engine 0.1.15+).
+
+    Text may be empty when only a local path/URL is known; observations still
+    point here via document_id + optional char_span.
+    """
+    document_id: str
+    source_id: str = ""
+    title: str = ""
+    text: str = ""
+    url_or_local_path: str = ""
+    language: str = "en"
+    license: str = ""
     metadata: dict = field(default_factory=dict)
 
 

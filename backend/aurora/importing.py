@@ -17,7 +17,15 @@ from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from .ids import prefixed_id, content_hash, normalize_text
-from .models import Source, Entity, Observation, SOURCE_TYPES, ENTITY_TYPES, OBSERVATION_TYPES
+from .models import (
+    Source,
+    Entity,
+    Observation,
+    Document,
+    SOURCE_TYPES,
+    ENTITY_TYPES,
+    OBSERVATION_TYPES,
+)
 from .errors import RowError
 from .entity_resolution import (
     EntityResolver,
@@ -64,6 +72,34 @@ def _extract_wire_id(row: dict, meta: dict) -> str:
 def _extract_license(row: dict, meta: dict, default: str = "") -> str:
     """First-class license with metadata + package default fallback (engine 0.1.14+)."""
     return (row.get("license") or meta.get("license") or default or "").strip()
+
+
+def _extract_document_id(row: dict, meta: dict) -> str:
+    """First-class document_id with metadata fallback (engine 0.1.15+)."""
+    return (row.get("document_id") or meta.get("document_id") or "").strip()
+
+
+def _extract_char_span(row: dict, meta: dict) -> Optional[list]:
+    """First-class char_span [start, end] with metadata fallback (engine 0.1.15+)."""
+    raw = row.get("char_span") if row.get("char_span") not in (None, "") else meta.get("char_span")
+    if raw in (None, ""):
+        return None
+    if isinstance(raw, dict):
+        start, end = raw.get("start"), raw.get("end")
+        if start is None or end is None:
+            return None
+        try:
+            a, b = int(start), int(end)
+        except (TypeError, ValueError):
+            return None
+        return [a, b] if a <= b else [b, a]
+    if isinstance(raw, (list, tuple)) and len(raw) >= 2:
+        try:
+            a, b = int(raw[0]), int(raw[1])
+        except (TypeError, ValueError):
+            return None
+        return [a, b] if a <= b else [b, a]
+    return None
 
 
 def _normalize_geo(raw) -> dict:
@@ -436,6 +472,13 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             meta.pop("location", None)
             meta.pop("country", None)
             meta.pop("jurisdiction", None)
+        # Document provenance (0.1.15+): document_id + optional char_span
+        document_id = _extract_document_id(row, meta)
+        if document_id:
+            meta.pop("document_id", None)
+        char_span = _extract_char_span(row, meta)
+        if char_span is not None:
+            meta.pop("char_span", None)
         meta["source_type"] = src.source_type
         meta["independence_group"] = resolved_group.get(sid, sid)
         meta.setdefault("reliability_tier", src.reliability_tier or "C")
@@ -450,8 +493,38 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 observation_type=row["observation_type"], subject_entity=subj, object_entity=obj,
                 numeric_value=row.get("numeric_value"), unit=row.get("unit"),
                 text_excerpt=row.get("text_excerpt", ""), confidence=float(row.get("confidence", 0.7)),
-                event_id=event_id, geo=geo, metadata=meta,
+                event_id=event_id, geo=geo, document_id=document_id,
+                char_span=char_span, metadata=meta,
             )
+
+    # Optional documents[] for full-text / path provenance (engine 0.1.15+)
+    documents: dict[str, Document] = {}
+    for i, row in enumerate(raw.get("documents") or []):
+        if not isinstance(row, dict):
+            errors.append(RowError(i, "documents", "SCHEMA_VALIDATION_FAILED",
+                                   "document row must be an object", str(row)))
+            continue
+        did = (row.get("document_id") or row.get("id") or "").strip()
+        if not did:
+            errors.append(RowError(i, "document_id", "SCHEMA_VALIDATION_FAILED",
+                                   "missing document_id", str(row)))
+            continue
+        src_ref = (row.get("source_ref") or "").strip()
+        source_id = ref_to_sid.get(src_ref, "") if src_ref else ""
+        if src_ref and not source_id:
+            errors.append(RowError(i, "source_ref", "SCHEMA_VALIDATION_FAILED",
+                                   f"document references unknown source {src_ref}", src_ref))
+        dmeta = dict(row.get("metadata") or {})
+        documents[did] = Document(
+            document_id=did,
+            source_id=source_id,
+            title=(row.get("title") or "").strip(),
+            text=row.get("text") or row.get("body") or "",
+            url_or_local_path=row.get("url_or_local_path") or row.get("url") or "",
+            language=row.get("language") or "en",
+            license=(row.get("license") or dmeta.pop("license", "") or "").strip(),
+            metadata=dmeta,
+        )
 
     snap = make_snapshot(
         entities=sorted(entities.values(), key=lambda e: e.entity_id),
@@ -460,6 +533,7 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         resolved_group=resolved_group,
         import_errors=[e.__dict__ for e in errors],
         created_at=created_at,
+        documents=sorted(documents.values(), key=lambda d: d.document_id),
     )
     snap.counts.update({
         "raw_source_count": indep["raw_source_count"],

@@ -8,4 +8,4 @@ from .taxonomy import Taxonomy
 from .pipeline import run_pipeline
 
 __all__ = ["DEFAULT_CONFIG", "EngineConfig", "import_package", "Taxonomy", "run_pipeline"]
-__version__ = "0.1.14"
+__version__ = "0.1.15"

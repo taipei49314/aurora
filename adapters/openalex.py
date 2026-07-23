@@ -206,8 +206,8 @@ def convert_openalex(raw: dict) -> Package:
                 "observed_at": pub_date,
                 "text_excerpt": (abstract or title)[:400],
                 "confidence": 0.75,
+                "document_id": ref,  # first-class 0.1.15+
                 "metadata": {
-                    "document_id": ref,
                     "extractor_id": ADAPTER_ID,
                     "work_id": wid,
                     "doi": doi_id or None,
