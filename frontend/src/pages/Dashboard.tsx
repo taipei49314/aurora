@@ -86,6 +86,11 @@ export function Dashboard() {
             value={st.sources_with_outlet_domain ?? "—"}
             sub={`${st.sources_with_wire_id ?? 0} with wire_id`}
           />
+          <StatCard
+            label="geo"
+            value={st.sources_with_geo ?? "—"}
+            sub={`${st.observations_with_geo ?? 0} obs · ${st.entities_with_country ?? 0} ents w/ country`}
+          />
         </div>
       )}
 

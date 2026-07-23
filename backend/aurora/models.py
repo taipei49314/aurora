@@ -86,6 +86,8 @@ class Source:
     # Outlet identity for independence (metadata fallback; engine 0.1.12+)
     outlet_domain: str = ""
     wire_id: str = ""
+    # Geo / jurisdiction (country, region, city, raw, jurisdiction); metadata.geo fallback
+    geo: dict = field(default_factory=dict)
     metadata: dict = field(default_factory=dict)
 
 
@@ -117,6 +119,8 @@ class Observation:
     confidence: float
     # Real-world event key (top-level or metadata; may inherit from Source.event_id)
     event_id: str = ""
+    # Geo / jurisdiction for the observation (may inherit from Source.geo)
+    geo: dict = field(default_factory=dict)
     metadata: dict = field(default_factory=dict)
 
 

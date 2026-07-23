@@ -138,6 +138,7 @@ Without `ref`, observations cannot attach to the source.
 | `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event key. Sources sharing `event_id` are not independent (dedup layer 2b). When `independence_group` empty → `event:<id>` (after wire/domain/family) |
 | `outlet_domain` | string | `""` | **First-class** (engine 0.1.12+); digital outlet host. Metadata fallback. When `independence_group` empty → `domain:<host>` (after wire) |
 | `wire_id` | string | `""` | **First-class** (engine 0.1.12+); news wire / syndication key. Metadata fallback. When `independence_group` empty → `wire:<id>` (highest priority auto-derive) |
+| `geo` | object | `{}` | **First-class** (engine 0.1.13+); keys: `country`, `region`, `city`, `raw`, `jurisdiction`. Accepts `location` alias and top-level `country` / `jurisdiction` shorthands. Metadata fallback. |
 | `reliability_tier` | `"A"\|"B"\|"C"\|"D"` | `"C"` | **Scored** via data_quality_penalty (engine 0.1.1+); stamped onto observation metadata at import |
 | `url_or_local_path` | string | `""` | Provenance |
 | `language` | string | `"en"` | **Stored only** today |
@@ -195,6 +196,7 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 | `object` | string \| null | null | Other entity name for relational edges |
 | `observed_at` | string \| null | null | Temporal signals, leakage, fade |
 | `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event. Metadata fallback; inherits `Source.event_id` when empty |
+| `geo` | object | `{}` | **First-class** (engine 0.1.13+); location/jurisdiction. Inherits `Source.geo` when empty. Accepts `location` / `country` / `jurisdiction` aliases |
 | `text_excerpt` | string | `""` | **Primary feature text** (TF-IDF / naming) |
 | `confidence` | number 0..1 | `0.7` | Edge weights for relational types |
 | `numeric_value` | number \| null | null | Lead-time / capacity heuristics |
@@ -328,7 +330,7 @@ Do **not** assume these exist as first-class fields:
 | Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |
 | Outlet auto-independence | **done** first-class `outlet_domain` + `wire_id` | derive independence_group |
 | Event-level dedup | **done** first-class `event_id` on Source + Observation | independence layer 2b |
-| Geo / jurisdiction in model | metadata / unused country | first-class geo |
+| Geo / jurisdiction in model | **done** first-class `geo` on Source + Observation | entity.country already first-class |
 | reliability in score | **done (engine 0.1.1)** via data_quality_penalty | optional: tier-weighted independence |
 | License for redistribution | metadata.license | required for public corpora |
 | PERSON entities | metadata / free text | optional type or out of scope |

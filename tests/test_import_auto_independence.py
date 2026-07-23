@@ -280,3 +280,58 @@ def test_event_id_first_class_and_source_independence():
     assert snap.counts["independent_source_count"] == 1
     assert snap.counts["raw_source_count"] == 2
     assert all(o.event_id == "evt_supply_2024" for o in snap.observations)
+
+@pytest.mark.unit
+def test_geo_first_class_on_source_and_observation():
+    """Engine 0.1.13+: geo is first-class; obs inherits source.geo when empty."""
+    pkg = _pkg([{
+        "ref": "a",
+        "source_type": "JOB_POSTING",
+        "publisher": "Acme careers",
+        "title": "Battery engineer",
+        "excerpt": "join us",
+        "published_at": "2024-05-01",
+        "geo": {"country": "us", "region": "AZ"},
+    }], [{
+        "source_ref": "a",
+        "observation_type": "HIRING_ACTIVITY",
+        "subject": "Acme",
+        "observed_at": "2024-05-01",
+        "text_excerpt": "hiring",
+    }])
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    src = snap.sources[0]
+    assert src.geo.get("country") == "US"
+    assert src.geo.get("region") == "AZ"
+    assert "geo" not in (src.metadata or {})
+    obs = snap.observations[0]
+    assert obs.geo.get("country") == "US"
+    assert obs.geo.get("region") == "AZ"
+
+
+@pytest.mark.unit
+def test_geo_from_metadata_location_and_country_shorthand():
+    pkg = _pkg([{
+        "ref": "a",
+        "source_type": "NEWS",
+        "publisher": "Local",
+        "title": "Plant opening",
+        "excerpt": "body",
+        "country": "DE",
+        "metadata": {"location": {"city": "Berlin"}},
+    }], [{
+        "source_ref": "a",
+        "observation_type": "CAPACITY_EXPANSION",
+        "subject": "Acme",
+        "observed_at": "2023-01-01",
+        "text_excerpt": "plant",
+        "jurisdiction": "DE-BE",
+    }])
+    snap = import_package(pkg)
+    src = snap.sources[0]
+    assert src.geo.get("country") == "DE"
+    assert src.geo.get("city") == "Berlin"
+    obs = snap.observations[0]
+    assert obs.geo.get("country") == "DE"
+    assert obs.geo.get("jurisdiction") == "DE-BE"

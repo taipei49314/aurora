@@ -61,6 +61,49 @@ def _extract_wire_id(row: dict, meta: dict) -> str:
     return (row.get("wire_id") or meta.get("wire_id") or "").strip()
 
 
+def _normalize_geo(raw) -> dict:
+    """Normalize location/geo payloads into a stable dict of known keys."""
+    if raw in (None, "", {}):
+        return {}
+    if isinstance(raw, str):
+        s = raw.strip()
+        if not s:
+            return {}
+        if len(s) in (2, 3) and s.isalpha():
+            return {"country": s.upper()}
+        return {"raw": s}
+    if not isinstance(raw, dict):
+        return {}
+    out: dict = {}
+    for k in ("country", "region", "city", "raw", "jurisdiction", "admin1", "state"):
+        v = raw.get(k)
+        if v in (None, ""):
+            continue
+        key = "region" if k in ("admin1", "state") else k
+        val = str(v).strip()
+        if key == "country" and len(val) in (2, 3) and val.isalpha():
+            val = val.upper()
+        if key not in out:
+            out[key] = val
+    return out
+
+
+def _extract_geo(row: dict, meta: dict) -> dict:
+    """First-class geo with location/country/jurisdiction fallbacks (engine 0.1.13+)."""
+    g = _normalize_geo(row.get("geo"))
+    if not g:
+        g = _normalize_geo(row.get("location") or meta.get("geo") or meta.get("location"))
+    country = (row.get("country") or meta.get("country") or "").strip()
+    jurisdiction = (row.get("jurisdiction") or meta.get("jurisdiction") or "").strip()
+    if country or jurisdiction:
+        g = dict(g)
+        if country and not g.get("country"):
+            g["country"] = country.upper() if len(country) in (2, 3) and country.isalpha() else country
+        if jurisdiction and not g.get("jurisdiction"):
+            g["jurisdiction"] = jurisdiction
+    return g
+
+
 def _derive_independence_group(
     row: dict,
     meta: dict,
@@ -267,6 +310,13 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             wire_id = _extract_wire_id(row, meta)
             if wire_id and meta.get("wire_id") == wire_id:
                 meta.pop("wire_id", None)
+            geo = _extract_geo(row, meta)
+            if geo:
+                # promote out of metadata once first-class
+                meta.pop("geo", None)
+                meta.pop("location", None)
+                meta.pop("country", None)
+                meta.pop("jurisdiction", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
                 indep = _derive_independence_group(
@@ -284,7 +334,7 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), family_id=family_id,
                 event_date=event_date, event_id=event_id,
-                outlet_domain=outlet_domain, wire_id=wire_id, metadata=meta,
+                outlet_domain=outlet_domain, wire_id=wire_id, geo=geo, metadata=meta,
             )
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid
@@ -360,6 +410,16 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         event_id = _extract_event_id(row, meta) or (src.event_id or "")
         if event_id and meta.get("event_id") == event_id:
             meta.pop("event_id", None)
+        # First-class geo (0.1.13+): start from source, overlay observation fields
+        geo = dict(src.geo or {})
+        obs_geo = _extract_geo(row, meta)
+        if obs_geo:
+            geo.update(obs_geo)
+        if geo:
+            meta.pop("geo", None)
+            meta.pop("location", None)
+            meta.pop("country", None)
+            meta.pop("jurisdiction", None)
         meta["source_type"] = src.source_type
         meta["independence_group"] = resolved_group.get(sid, sid)
         meta.setdefault("reliability_tier", src.reliability_tier or "C")
@@ -374,7 +434,7 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 observation_type=row["observation_type"], subject_entity=subj, object_entity=obj,
                 numeric_value=row.get("numeric_value"), unit=row.get("unit"),
                 text_excerpt=row.get("text_excerpt", ""), confidence=float(row.get("confidence", 0.7)),
-                event_id=event_id, metadata=meta,
+                event_id=event_id, geo=geo, metadata=meta,
             )
 
     snap = make_snapshot(

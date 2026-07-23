@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.13] — 2026-07-24
+
+### Added
+
+- First-class **`geo`** on `Source` and `Observation` (`country` / `region` / `city` / `jurisdiction` / `raw`)
+- Accepts `location` alias and top-level `country` / `jurisdiction` shorthands; obs inherits source geo
+- Stats: `sources_with_geo`, `observations_with_geo`, `observation_country_counts`, `entities_with_country`
+- Data Explorer geo column; Dashboard geo card
+- Jobs adapter emits top-level `geo` on sources and observations
+
+### Changed
+
+- Engine / feature → **0.1.13**
+- Import-schema geo/jurisdiction gap marked done
+
 ## [0.1.12] — 2026-07-24
 
 ### Added

@@ -116,6 +116,19 @@
           "type": "string",
           "description": "News wire / syndication family; when independence_group empty → wire:<id> (0.1.12+)"
         },
+        "geo": {
+          "type": "object",
+          "description": "Location/jurisdiction (country, region, city, raw, jurisdiction); engine 0.1.13+",
+          "additionalProperties": true
+        },
+        "country": {
+          "type": "string",
+          "description": "Shorthand for geo.country"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "description": "Shorthand for geo.jurisdiction"
+        },
         "metadata": { "type": "object" }
       }
     },
@@ -137,6 +150,13 @@
           "type": "string",
           "description": "Real-world event key; inherits from source when empty"
         },
+        "geo": {
+          "type": "object",
+          "description": "Location/jurisdiction; inherits from source when empty (0.1.13+)",
+          "additionalProperties": true
+        },
+        "country": { "type": "string" },
+        "jurisdiction": { "type": "string" },
         "text_excerpt": { "type": "string" },
         "confidence": {
           "type": "number",
