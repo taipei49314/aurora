@@ -1,15 +1,18 @@
 {
   "case_id": "openalex-sample",
-  "loop": 15,
-  "purpose": "OpenAlex works fixture → PAPER + RESEARCH_ACTIVITY",
+  "loop": 23,
+  "purpose": "OpenAlex works fixture → PAPER + RESEARCH_ACTIVITY + documents[]",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": ["RESEARCH_ACTIVITY"],
     "independent_lt_raw": false,
-    "min_sources": 2
+    "min_sources": 2,
+    "min_documents": 2,
+    "require_no_orphan_document_ids": true
   },
   "honesty": [
     "Synthetic OpenAlex-shaped works for CI.",
     "Replace dump with a real OpenAlex export of the same shape."
   ]
 }
+

@@ -96,8 +96,14 @@ All / with span / auto / no span. API: `?has_char_span=` and `?char_span_auto=`.
 Fail when observation.document_id has no matching documents[] row. Soft stats
 always (orphan_document_ids). Multisource check_all uses the hard flag.
 
+## 20. Cases ship documents[] — **done (v0.1.23)**
+
+Regenerated iron-air-mini / openalex / patentsview via adapters; retro stamped
+document_id + ensure_documents. Scorecard gates `min_documents` +
+`require_no_orphan_document_ids`. check_all lints all packages hard.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: regenerate remaining cases with documents[] via ensure_documents
+- Optional: align more retro text_excerpts so char_span auto fills

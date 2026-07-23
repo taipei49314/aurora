@@ -72,7 +72,13 @@ def main(argv=None) -> int:
     )
     run(
         "lint-example",
-        [py, "scripts/lint_package.py", "examples/real_mini_package.json", "--strict"],
+        [
+            py,
+            "scripts/lint_package.py",
+            "examples/real_mini_package.json",
+            "--strict",
+            "--require-documents",
+        ],
     )
     run(
         "lint-multisource",
@@ -80,6 +86,26 @@ def main(argv=None) -> int:
             py,
             "scripts/lint_package.py",
             "cases/multisource-iron-air/package.json",
+            "--strict",
+            "--require-documents",
+        ],
+    )
+    run(
+        "lint-iron-air-mini",
+        [
+            py,
+            "scripts/lint_package.py",
+            "cases/iron-air-mini/package.json",
+            "--strict",
+            "--require-documents",
+        ],
+    )
+    run(
+        "lint-iron-air-retro",
+        [
+            py,
+            "scripts/lint_package.py",
+            "cases/iron-air-retro/package.json",
             "--strict",
             "--require-documents",
         ],
@@ -103,6 +129,16 @@ def main(argv=None) -> int:
             "--strip",
             "--validate",
             "--strict",
+        ],
+    )
+    run(
+        "lint-patentsview",
+        [
+            py,
+            "scripts/lint_package.py",
+            "cases/patentsview-sample/package.json",
+            "--strict",
+            "--require-documents",
         ],
     )
     run(
@@ -134,6 +170,16 @@ def main(argv=None) -> int:
     run(
         "openalex-scorecard",
         [py, "scripts/check_case_scorecard.py", "cases/openalex-sample"],
+    )
+    run(
+        "lint-openalex",
+        [
+            py,
+            "scripts/lint_package.py",
+            "cases/openalex-sample/package.json",
+            "--strict",
+            "--require-documents",
+        ],
     )
     print("=" * 72)
     print("ALL OK")

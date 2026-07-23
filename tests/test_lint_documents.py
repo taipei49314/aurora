@@ -111,11 +111,22 @@ def test_require_documents_passes_when_documents_present(tmp_path):
 
 
 @pytest.mark.unit
-def test_multisource_case_has_no_orphan_document_ids():
-    """Regenerated multisource package should pass --require-documents."""
-    pkg = ROOT / "cases" / "multisource-iron-air" / "package.json"
+@pytest.mark.parametrize(
+    "rel",
+    [
+        "cases/multisource-iron-air/package.json",
+        "cases/iron-air-mini/package.json",
+        "cases/iron-air-retro/package.json",
+        "cases/openalex-sample/package.json",
+        "cases/patentsview-sample/package.json",
+        "examples/real_mini_package.json",
+    ],
+)
+def test_case_packages_require_documents(rel):
+    """Adapter-regenerated and curated cases ship documents[] without orphans."""
+    pkg = ROOT / rel
     if not pkg.is_file():
-        pytest.skip("multisource case missing")
+        pytest.skip(f"{rel} missing")
     r = _run(pkg, "--require-documents", "--json", "--strict")
     assert r.returncode == 0, r.stdout + r.stderr
     body = json.loads(r.stdout)

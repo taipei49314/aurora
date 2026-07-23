@@ -27,15 +27,31 @@ def main(argv=None) -> int:
     sys.path.insert(0, str(ROOT / "backend"))
     from aurora import import_package
 
-    snap = import_package({
+    pkg = {
         "entities": package.get("entities", []),
         "sources": package.get("sources", []),
         "observations": package.get("observations", []),
-    })
+    }
+    if package.get("documents"):
+        pkg["documents"] = package["documents"]
+    snap = import_package(pkg)
     n_err = len(snap.import_errors or [])
     obs_types = {o.observation_type for o in snap.observations}
     raw = snap.counts.get("raw_source_count", 0)
     indep = snap.counts.get("independent_source_count", 0)
+    n_docs = len(getattr(snap, "documents", None) or [])
+
+    # Orphan document_ids: referenced by obs but missing from documents[]
+    present = {
+        (d.document_id if hasattr(d, "document_id") else d.get("document_id", "")).strip()
+        for d in (getattr(snap, "documents", None) or [])
+    }
+    referenced = set()
+    for o in snap.observations:
+        did = (getattr(o, "document_id", None) or "").strip()
+        if did:
+            referenced.add(did)
+    orphans = sorted(referenced - present)
 
     failures = []
     if n_err > gates.get("import_errors_max", 0):
@@ -47,10 +63,18 @@ def main(argv=None) -> int:
         failures.append(f"expected independent ({indep}) < raw ({raw})")
     if raw < gates.get("min_sources", 0):
         failures.append(f"raw sources {raw} < min_sources {gates['min_sources']}")
+    if n_docs < gates.get("min_documents", 0):
+        failures.append(f"documents {n_docs} < min_documents {gates['min_documents']}")
+    if gates.get("require_no_orphan_document_ids") and orphans:
+        sample = ", ".join(orphans[:5])
+        failures.append(
+            f"{len(orphans)} orphan document_id(s) without documents[] row: {sample}"
+        )
 
     print(
         f"case={scorecard.get('case_id')} errors={n_err} "
-        f"sources={raw} independent={indep} obs_types={sorted(obs_types)}"
+        f"sources={raw} independent={indep} documents={n_docs} "
+        f"orphan_doc_ids={len(orphans)} obs_types={sorted(obs_types)}"
     )
     if failures:
         for f in failures:

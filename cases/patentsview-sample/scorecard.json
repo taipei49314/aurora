@@ -1,12 +1,14 @@
 {
   "case_id": "patentsview-sample",
-  "loop": 4,
-  "purpose": "PatentsView-compatible offline dump ingest (fixture replaceable by real export)",
+  "loop": 23,
+  "purpose": "PatentsView-compatible offline dump ingest + documents[] (fixture replaceable)",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": ["PATENT_ACTIVITY"],
     "independent_lt_raw": true,
-    "min_sources": 4
+    "min_sources": 4,
+    "min_documents": 4,
+    "require_no_orphan_document_ids": true
   },
   "adapters": ["patentsview"],
   "dump": "cases/patentsview-sample/dump.json",
@@ -15,3 +17,4 @@
     "Swap dump.json for a real export without changing adapter code."
   ]
 }
+
