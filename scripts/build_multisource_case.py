@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build cases/multisource-iron-air from adapter fixtures + shared LEI crosswalk.
 
-Demonstrates multi-adapter merge where company identity joins on external_ids.
-Fixture-based only — not a live crawl.
+Stacks: patentsview + jobs + news + filings + openalex.
+Companies join on external_ids (LEI/domain). Fixture-based only.
 """
 from __future__ import annotations
 
@@ -96,8 +96,8 @@ def export_snapshot(snap) -> dict:
         })
     return {
         "_comment": (
-            "Multi-adapter iron-air demo with shared LEI/domain external_ids. "
-            "Built by scripts/build_multisource_case.py from offline fixtures."
+            "Multi-adapter iron-air demo: patentsview + jobs + news + filings + openalex. "
+            "Shared LEI/domain external_ids. Built by scripts/build_multisource_case.py."
         ),
         "entities": entities,
         "sources": sources,
@@ -108,21 +108,42 @@ def export_snapshot(snap) -> dict:
 def main() -> int:
     sys.path.insert(0, str(ROOT))
     sys.path.insert(0, str(ROOT / "backend"))
-    from adapters import convert_jobs, convert_news, merge_packages, strip_package
+    from adapters import (
+        convert_filings,
+        convert_jobs,
+        convert_news,
+        convert_openalex,
+        merge_packages,
+        strip_package,
+    )
     from adapters.patentsview import convert_patentsview
     from aurora import import_package
 
-    pkg_pat = stamp_company_ids(
-        convert_patentsview(json.loads((FIX / "patentsview_sample.json").read_text(encoding="utf-8")))
-    )
-    pkg_jobs = stamp_company_ids(
-        convert_jobs(json.loads((FIX / "jobs_sample.json").read_text(encoding="utf-8")))
-    )
-    pkg_news = stamp_company_ids(
-        convert_news(json.loads((FIX / "news_sample.json").read_text(encoding="utf-8")))
-    )
+    packages = [
+        stamp_company_ids(
+            convert_patentsview(
+                json.loads((FIX / "patentsview_sample.json").read_text(encoding="utf-8"))
+            )
+        ),
+        stamp_company_ids(
+            convert_jobs(json.loads((FIX / "jobs_sample.json").read_text(encoding="utf-8")))
+        ),
+        stamp_company_ids(
+            convert_news(json.loads((FIX / "news_sample.json").read_text(encoding="utf-8")))
+        ),
+        stamp_company_ids(
+            convert_filings(
+                json.loads((FIX / "filings_sample.json").read_text(encoding="utf-8"))
+            )
+        ),
+        stamp_company_ids(
+            convert_openalex(
+                json.loads((FIX / "openalex_sample.json").read_text(encoding="utf-8"))
+            )
+        ),
+    ]
 
-    merged = stamp_company_ids(merge_packages([pkg_pat, pkg_jobs, pkg_news]))
+    merged = stamp_company_ids(merge_packages(packages))
     snap = import_package(strip_package(merged))
     out_pkg = export_snapshot(snap)
 
@@ -130,7 +151,6 @@ def main() -> int:
     path = OUT / "package.json"
     path.write_text(json.dumps(out_pkg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    # second import of exported package must stay clean
     snap2 = import_package(strip_package(out_pkg))
     leis = sum(
         1
@@ -139,12 +159,17 @@ def main() -> int:
         if x.get("system") == "lei"
     )
     types = {o.observation_type for o in snap2.observations}
+    tiers = {}
+    for s in snap2.sources:
+        t = (s.reliability_tier or "C").upper()
+        tiers[t] = tiers.get(t, 0) + 1
     print(f"wrote {path}")
     print(
         f"entities={len(snap2.entities)} sources={len(snap2.sources)} "
         f"obs={len(snap2.observations)} errors={len(snap2.import_errors)} lei={leis}"
     )
     print(f"types={sorted(types)}")
+    print(f"tiers={tiers}")
     print(
         f"independent={snap2.counts.get('independent_source_count')}/"
         f"{snap2.counts.get('raw_source_count')}"
@@ -153,12 +178,21 @@ def main() -> int:
         for e in snap2.import_errors[:8]:
             print(" err", e)
         return 1
-    need = {"PATENT_ACTIVITY", "HIRING_ACTIVITY", "SUPPLIER_RELATIONSHIP"}
+    need = {
+        "PATENT_ACTIVITY",
+        "HIRING_ACTIVITY",
+        "SUPPLIER_RELATIONSHIP",
+        "CAPEX_ACTIVITY",
+        "RESEARCH_ACTIVITY",
+    }
     if not need.issubset(types):
         print(f"error: missing {need - types}", file=sys.stderr)
         return 1
     if leis < 3:
         print("error: expected LEI on multiple companies", file=sys.stderr)
+        return 1
+    if "A" not in tiers:
+        print("error: expected tier-A filings sources", file=sys.stderr)
         return 1
     return 0
 

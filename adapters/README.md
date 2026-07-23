@@ -17,8 +17,12 @@ python -m adapters uspto adapters/fixtures/uspto_sample.json -o /tmp/p.json --st
 python -m adapters patentsview adapters/fixtures/patentsview_sample.json -o /tmp/pv.json --strip --validate
 python -m adapters jobs  adapters/fixtures/jobs_sample.json  -o /tmp/j.json --strip --validate
 python -m adapters news  adapters/fixtures/news_sample.json  -o /tmp/n.json --strip --validate
+python -m adapters filings adapters/fixtures/filings_sample.json -o /tmp/f.json --strip --validate
+python -m adapters openalex adapters/fixtures/openalex_sample.json -o /tmp/oa.json --strip --validate
 
 python -m adapters merge /tmp/p.json /tmp/j.json /tmp/n.json -o /tmp/combined.json --strip --validate --strict
+# full stack demo:
+#   python scripts/build_multisource_case.py
 ```
 
 Makefile:
@@ -27,6 +31,7 @@ Makefile:
 make adapt-uspto
 make adapt-merge-demo      # builds cases/iron-air-mini/package.json + scorecard check
 make patentsview-sample    # PatentsView-compatible dump case
+make multisource-case      # five-adapter LEI-joined package
 ```
 
 ## Source mapping
@@ -38,6 +43,7 @@ make patentsview-sample    # PatentsView-compatible dump case
 | `jobs` | `postings[]` | `JOB_POSTING` | `HIRING_ACTIVITY` (+ weak tech edges) |
 | `news` | `articles[]` + `claims[]` | `NEWS` | whatever claims declare (`SUPPLIER_RELATIONSHIP`, …) |
 | `openalex` | `results[]` / `works[]` | `PAPER` | `RESEARCH_ACTIVITY` per institution |
+| `filings` | `filings[]` | `COMPANY_FILING` (tier A) | `CAPEX_ACTIVITY`, `CAPACITY_EXPANSION`, … |
 
 ### Independence conventions
 
@@ -57,6 +63,8 @@ News reprints: set `is_reprint_of` to the primary article `id` **and** share `wi
 | `fixtures/patentsview_sample.json` | 4 patents, PatentsView field names (replaceable) |
 | `fixtures/jobs_sample.json` | 3 postings (hiring) |
 | `fixtures/news_sample.json` | wire + reprint + pilot article |
+| `fixtures/openalex_sample.json` | 2 OpenAlex-shaped works |
+| `fixtures/filings_sample.json` | 3 company filings (tier A) |
 
 ## Adding another source
 

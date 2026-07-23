@@ -6,6 +6,17 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.7] — 2026-07-24
+
+### Added
+
+- Multisource case stacks **five** adapters: patentsview + jobs + news + **filings** + **openalex**
+- Scorecard requires CAPEX + RESEARCH_ACTIVITY as well as patent/hire/supplier
+
+### Changed
+
+- Engine → **0.1.7**
+
 ## [0.1.6] — 2026-07-24
 
 ### Added
