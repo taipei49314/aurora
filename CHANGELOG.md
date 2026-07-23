@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.2] — 2026-07-24
+
+### Added
+
+- **Entity resolution via `external_ids`**: `ext:system:id`, structured subject/object,
+  and `subject_external_ids` disambiguation
+- **Import merge** of entity rows that share the same external id (aliases union)
+- Collision reporting: `EXTERNAL_ID_COLLISION`
+
+### Changed
+
+- Engine / package version → **0.1.2**
+
 ## [0.1.1] — 2026-07-24
 
 ### Added

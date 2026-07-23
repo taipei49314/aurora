@@ -6,15 +6,25 @@ Source Dedup -> Temporal Validation -> Observation Extraction -> Snapshot.
 Determinism & idempotency: every id is content-derived, so re-importing the same
 package produces the same ids and dedupes to the same snapshot — importing twice
 never doubles the evidence (spec §34.3).
+
+Entities that share an ``external_ids`` key are merged into the first entity
+that claimed that key (aliases + external_ids union). Observations may resolve
+subjects via name, ``ext:system:id``, or ``{name, external_ids}``.
 """
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+from typing import Any, Dict, List, Optional, Tuple
 
 from .ids import prefixed_id, content_hash, normalize_text
 from .models import Source, Entity, Observation, SOURCE_TYPES, ENTITY_TYPES, OBSERVATION_TYPES
-from .errors import AuroraError, RowError
-from .entity_resolution import EntityResolver
+from .errors import RowError
+from .entity_resolution import (
+    EntityResolver,
+    normalize_external_id,
+    normalize_external_ids,
+    parse_entity_ref,
+)
 from .dedup import resolve_independence
 from .store import make_snapshot
 
@@ -24,11 +34,7 @@ _REQUIRED_OBS = {"source_ref", "observation_type", "subject"}
 
 
 def _derive_independence_group(row: dict, meta: dict) -> str:
-    """When independence_group is empty, derive from wire/domain/family metadata.
-
-    Does not invent groups from free-text publishers (too noisy). Explicit
-    ``independence_group`` on the row always wins (caller should set it when known).
-    """
+    """When independence_group is empty, derive from wire/domain/family metadata."""
     wire = (meta.get("wire_id") or row.get("wire_id") or "").strip()
     if wire:
         return f"wire:{wire}"
@@ -47,7 +53,7 @@ def _now() -> str:
 
 def _valid_date(d) -> bool:
     if d in (None, ""):
-        return True  # missing allowed but flagged
+        return True
     try:
         date.fromisoformat(str(d)[:10])
         return True
@@ -55,12 +61,33 @@ def _valid_date(d) -> bool:
         return False
 
 
+def _merge_entity_row(existing: Entity, *, aliases, description, country, ext_ids, meta) -> None:
+    for a in aliases or []:
+        if a not in existing.aliases:
+            existing.aliases.append(a)
+    if description and not existing.description:
+        existing.description = description
+    if country and not existing.country:
+        existing.country = country
+    seen_norm = set(normalize_external_ids(existing.external_ids))
+    for x in ext_ids or []:
+        nk = normalize_external_id(x)
+        if nk and nk not in seen_norm:
+            existing.external_ids.append({"system": nk[0], "id": nk[1]})
+            seen_norm.add(nk)
+    for k, v in (meta or {}).items():
+        if k not in existing.metadata:
+            existing.metadata[k] = v
+
+
 def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
     created_at = created_at or _now()
     errors: list[RowError] = []
 
-    # --- 1. build entities (deterministic ids) ---
+    # --- 1. build entities (deterministic ids; merge on shared external_ids) ---
     entities: dict[str, Entity] = {}
+    ext_owner: Dict[Tuple[str, str], str] = {}  # (system,id) -> entity_id
+
     for i, row in enumerate(raw.get("entities", [])):
         missing = _REQUIRED_ENTITY - set(k for k, v in row.items() if v not in (None, ""))
         if missing:
@@ -71,41 +98,88 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             errors.append(RowError(i, "entity_type", "SCHEMA_VALIDATION_FAILED",
                                    f"unknown entity_type {row['entity_type']}", str(row["entity_type"])))
             continue
-        eid = prefixed_id("ent", row["entity_type"], normalize_text(row["canonical_name"]))
         meta = dict(row.get("metadata") or {})
-        # Prefer first-class external_ids; fall back to metadata.external_ids (v0 convention)
-        ext_ids = list(row.get("external_ids") or meta.pop("external_ids", None) or [])
-        if eid not in entities:
-            entities[eid] = Entity(
-                entity_id=eid, entity_type=row["entity_type"], canonical_name=row["canonical_name"],
-                aliases=list(row.get("aliases", [])), description=row.get("description", ""),
-                country=row.get("country", ""), created_at=created_at,
-                external_ids=ext_ids, metadata=meta,
+        ext_ids_raw = list(row.get("external_ids") or meta.pop("external_ids", None) or [])
+        ext_keys = normalize_external_ids(ext_ids_raw)
+        # normalize stored form
+        ext_ids = [{"system": sys, "id": iid} for sys, iid in ext_keys]
+
+        # Prefer merge into existing owner of any external id
+        owner_eid = None
+        for key in sorted(ext_keys):
+            if key in ext_owner:
+                owner_eid = ext_owner[key]
+                break
+
+        eid = prefixed_id("ent", row["entity_type"], normalize_text(row["canonical_name"]))
+        aliases = list(row.get("aliases", []))
+        description = row.get("description", "")
+        country = row.get("country", "")
+
+        if owner_eid and owner_eid in entities:
+            existing = entities[owner_eid]
+            # name may differ across dumps — keep owner id, add name as alias
+            cname = row["canonical_name"]
+            if normalize_text(cname) != normalize_text(existing.canonical_name):
+                if cname not in existing.aliases:
+                    existing.aliases.append(cname)
+            _merge_entity_row(
+                existing,
+                aliases=aliases,
+                description=description,
+                country=country,
+                ext_ids=ext_ids,
+                meta=meta,
             )
-        else:
-            # merge aliases + external_ids on re-import (idempotent union)
+            target = existing
+        elif eid in entities:
             existing = entities[eid]
-            for a in row.get("aliases", []):
-                if a not in existing.aliases:
-                    existing.aliases.append(a)
-            seen = {
-                (x.get("system"), x.get("id"))
-                for x in (existing.external_ids or [])
-                if isinstance(x, dict)
-            }
-            for x in ext_ids:
-                if not isinstance(x, dict):
-                    continue
-                key = (x.get("system"), x.get("id"))
-                if key not in seen:
-                    existing.external_ids.append(x)
-                    seen.add(key)
+            _merge_entity_row(
+                existing,
+                aliases=aliases,
+                description=description,
+                country=country,
+                ext_ids=ext_ids,
+                meta=meta,
+            )
+            target = existing
+        else:
+            target = Entity(
+                entity_id=eid,
+                entity_type=row["entity_type"],
+                canonical_name=row["canonical_name"],
+                aliases=aliases,
+                description=description,
+                country=country,
+                created_at=created_at,
+                external_ids=ext_ids,
+                metadata=meta,
+            )
+            entities[eid] = target
+
+        # register external ownership; collide if two different eids claim same key
+        for key in ext_keys:
+            prev = ext_owner.get(key)
+            if prev is None:
+                ext_owner[key] = target.entity_id
+            elif prev != target.entity_id:
+                errors.append(RowError(
+                    i, "external_ids", "EXTERNAL_ID_COLLISION",
+                    f"external id {key[0]}:{key[1]} already owned by {prev}",
+                    f"{key[0]}:{key[1]}",
+                ))
 
     resolver = EntityResolver(entities.values())
     amb = resolver.ambiguities()
     for a in amb:
         errors.append(RowError(-1, "alias", "ENTITY_RESOLUTION_AMBIGUOUS",
                                f"name {a['name']} maps to {len(a['entity_ids'])} entities", a["name"]))
+    for c in resolver.external_id_collisions():
+        errors.append(RowError(
+            -1, "external_ids", "EXTERNAL_ID_COLLISION",
+            f"external id {c['system']}:{c['id']} maps to {len(c['entity_ids'])} entities",
+            f"{c['system']}:{c['id']}",
+        ))
 
     # --- 2. build sources (dedup by content hash) ---
     sources: dict[str, Source] = {}
@@ -132,7 +206,6 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 meta["excerpt"] = row["excerpt"]
             indep = (row.get("independence_group") or "").strip()
             if not indep:
-                # Auto-derive from common adapter/metadata conventions (engine 0.1.1+)
                 indep = _derive_independence_group(row, meta)
             sources[sid] = Source(
                 source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
@@ -141,17 +214,25 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), metadata=meta,
             )
-        # map the raw ref key (given by caller) to the resolved source id
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid
 
     indep = resolve_independence(list(sources.values()))
     resolved_group = indep["resolved_group"]
 
-    # --- 3. build observations (dedup by deterministic id) ---
+    # --- 3. build observations ---
     observations: dict[str, Observation] = {}
     for i, row in enumerate(raw.get("observations", [])):
-        missing = _REQUIRED_OBS - set(k for k, v in row.items() if v not in (None, ""))
+        # subject may be dict — required check tolerates that
+        if row.get("subject") in (None, ""):
+            errors.append(RowError(i, "subject", "SCHEMA_VALIDATION_FAILED",
+                                   "missing required observation fields", str(row)))
+            continue
+        missing = set()
+        if not row.get("source_ref"):
+            missing.add("source_ref")
+        if not row.get("observation_type"):
+            missing.add("observation_type")
         if missing:
             errors.append(RowError(i, ",".join(sorted(missing)), "SCHEMA_VALIDATION_FAILED",
                                    "missing required observation fields", str(row)))
@@ -165,23 +246,48 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             errors.append(RowError(i, "source_ref", "SCHEMA_VALIDATION_FAILED",
                                    f"observation references unknown source {row['source_ref']}", str(row["source_ref"])))
             continue
-        subj = resolver.resolve(row["subject"])
+
+        meta = dict(row.get("metadata", {}))
+        # optional observation-level external hints
+        subj_ext = normalize_external_ids(
+            row.get("subject_external_ids")
+            or meta.pop("subject_external_ids", None)
+            or ([meta["subject_external_id"]] if meta.get("subject_external_id") else None)
+        )
+        obj_ext = normalize_external_ids(
+            row.get("object_external_ids")
+            or meta.pop("object_external_ids", None)
+            or ([meta["object_external_id"]] if meta.get("object_external_id") else None)
+        )
+
+        name_s, ext_s = parse_entity_ref(row["subject"])
+        subj = resolver.resolve(name_s, external_ids=list(ext_s) + list(subj_ext))
         if subj is None:
             errors.append(RowError(i, "subject", "ENTITY_RESOLUTION_AMBIGUOUS",
                                    f"cannot resolve subject {row['subject']!r}", str(row["subject"])))
             continue
-        obj = resolver.resolve(row["object"]) if row.get("object") else None
+
+        obj = None
+        if row.get("object") not in (None, ""):
+            name_o, ext_o = parse_entity_ref(row["object"])
+            obj = resolver.resolve(name_o, external_ids=list(ext_o) + list(obj_ext))
+            if obj is None:
+                errors.append(RowError(i, "object", "ENTITY_RESOLUTION_AMBIGUOUS",
+                                       f"cannot resolve object {row['object']!r}", str(row["object"])))
+                continue
+
         if not _valid_date(row.get("observed_at")):
             errors.append(RowError(i, "observed_at", "SOURCE_DATE_MISSING",
                                    "unparseable observed_at", str(row.get("observed_at"))))
         src = sources[sid]
-        meta = dict(row.get("metadata", {}))
         meta["source_type"] = src.source_type
         meta["independence_group"] = resolved_group.get(sid, sid)
-        # Stamp tier so scoring/data-quality works even if source rows are later subset
         meta.setdefault("reliability_tier", src.reliability_tier or "C")
-        oid = prefixed_id("obs", sid, row["observation_type"], subj, obj or "",
-                          row.get("observed_at") or "", normalize_text(row.get("text_excerpt", "")))
+        oid = prefixed_id(
+            "obs", sid, row["observation_type"], subj, obj or "",
+            row.get("observed_at") or "",
+            normalize_text(row.get("text_excerpt", "")),
+        )
         if oid not in observations:
             observations[oid] = Observation(
                 observation_id=oid, source_id=sid, observed_at=(row.get("observed_at") or None),
