@@ -53,12 +53,14 @@ def validate_engine(raw: dict) -> dict:
     sys.path.insert(0, str(ROOT / "backend"))
     from aurora import import_package  # noqa: WPS433
 
-    # Strip documentation-only keys that adapters may include
+    # Keep engine arrays only (include documents[] when present — 0.1.15+)
     package = {
         "entities": raw.get("entities", []),
         "sources": raw.get("sources", []),
         "observations": raw.get("observations", []),
     }
+    if raw.get("documents"):
+        package["documents"] = list(raw["documents"])
     snap = import_package(package)
     row_errors = list(snap.import_errors or [])
     return {

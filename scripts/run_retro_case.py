@@ -29,11 +29,14 @@ def _load_case(case_dir: Path) -> dict:
 
 
 def _engine_package(raw: dict) -> dict:
-    return {
+    out = {
         "entities": raw.get("entities") or [],
         "sources": raw.get("sources") or [],
         "observations": raw.get("observations") or [],
     }
+    if raw.get("documents"):
+        out["documents"] = list(raw["documents"])
+    return out
 
 
 def _hyp_summary(run) -> List[dict]:

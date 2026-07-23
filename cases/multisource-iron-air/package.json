@@ -736,8 +736,13 @@
       "document_id": "filing-oxa-annual-2023",
       "metadata": {
         "extractor_id": "filings-offline",
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        121
+      ]
     },
     {
       "source_ref": "src_793b0dc5a70aa830",
@@ -858,8 +863,13 @@
         "inventors": [
           "A. Researcher"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        231
+      ]
     },
     {
       "source_ref": "src_33428391eeb853f0",
@@ -879,8 +889,13 @@
           "H01M10/26",
           "H01M12/06"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        213
+      ]
     },
     {
       "source_ref": "src_33428391eeb853f0",
@@ -940,8 +955,13 @@
         "authors": [
           "Alex Chen"
         ],
+        "char_span_auto": true,
         "reliability_tier": "B"
-      }
+      },
+      "char_span": [
+        0,
+        111
+      ]
     },
     {
       "source_ref": "src_4ec11f2210944dbb",
@@ -956,8 +976,13 @@
       "document_id": "filing-fg-8k-2024-0620",
       "metadata": {
         "extractor_id": "filings-offline",
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        119
+      ]
     },
     {
       "source_ref": "src_bf2873a2fbf1bd9e",
@@ -998,8 +1023,13 @@
         "extractor_id": "jobs-offline",
         "extractor_version": "0.1.1",
         "valid_from": "2024-05-10",
+        "char_span_auto": true,
         "reliability_tier": "B"
-      }
+      },
+      "char_span": [
+        0,
+        79
+      ]
     },
     {
       "source_ref": "src_0a4f27f43f5db3f1",
@@ -1014,8 +1044,13 @@
       "document_id": "filing-fg-8k-2024-0620-cap",
       "metadata": {
         "extractor_id": "filings-offline",
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        90
+      ]
     },
     {
       "source_ref": "src_3d77db16270421f0",
@@ -1036,8 +1071,13 @@
           "M. Schneider",
           "Alex Chen"
         ],
+        "char_span_auto": true,
         "reliability_tier": "B"
-      }
+      },
+      "char_span": [
+        0,
+        93
+      ]
     },
     {
       "source_ref": "src_793b0dc5a70aa830",
@@ -1074,8 +1114,13 @@
           "H01M4/86",
           "H01M4/02"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        221
+      ]
     },
     {
       "source_ref": "src_e0fb39fc74b348be",
@@ -1092,8 +1137,13 @@
         "extractor_id": "jobs-offline",
         "extractor_version": "0.1.1",
         "valid_from": "2024-04-01",
+        "char_span_auto": true,
         "reliability_tier": "B"
-      }
+      },
+      "char_span": [
+        0,
+        98
+      ]
     },
     {
       "source_ref": "src_bf2873a2fbf1bd9e",
@@ -1154,8 +1204,13 @@
       "metadata": {
         "extractor_id": "news-offline",
         "extractor_version": "0.1.1",
+        "char_span_auto": true,
         "reliability_tier": "C"
-      }
+      },
+      "char_span": [
+        0,
+        175
+      ]
     },
     {
       "source_ref": "src_d432196dd2a0759f",
@@ -1171,8 +1226,13 @@
       "metadata": {
         "extractor_id": "news-offline",
         "extractor_version": "0.1.1",
+        "char_span_auto": true,
         "reliability_tier": "C"
-      }
+      },
+      "char_span": [
+        0,
+        175
+      ]
     },
     {
       "source_ref": "src_ffdbd1cba1932729",
@@ -1190,8 +1250,13 @@
         "extractor_version": "0.1.1",
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01",
+        "char_span_auto": true,
         "reliability_tier": "B"
-      }
+      },
+      "char_span": [
+        0,
+        182
+      ]
     },
     {
       "source_ref": "src_793b0dc5a70aa830",
@@ -1228,8 +1293,13 @@
           "H01M4/86",
           "H01M4/02"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        221
+      ]
     },
     {
       "source_ref": "src_3d77db16270421f0",
@@ -1250,8 +1320,13 @@
           "M. Schneider",
           "Alex Chen"
         ],
+        "char_span_auto": true,
         "reliability_tier": "B"
-      }
+      },
+      "char_span": [
+        0,
+        93
+      ]
     },
     {
       "source_ref": "src_a43b90633ee579fc",
@@ -1292,8 +1367,13 @@
           "H01M4/86",
           "H01M12/06"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        214
+      ]
     },
     {
       "source_ref": "src_d432196dd2a0759f",
@@ -1309,8 +1389,13 @@
       "metadata": {
         "extractor_id": "news-offline",
         "extractor_version": "0.1.1",
+        "char_span_auto": true,
         "reliability_tier": "C"
-      }
+      },
+      "char_span": [
+        0,
+        175
+      ]
     },
     {
       "source_ref": "src_e33259975b8fde0e",

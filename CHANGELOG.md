@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.23] — 2026-07-24
+
+### Added
+
+- Regenerated case packages with `documents[]` + spans (iron-air-mini, openalex, patentsview)
+- iron-air-retro: stamp `document_id` + `ensure_documents` (12 docs)
+- Scorecard gates: `min_documents`, `require_no_orphan_document_ids`
+- `check_case_scorecard` imports `documents[]` and enforces new gates
+- `check_all` lints all major cases/examples with `--require-documents`
+
+### Changed
+
+- Engine / feature → **0.1.23**
+
 ## [0.1.22] — 2026-07-24
 
 ### Added

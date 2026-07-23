@@ -1,6 +1,31 @@
 {
   "entities": [
     {
+      "entity_type": "PERSON",
+      "canonical_name": "Alex Chen",
+      "aliases": [],
+      "description": "Author / researcher",
+      "country": "",
+      "external_ids": [
+        {
+          "system": "person_name",
+          "id": "Alex Chen"
+        },
+        {
+          "system": "openalex_author",
+          "id": "A90001"
+        },
+        {
+          "system": "orcid",
+          "id": "0000-0001-2345-6789"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.2"
+      }
+    },
+    {
       "entity_type": "RESEARCH_INSTITUTE",
       "canonical_name": "Grid Storage Research Lab",
       "aliases": [],
@@ -14,7 +39,28 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.0"
+        "extractor_version": "0.1.2"
+      }
+    },
+    {
+      "entity_type": "PERSON",
+      "canonical_name": "M. Schneider",
+      "aliases": [],
+      "description": "Author / researcher",
+      "country": "",
+      "external_ids": [
+        {
+          "system": "person_name",
+          "id": "M. Schneider"
+        },
+        {
+          "system": "openalex_author",
+          "id": "A90002"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "openalex-offline",
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -31,7 +77,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.0"
+        "extractor_version": "0.1.2"
       }
     }
   ],
@@ -47,9 +93,10 @@
       "reliability_tier": "B",
       "url_or_local_path": "https://doi.org/10.1234/esml.ironair.2019",
       "language": "en",
+      "license": "openalex-unknown",
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.0",
+        "extractor_version": "0.1.2",
         "source_format": "openalex-works-v1",
         "external_ids": [
           {
@@ -74,9 +121,10 @@
       "reliability_tier": "B",
       "url_or_local_path": "https://doi.org/10.1234/oa.ironair.2021",
       "language": "en",
+      "license": "openalex-unknown",
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.0",
+        "extractor_version": "0.1.2",
         "source_format": "openalex-works-v1",
         "external_ids": [
           {
@@ -100,12 +148,20 @@
       "observed_at": "2019-06-01",
       "text_excerpt": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
       "confidence": 0.75,
+      "document_id": "oa-w9000000001",
       "metadata": {
-        "document_id": "oa-w9000000001",
         "extractor_id": "openalex-offline",
         "work_id": "W9000000001",
-        "doi": "10.1234/esml.ironair.2019"
-      }
+        "doi": "10.1234/esml.ironair.2019",
+        "authors": [
+          "Alex Chen"
+        ],
+        "char_span_auto": true
+      },
+      "char_span": [
+        0,
+        111
+      ]
     },
     {
       "source_ref": "oa-w9000000002",
@@ -115,12 +171,21 @@
       "observed_at": "2021-03-12",
       "text_excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
       "confidence": 0.75,
+      "document_id": "oa-w9000000002",
       "metadata": {
-        "document_id": "oa-w9000000002",
         "extractor_id": "openalex-offline",
         "work_id": "W9000000002",
-        "doi": "10.1234/oa.ironair.2021"
-      }
+        "doi": "10.1234/oa.ironair.2021",
+        "authors": [
+          "M. Schneider",
+          "Alex Chen"
+        ],
+        "char_span_auto": true
+      },
+      "char_span": [
+        0,
+        93
+      ]
     },
     {
       "source_ref": "oa-w9000000002",
@@ -130,11 +195,48 @@
       "observed_at": "2021-03-12",
       "text_excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
       "confidence": 0.75,
+      "document_id": "oa-w9000000002",
       "metadata": {
-        "document_id": "oa-w9000000002",
         "extractor_id": "openalex-offline",
         "work_id": "W9000000002",
-        "doi": "10.1234/oa.ironair.2021"
+        "doi": "10.1234/oa.ironair.2021",
+        "authors": [
+          "M. Schneider",
+          "Alex Chen"
+        ],
+        "char_span_auto": true
+      },
+      "char_span": [
+        0,
+        93
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "oa-w9000000001",
+      "source_ref": "oa-w9000000001",
+      "title": "Reversible iron oxidation pathways for multi-day storage",
+      "text": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
+      "url_or_local_path": "https://doi.org/10.1234/esml.ironair.2019",
+      "language": "en",
+      "license": "openalex-unknown",
+      "metadata": {
+        "auto_built": true,
+        "from": "source_excerpt"
+      }
+    },
+    {
+      "document_id": "oa-w9000000002",
+      "source_ref": "oa-w9000000002",
+      "title": "Oxygen electrode stacks for long-duration iron-air cells",
+      "text": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
+      "url_or_local_path": "https://doi.org/10.1234/oa.ironair.2021",
+      "language": "en",
+      "license": "openalex-unknown",
+      "metadata": {
+        "auto_built": true,
+        "from": "source_excerpt"
       }
     }
   ]
