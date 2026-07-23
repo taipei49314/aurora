@@ -248,6 +248,65 @@ def test_stats_char_span_auto_field(client):
     assert body["observations_with_char_span_auto"] >= 0
 
 
+def test_observations_has_char_span_and_auto_filters(client):
+    """0.1.21+: filter observations by span presence / auto-align flag."""
+    # Seed a package with one auto span and one without
+    pkg = {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "SpanCo"}],
+        "sources": [{
+            "ref": "s1",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "T",
+            "excerpt": "abcdef hello world span",
+            "published_at": "2022-01-01",
+        }],
+        "documents": [{
+            "document_id": "d1",
+            "source_ref": "s1",
+            "text": "abcdef hello world span more text here",
+        }],
+        "observations": [
+            {
+                "source_ref": "s1",
+                "observation_type": "PATENT_ACTIVITY",
+                "subject": "SpanCo",
+                "observed_at": "2021-01-01",
+                "text_excerpt": "abcdef hello world span",
+                "document_id": "d1",
+                # no char_span → import auto-aligns
+            },
+            {
+                "source_ref": "s1",
+                "observation_type": "TECHNICAL_DEPENDENCY",
+                "subject": "SpanCo",
+                "object": "SpanCo",
+                "observed_at": "2021-01-01",
+                "text_excerpt": "not found in document at all xyz",
+                "document_id": "d1",
+            },
+        ],
+    }
+    up = client.post(
+        "/api/imports",
+        files={"file": ("p.json", json.dumps(pkg).encode("utf-8"), "application/json")},
+    )
+    assert up.status_code == 200
+
+    all_obs = client.get("/api/observations?limit=50").json()
+    with_span = client.get("/api/observations?has_char_span=true&limit=50").json()
+    no_span = client.get("/api/observations?has_char_span=false&limit=50").json()
+    auto = client.get("/api/observations?char_span_auto=true&limit=50").json()
+
+    assert len(with_span) + len(no_span) == len(all_obs) or len(with_span) >= 1
+    assert any((o.get("metadata") or {}).get("char_span_auto") for o in with_span) or len(auto) >= 1
+    for o in auto:
+        assert (o.get("metadata") or {}).get("char_span_auto") is True
+        assert o.get("char_span") is not None
+    for o in no_span:
+        assert not (o.get("char_span") or (o.get("metadata") or {}).get("char_span"))
+
+
 def test_import_upload_rejects_non_json(client):
     r = client.post("/api/imports", files={"file": ("x.bin", b"\xff\xfe not json", "application/octet-stream")})
     assert r.status_code == 400

@@ -92,8 +92,30 @@ function cellValue(tab: Tab, col: string, row: any): ReactNode {
   if (col === "char_span") {
     const sp = row.char_span || row.metadata?.char_span;
     if (sp == null) return "—";
-    if (Array.isArray(sp) && sp.length >= 2) return `[${sp[0]}, ${sp[1]}]`;
-    return String(JSON.stringify(sp));
+    const label =
+      Array.isArray(sp) && sp.length >= 2
+        ? `[${sp[0]}, ${sp[1]}]`
+        : String(JSON.stringify(sp));
+    if (row.metadata?.char_span_auto) {
+      return (
+        <span title="Auto-aligned from text_excerpt (engine 0.1.20+)">
+          {label}{" "}
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#9a6700",
+              background: "#fff8c5",
+              borderRadius: 8,
+              padding: "0 5px",
+            }}
+          >
+            auto
+          </span>
+        </span>
+      );
+    }
+    return label;
   }
   if (tab === "documents" && col === "stub") {
     return row.stub ? "stub" : "full";
@@ -125,6 +147,8 @@ export function DataExplorer() {
   const [sourceType, setSourceType] = useState("");
   const [entityType, setEntityType] = useState("");
   const [obsType, setObsType] = useState("");
+  /** "" | "with" | "auto" | "none" — char_span filter (0.1.21+) */
+  const [spanFilter, setSpanFilter] = useState<"" | "with" | "auto" | "none">("");
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
@@ -139,11 +163,18 @@ export function DataExplorer() {
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
-    queryKey: ["observations", q, obsType],
+    queryKey: ["observations", q, obsType, spanFilter],
     queryFn: () =>
       getObservations({
         q: q.trim() || undefined,
         observation_type: obsType || undefined,
+        has_char_span:
+          spanFilter === "with" || spanFilter === "auto"
+            ? true
+            : spanFilter === "none"
+              ? false
+              : undefined,
+        char_span_auto: spanFilter === "auto" ? true : undefined,
       }),
     enabled: tab === "observations",
   });
@@ -301,7 +332,7 @@ export function DataExplorer() {
           {filtered.length} rows
           {q ||
           (tab === "sources" && (tierFilter || sourceType)) ||
-          (tab === "observations" && obsType) ||
+          (tab === "observations" && (obsType || spanFilter)) ||
           (tab === "entities" && entityType)
             ? " (filtered)"
             : ""}
@@ -419,6 +450,94 @@ export function DataExplorer() {
               );
             })}
           <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/observations?observation_type=</span>
+        </div>
+      )}
+
+      {tab === "observations" && (
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#f6f8fa",
+            border: "1px solid #d0d7de",
+            borderRadius: 8,
+          }}
+        >
+          <b style={{ fontSize: 12 }}>char_span</b>
+          {(
+            [
+              { id: "" as const, label: "All", n: undefined as number | undefined },
+              {
+                id: "with" as const,
+                label: "with span",
+                n: stats.data?.observations_with_char_span,
+              },
+              {
+                id: "auto" as const,
+                label: "auto",
+                n: stats.data?.observations_with_char_span_auto,
+              },
+              {
+                id: "none" as const,
+                label: "no span",
+                n:
+                  typeof stats.data?.counts?.observations === "number" &&
+                  typeof stats.data?.observations_with_char_span === "number"
+                    ? Math.max(
+                        0,
+                        (stats.data.counts.observations as number) -
+                          (stats.data.observations_with_char_span as number),
+                      )
+                    : undefined,
+              },
+            ] as const
+          ).map(({ id, label, n }) => {
+            const active = spanFilter === id;
+            return (
+              <button
+                key={label}
+                type="button"
+                title={
+                  id === "auto"
+                    ? "Auto-aligned from text_excerpt (engine 0.1.20+)"
+                    : id === "with"
+                      ? "Observations with any char_span"
+                      : id === "none"
+                        ? "Observations without char_span"
+                        : "All observations"
+                }
+                onClick={() => setSpanFilter(active && id !== "" ? "" : id)}
+                style={{
+                  fontWeight: active ? 700 : 400,
+                  border: active
+                    ? id === "auto"
+                      ? "1px solid #9a6700"
+                      : "1px solid #0969da"
+                    : "1px solid #d0d7de",
+                  borderRadius: 6,
+                  padding: "2px 8px",
+                  background: active
+                    ? id === "auto"
+                      ? "#fff8c5"
+                      : "#ddf4ff"
+                    : "white",
+                  color: active && id === "auto" ? "#9a6700" : undefined,
+                  cursor: "pointer",
+                  fontSize: 11,
+                }}
+              >
+                {label}
+                {typeof n === "number" ? ` (${n})` : ""}
+              </button>
+            );
+          })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>
+            GET /api/observations?has_char_span=&amp;char_span_auto=
+          </span>
         </div>
       )}
 
@@ -905,6 +1024,23 @@ function ObservationDetail({ obs }: { obs: any }) {
             {" "}
             · <b>char_span</b>{" "}
             <code>{Array.isArray(span) ? `[${span[0]}, ${span[1]}]` : JSON.stringify(span)}</code>
+            {obs.metadata?.char_span_auto && (
+              <span
+                title="Auto-aligned from text_excerpt (engine 0.1.20+)"
+                style={{
+                  marginLeft: 6,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "#9a6700",
+                  background: "#fff8c5",
+                  borderRadius: 8,
+                  padding: "1px 6px",
+                  verticalAlign: "middle",
+                }}
+              >
+                auto
+              </span>
+            )}
           </>
         )}
       </div>
@@ -923,7 +1059,24 @@ function ObservationDetail({ obs }: { obs: any }) {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <b style={{ fontSize: 11 }}>Document text</b>
+            <b style={{ fontSize: 11 }}>
+              Document text
+              {obs.metadata?.char_span_auto && span != null ? (
+                <span
+                  style={{
+                    marginLeft: 6,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: "#9a6700",
+                    background: "#fff8c5",
+                    borderRadius: 8,
+                    padding: "1px 6px",
+                  }}
+                >
+                  auto span
+                </span>
+              ) : null}
+            </b>
             <span style={{ fontSize: 10, color: "#8c959f" }}>GET /api/documents/…</span>
           </div>
           {doc.isLoading && <span style={{ color: "#57606a" }}>Loading document…</span>}

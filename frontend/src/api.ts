@@ -91,11 +91,17 @@ export const getEntities = (q?: string, entityType?: string) => {
 export const getObservations = (opts?: {
   observation_type?: string;
   document_id?: string;
+  has_char_span?: boolean;
+  char_span_auto?: boolean;
   q?: string;
 }) => {
   const params = new URLSearchParams({ limit: "800" });
   if (opts?.observation_type) params.set("observation_type", opts.observation_type);
   if (opts?.document_id) params.set("document_id", opts.document_id);
+  if (opts?.has_char_span === true) params.set("has_char_span", "true");
+  if (opts?.has_char_span === false) params.set("has_char_span", "false");
+  if (opts?.char_span_auto === true) params.set("char_span_auto", "true");
+  if (opts?.char_span_auto === false) params.set("char_span_auto", "false");
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/observations?${params.toString()}`);
 };

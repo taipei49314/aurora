@@ -366,14 +366,32 @@ def sources(
     return rows[:limit]
 
 
+def _obs_has_char_span(row: dict) -> bool:
+    return bool(row.get("char_span") or (row.get("metadata") or {}).get("char_span"))
+
+
+def _obs_char_span_auto(row: dict) -> bool:
+    return bool((row.get("metadata") or {}).get("char_span_auto"))
+
+
 @app.get("/api/observations")
 def observations(
     limit: int = 500,
     observation_type: Optional[str] = None,
     document_id: Optional[str] = None,
+    has_char_span: Optional[bool] = None,
+    char_span_auto: Optional[bool] = None,
     q: Optional[str] = None,
 ):
-    """List observations. Optional ``observation_type``, ``document_id``, and ``q``."""
+    """List observations.
+
+    Filters:
+    - ``observation_type``: comma list
+    - ``document_id``: exact match
+    - ``has_char_span``: true/false — rows with / without a span (0.1.21+)
+    - ``char_span_auto``: true/false — auto-aligned spans only / exclude them
+    - ``q``: case-insensitive substring over the serialized row
+    """
     rows = [to_dict(o) for o in REPO.snapshot.observations]
     if observation_type:
         types = {t.strip() for t in observation_type.split(",") if t.strip()}
@@ -384,6 +402,10 @@ def observations(
             r for r in rows
             if str(r.get("document_id") or (r.get("metadata") or {}).get("document_id") or "").strip() == did
         ]
+    if has_char_span is not None:
+        rows = [r for r in rows if _obs_has_char_span(r) is has_char_span]
+    if char_span_auto is not None:
+        rows = [r for r in rows if _obs_char_span_auto(r) is char_span_auto]
     if q:
         needle = q.strip().lower()
         if needle:
