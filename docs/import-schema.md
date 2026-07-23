@@ -175,6 +175,9 @@ may be private), but the linter can enforce the policy:
 ```bash
 PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --public-corpus
 # or: --require-license
+
+# Fail when observation.document_id has no documents[] row (0.1.22+)
+PYTHONPATH=backend python scripts/lint_package.py path/to/package.json --require-documents
 ```
 
 Suggested license strings (not an exhaustive legal list):
@@ -255,6 +258,11 @@ the excerpt inside document text — exact, then case-insensitive, then
 whitespace-flexible — and set `[start, end]` with `metadata.char_span_auto`.
 Explicit spans are never overwritten. Snapshot count:
 `char_spans_auto_aligned`.
+
+**lint document policy (0.1.22+):** `lint_package` always reports
+`orphan_document_ids` (observation `document_id` with no `documents[]` row).
+`--require-documents` fails the package when any orphan exists. Prefer
+adapter `ensure_documents` or an explicit `documents[]` array.
 
 ### Resolution rules
 

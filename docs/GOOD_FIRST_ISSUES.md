@@ -91,8 +91,13 @@ and set `[start, end]` with `metadata.char_span_auto`. Engine import + adapters.
 Yellow **auto** badge on char_span column and observation detail; filter chips
 All / with span / auto / no span. API: `?has_char_span=` and `?char_span_auto=`.
 
+## 19. lint_package --require-documents — **done (v0.1.22)**
+
+Fail when observation.document_id has no matching documents[] row. Soft stats
+always (orphan_document_ids). Multisource check_all uses the hard flag.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: lint_package check for document_id without documents[] row
+- Optional: regenerate remaining cases with documents[] via ensure_documents

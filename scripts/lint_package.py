@@ -15,6 +15,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _obs_document_id(row: dict) -> str:
+    did = (row.get("document_id") or "").strip()
+    if did:
+        return did
+    meta = row.get("metadata") or {}
+    if isinstance(meta, dict):
+        return (meta.get("document_id") or "").strip()
+    return ""
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("package", type=Path)
@@ -29,6 +39,14 @@ def main(argv=None) -> int:
         "--public-corpus",
         action="store_true",
         help="Alias for --require-license (sources must declare redistribution license)",
+    )
+    ap.add_argument(
+        "--require-documents",
+        action="store_true",
+        help=(
+            "Fail if any observation.document_id has no matching documents[] row "
+            "(span/provenance policy; engine 0.1.22+)"
+        ),
     )
     args = ap.parse_args(argv)
     require_license = args.require_license or args.public_corpus
@@ -50,6 +68,13 @@ def main(argv=None) -> int:
         "sources_with_license": 0,
         "license_counts": {},
         "import_errors": 0,
+        "documents_total": 0,
+        "documents_with_text": 0,
+        "document_ids_referenced": 0,
+        "observations_with_document_id": 0,
+        "observations_with_char_span": 0,
+        "orphan_document_ids": [],
+        "orphan_document_id_count": 0,
     }
 
     for key in ("entities", "sources", "observations"):
@@ -65,7 +90,7 @@ def main(argv=None) -> int:
                 print(f"FAIL {i}")
         return 1
 
-    # vocab lint (soft)
+    # vocab lint (soft → hard when unknown)
     for i, e in enumerate(raw.get("entities") or []):
         et = e.get("entity_type")
         if et and et not in ENTITY_TYPES:
@@ -79,12 +104,57 @@ def main(argv=None) -> int:
         if ot and ot not in OBSERVATION_TYPES:
             report["issues"].append(f"observations[{i}] unknown observation_type {ot}")
 
-    # Preserve package-level license default for import
+    # Document provenance pre-check (raw package, before import)
+    docs_raw = raw.get("documents") or []
+    if docs_raw and not isinstance(docs_raw, list):
+        report["issues"].append("documents must be an array when present")
+        report["ok"] = False
+        docs_raw = []
+
+    doc_ids_present = set()
+    docs_with_text = 0
+    for d in docs_raw:
+        if not isinstance(d, dict):
+            continue
+        did = (d.get("document_id") or d.get("id") or "").strip()
+        if did:
+            doc_ids_present.add(did)
+        if (d.get("text") or d.get("body") or "").strip():
+            docs_with_text += 1
+
+    referenced: set = set()
+    obs_with_doc = 0
+    obs_with_span = 0
+    for o in raw.get("observations") or []:
+        if not isinstance(o, dict):
+            continue
+        did = _obs_document_id(o)
+        if did:
+            referenced.add(did)
+            obs_with_doc += 1
+        span = o.get("char_span")
+        if span is None and isinstance(o.get("metadata"), dict):
+            span = o["metadata"].get("char_span")
+        if span not in (None, ""):
+            obs_with_span += 1
+
+    orphan_ids = sorted(referenced - doc_ids_present)
+    report["documents_total"] = len(doc_ids_present)
+    report["documents_with_text"] = docs_with_text
+    report["document_ids_referenced"] = len(referenced)
+    report["observations_with_document_id"] = obs_with_doc
+    report["observations_with_char_span"] = obs_with_span
+    report["orphan_document_ids"] = orphan_ids
+    report["orphan_document_id_count"] = len(orphan_ids)
+
+    # Preserve package-level license default for import; include documents[]
     pkg = {
         "entities": raw.get("entities") or [],
         "sources": raw.get("sources") or [],
         "observations": raw.get("observations") or [],
     }
+    if docs_raw:
+        pkg["documents"] = list(docs_raw)
     if raw.get("license"):
         pkg["license"] = raw["license"]
     elif isinstance(raw.get("package"), dict) and raw["package"].get("license"):
@@ -103,6 +173,24 @@ def main(argv=None) -> int:
     report["entities_with_external_ids"] = sum(
         1 for e in snap.entities if e.external_ids
     )
+    # Prefer post-import document counts when import succeeded
+    snap_docs = getattr(snap, "documents", None) or []
+    if snap_docs:
+        report["documents_total"] = len(snap_docs)
+        report["documents_with_text"] = sum(
+            1 for d in snap_docs if (getattr(d, "text", None) or "").strip()
+        )
+    # Post-import span count (includes auto-aligned)
+    report["observations_with_char_span"] = sum(
+        1 for o in snap.observations if getattr(o, "char_span", None) is not None
+    )
+    report["observations_with_document_id"] = sum(
+        1 for o in snap.observations if (getattr(o, "document_id", None) or "").strip()
+    )
+    report["char_spans_auto_aligned"] = int(
+        (snap.counts or {}).get("char_spans_auto_aligned") or 0
+    )
+
     license_counter: Counter = Counter()
     missing_license = 0
     for s in snap.sources:
@@ -120,6 +208,15 @@ def main(argv=None) -> int:
         report["issues"].append(
             f"{missing_license} source(s) missing license "
             f"(public-corpus policy: every source needs Source.license)"
+        )
+    if args.require_documents and orphan_ids:
+        report["ok"] = False
+        sample = ", ".join(orphan_ids[:8])
+        more = f" (+{len(orphan_ids) - 8} more)" if len(orphan_ids) > 8 else ""
+        report["issues"].append(
+            f"{len(orphan_ids)} observation document_id(s) have no documents[] row: "
+            f"{sample}{more} "
+            f"(use ensure_documents / --require-documents policy)"
         )
     if args.strict and report["import_errors"]:
         report["ok"] = False
@@ -142,6 +239,15 @@ def main(argv=None) -> int:
             f"  sources_with_license: {report['sources_with_license']}/"
             f"{report['counts'].get('sources', 0)}"
             f"  licenses={report['license_counts']}"
+        )
+        print(
+            f"  documents: {report['documents_total']} "
+            f"({report['documents_with_text']} with text) · "
+            f"referenced={report['document_ids_referenced']} · "
+            f"orphan_ids={report['orphan_document_id_count']} · "
+            f"obs_with_doc={report['observations_with_document_id']} · "
+            f"spans={report['observations_with_char_span']}"
+            f" (auto={report.get('char_spans_auto_aligned', 0)})"
         )
         print(f"  import_errors: {report['import_errors']}")
         for i in report["issues"][:20]:

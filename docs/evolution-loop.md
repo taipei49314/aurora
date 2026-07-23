@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.21)
+## Shipped (through 0.1.22)
 
 | Ver | Highlights |
 |-----|------------|
@@ -29,12 +29,13 @@
 | 0.1.19 | Adapters auto-build `documents[]` from source excerpts |
 | 0.1.20 | char_span auto-align from text_excerpt vs document text |
 | 0.1.21 | Data Explorer auto-span badge + has_char_span API filters |
+| 0.1.22 | lint_package `--require-documents` for orphan document_ids |
 
 ## Next
 
 1. Real PatentsView dump (human data)
 2. Enable Actions with workflow-scoped PAT (human)
-3. Optional: lint_package check for document_id without documents[] row
+3. Optional: regenerate remaining cases with documents[] via ensure_documents
 
 ## Out of scope
 

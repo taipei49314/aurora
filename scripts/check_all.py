@@ -76,7 +76,13 @@ def main(argv=None) -> int:
     )
     run(
         "lint-multisource",
-        [py, "scripts/lint_package.py", "cases/multisource-iron-air/package.json", "--strict"],
+        [
+            py,
+            "scripts/lint_package.py",
+            "cases/multisource-iron-air/package.json",
+            "--strict",
+            "--require-documents",
+        ],
     )
     run("retro-case", [py, "scripts/run_retro_case.py", "cases/iron-air-retro"])
     run("multisource-case", [py, "scripts/build_multisource_case.py"])

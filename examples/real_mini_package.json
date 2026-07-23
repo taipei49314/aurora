@@ -4,81 +4,127 @@
     {
       "entity_type": "COMPANY",
       "canonical_name": "FerroGrid Power",
-      "aliases": ["FerroGrid", "Ferro Grid Power Inc."],
+      "aliases": [
+        "FerroGrid",
+        "Ferro Grid Power Inc."
+      ],
       "description": "Long-duration iron-air grid storage developer",
       "country": "US",
       "metadata": {
         "external_ids": [
-          {"system": "lei", "id": "549300EXAMPLEFERRO01"},
-          {"system": "domain", "id": "ferrogrid.example"}
+          {
+            "system": "lei",
+            "id": "549300EXAMPLEFERRO01"
+          },
+          {
+            "system": "domain",
+            "id": "ferrogrid.example"
+          }
         ],
-        "domains": ["ferrogrid.example"]
+        "domains": [
+          "ferrogrid.example"
+        ]
       }
     },
     {
       "entity_type": "COMPANY",
       "canonical_name": "OxaCell Systems",
-      "aliases": ["OxaCell"],
+      "aliases": [
+        "OxaCell"
+      ],
       "description": "Oxygen electrode and stack manufacturer",
       "country": "DE",
       "metadata": {
-        "external_ids": [{"system": "domain", "id": "oxacell.example"}]
+        "external_ids": [
+          {
+            "system": "domain",
+            "id": "oxacell.example"
+          }
+        ]
       }
     },
     {
       "entity_type": "COMPANY",
       "canonical_name": "PureChitin Bio",
-      "aliases": ["PureChitin"],
+      "aliases": [
+        "PureChitin"
+      ],
       "country": "NL",
       "metadata": {
-        "external_ids": [{"system": "domain", "id": "purechitin.example"}]
+        "external_ids": [
+          {
+            "system": "domain",
+            "id": "purechitin.example"
+          }
+        ]
       }
     },
     {
       "entity_type": "COMPANY",
       "canonical_name": "LongHaul Energy",
-      "aliases": ["LongHaul"],
+      "aliases": [
+        "LongHaul"
+      ],
       "country": "US"
     },
     {
       "entity_type": "TECHNOLOGY",
       "canonical_name": "reversible iron oxidation",
-      "aliases": ["iron-air redox", "rust-cycle storage"],
+      "aliases": [
+        "iron-air redox",
+        "rust-cycle storage"
+      ],
       "description": "Multi-day grid storage via reversible iron oxidation"
     },
     {
       "entity_type": "COMPONENT",
       "canonical_name": "porous iron electrode",
-      "aliases": ["iron air cathode structure"]
+      "aliases": [
+        "iron air cathode structure"
+      ]
     },
     {
       "entity_type": "MATERIAL",
       "canonical_name": "food-grade iron powder",
-      "aliases": ["iron powder feedstock"]
+      "aliases": [
+        "iron powder feedstock"
+      ]
     },
     {
       "entity_type": "FACILITY",
       "canonical_name": "FerroGrid Arizona pilot plant",
-      "aliases": ["AZ pilot line"],
+      "aliases": [
+        "AZ pilot line"
+      ],
       "country": "US",
       "metadata": {
-        "geo": {"country": "US", "region": "AZ"}
+        "geo": {
+          "country": "US",
+          "region": "AZ"
+        }
       }
     },
     {
       "entity_type": "APPLICATION",
       "canonical_name": "grid firming",
-      "aliases": ["multi-day firming", "dispatchable firming"]
+      "aliases": [
+        "multi-day firming",
+        "dispatchable firming"
+      ]
     },
     {
       "entity_type": "MARKET",
       "canonical_name": "regional utility",
-      "aliases": ["IOU utility buyers"]
+      "aliases": [
+        "IOU utility buyers"
+      ]
     },
     {
       "entity_type": "STANDARD_BODY",
       "canonical_name": "grid interconnection working group",
-      "aliases": ["GIWG"]
+      "aliases": [
+        "GIWG"
+      ]
     }
   ],
   "sources": [
@@ -96,10 +142,19 @@
       "metadata": {
         "outlet_domain": "patents.example",
         "external_ids": [
-          {"system": "us_publication", "id": "US20220123456A1"},
-          {"system": "patent_family", "id": "ironair-ferro-2022"}
+          {
+            "system": "us_publication",
+            "id": "US20220123456A1"
+          },
+          {
+            "system": "patent_family",
+            "id": "ironair-ferro-2022"
+          }
         ],
-        "classification_codes": ["H01M-4/86", "H01M-12/06"],
+        "classification_codes": [
+          "H01M-4/86",
+          "H01M-12/06"
+        ],
         "event_date": "2021-11-02",
         "license": "public-patent-text",
         "extractor_id": "example-patent-adapter",
@@ -119,10 +174,19 @@
       "language": "en",
       "metadata": {
         "external_ids": [
-          {"system": "ep_publication", "id": "EP4123456A1"},
-          {"system": "patent_family", "id": "oxa-o2-2023"}
+          {
+            "system": "ep_publication",
+            "id": "EP4123456A1"
+          },
+          {
+            "system": "patent_family",
+            "id": "oxa-o2-2023"
+          }
         ],
-        "classification_codes": ["H01M-4/86", "H01M-12/06"],
+        "classification_codes": [
+          "H01M-4/86",
+          "H01M-12/06"
+        ],
         "extractor_id": "example-patent-adapter",
         "extractor_version": "0.1.0"
       }
@@ -142,7 +206,10 @@
         "outlet_domain": "ferrogrid.example",
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01",
-        "geo": {"country": "US", "region": "AZ"},
+        "geo": {
+          "country": "US",
+          "region": "AZ"
+        },
         "extractor_id": "example-jobs-adapter",
         "extractor_version": "0.1.0"
       }
@@ -160,7 +227,10 @@
       "language": "en",
       "metadata": {
         "outlet_domain": "oxacell.example",
-        "geo": {"country": "DE", "region": "BY"}
+        "geo": {
+          "country": "DE",
+          "region": "BY"
+        }
       }
     },
     {
@@ -175,7 +245,12 @@
       "url_or_local_path": "local://filings/ferrogrid-2024-06-20.html",
       "language": "en",
       "metadata": {
-        "external_ids": [{"system": "internal_filing", "id": "FG-8K-2024-0620"}],
+        "external_ids": [
+          {
+            "system": "internal_filing",
+            "id": "FG-8K-2024-0620"
+          }
+        ],
         "currency": "USD",
         "amount_original": 120000000,
         "license": "company-release"
@@ -246,7 +321,12 @@
       "url_or_local_path": "https://giwg.example/drafts/mdr-storage-2024",
       "language": "en",
       "metadata": {
-        "external_ids": [{"system": "std_draft", "id": "GIWG-MDR-2024-02"}],
+        "external_ids": [
+          {
+            "system": "std_draft",
+            "id": "GIWG-MDR-2024-02"
+          }
+        ],
         "valid_from": "2024-02-01"
       }
     },
@@ -262,7 +342,12 @@
       "url_or_local_path": "https://doi.example/10.1234/esml.ironair.2021",
       "language": "en",
       "metadata": {
-        "external_ids": [{"system": "doi", "id": "10.1234/esml.ironair.2021"}],
+        "external_ids": [
+          {
+            "system": "doi",
+            "id": "10.1234/esml.ironair.2021"
+          }
+        ],
         "license": "cc-by-4.0"
       }
     }
@@ -278,8 +363,14 @@
       "confidence": 0.9,
       "metadata": {
         "document_id": "pat-us-ferro-2022",
-        "char_span": [0, 160],
-        "classification_codes": ["H01M-4/86", "H01M-12/06"],
+        "char_span": [
+          0,
+          160
+        ],
+        "classification_codes": [
+          "H01M-4/86",
+          "H01M-12/06"
+        ],
         "event_id": "evt_ferro_patent_family_2022"
       }
     },
@@ -293,7 +384,10 @@
       "confidence": 0.85,
       "metadata": {
         "document_id": "pat-us-ferro-2022",
-        "char_span": [160, 280]
+        "char_span": [
+          160,
+          280
+        ]
       }
     },
     {
@@ -314,7 +408,9 @@
       "text_excerpt": "Oxygen electrode stack optimized for long-duration iron-air duty cycles.",
       "confidence": 0.9,
       "metadata": {
-        "classification_codes": ["H01M-4/86"]
+        "classification_codes": [
+          "H01M-4/86"
+        ]
       }
     },
     {
@@ -330,7 +426,10 @@
       "metadata": {
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01",
-        "geo": {"country": "US", "region": "AZ"}
+        "geo": {
+          "country": "US",
+          "region": "AZ"
+        }
       }
     },
     {
@@ -384,7 +483,10 @@
       "metadata": {
         "event_id": "evt_ferro_purechitin_supply_2024",
         "document_id": "news-reuters-2024-supply",
-        "char_span": [0, 140]
+        "char_span": [
+          0,
+          140
+        ]
       }
     },
     {
@@ -459,7 +561,12 @@
       "text_excerpt": "Academic review of reversible iron oxidation pathways and electrode limits for multi-day storage.",
       "confidence": 0.8,
       "metadata": {
-        "external_ids": [{"system": "doi", "id": "10.1234/esml.ironair.2021"}]
+        "external_ids": [
+          {
+            "system": "doi",
+            "id": "10.1234/esml.ironair.2021"
+          }
+        ]
       }
     },
     {
@@ -481,6 +588,34 @@
       "confidence": 0.55,
       "metadata": {
         "_note": "Weaker inferred dependency from hiring text — low confidence on purpose"
+      }
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "news-reuters-2024-supply",
+      "source_ref": "news-reuters-2024-supply",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "text": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes.",
+      "url_or_local_path": "https://news.example/reuter/ferrogrid-supply",
+      "language": "en",
+      "license": "",
+      "metadata": {
+        "auto_built": true,
+        "from": "source_excerpt"
+      }
+    },
+    {
+      "document_id": "pat-us-ferro-2022",
+      "source_ref": "pat-us-ferro-2022",
+      "title": "Porous iron electrode for multi-day iron-air storage",
+      "text": "A porous iron electrode enables reversible iron oxidation for hundred-hour depth-discharge grid-dispatch storage with alkaline electrolyte.",
+      "url_or_local_path": "https://patents.example/US20220123456A1",
+      "language": "en",
+      "license": "",
+      "metadata": {
+        "auto_built": true,
+        "from": "source_excerpt"
       }
     }
   ]
