@@ -81,6 +81,11 @@ export function Dashboard() {
             value={st.unique_event_ids ?? "—"}
             sub={`${st.observations_with_event_id ?? 0} obs tagged`}
           />
+          <StatCard
+            label="outlet/wire"
+            value={st.sources_with_outlet_domain ?? "—"}
+            sub={`${st.sources_with_wire_id ?? 0} with wire_id`}
+          />
         </div>
       )}
 

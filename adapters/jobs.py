@@ -155,8 +155,6 @@ def convert_jobs(raw: dict) -> Package:
             "extractor_version": ADAPTER_VERSION,
             "external_ids": [{"system": "job_id", "id": job_id}],
         }
-        if domain:
-            source_meta["outlet_domain"] = domain
         if closed:
             source_meta["valid_to"] = closed
         if posted:
@@ -164,7 +162,7 @@ def convert_jobs(raw: dict) -> Package:
         if loc:
             source_meta["geo"] = loc
 
-        sources.append({
+        src_row: Dict[str, Any] = {
             "ref": ref,
             "source_type": "JOB_POSTING",
             "publisher": row.get("publisher") or f"{company} careers",
@@ -176,7 +174,10 @@ def convert_jobs(raw: dict) -> Package:
             "url_or_local_path": row.get("url") or f"local://jobs/{job_id}",
             "language": row.get("language") or "en",
             "metadata": source_meta,
-        })
+        }
+        if domain:
+            src_row["outlet_domain"] = domain  # first-class 0.1.12+
+        sources.append(src_row)
 
         obj = comps[0] if comps else (techs[0] if techs else None)
         obs_meta: Dict[str, Any] = {

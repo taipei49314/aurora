@@ -136,6 +136,8 @@ Without `ref`, observations cannot attach to the source.
 | `independence_group` | string | auto or `""` | Declared non-independence; if empty, engine derives from `metadata.wire_id` → `wire:…`, `outlet_domain` → `domain:…`, or `family_id` → `family:…` (0.1.1+) |
 | `family_id` | string | `""` | **First-class** (engine 0.1.8+); patent/document family. Metadata fallback still accepted; promoted onto `Source.family_id`. When `independence_group` empty → `family:<id>` |
 | `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event key. Sources sharing `event_id` are not independent (dedup layer 2b). When `independence_group` empty → `event:<id>` (after wire/domain/family) |
+| `outlet_domain` | string | `""` | **First-class** (engine 0.1.12+); digital outlet host. Metadata fallback. When `independence_group` empty → `domain:<host>` (after wire) |
+| `wire_id` | string | `""` | **First-class** (engine 0.1.12+); news wire / syndication key. Metadata fallback. When `independence_group` empty → `wire:<id>` (highest priority auto-derive) |
 | `reliability_tier` | `"A"\|"B"\|"C"\|"D"` | `"C"` | **Scored** via data_quality_penalty (engine 0.1.1+); stamped onto observation metadata at import |
 | `url_or_local_path` | string | `""` | Provenance |
 | `language` | string | `"en"` | **Stored only** today |
@@ -324,7 +326,7 @@ Do **not** assume these exist as first-class fields:
 | Unresolved mentions | must pre-resolve names | staging / `subject_raw` |
 | Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
 | Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |
-| Outlet auto-independence | manual group | `outlet_domain`, `wire_id` |
+| Outlet auto-independence | **done** first-class `outlet_domain` + `wire_id` | derive independence_group |
 | Event-level dedup | **done** first-class `event_id` on Source + Observation | independence layer 2b |
 | Geo / jurisdiction in model | metadata / unused country | first-class geo |
 | reliability in score | **done (engine 0.1.1)** via data_quality_penalty | optional: tier-weighted independence |

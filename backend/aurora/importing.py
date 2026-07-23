@@ -51,14 +51,29 @@ def _extract_event_id(row: dict, meta: dict) -> str:
     return (row.get("event_id") or meta.get("event_id") or "").strip()
 
 
+def _extract_outlet_domain(row: dict, meta: dict) -> str:
+    """First-class outlet_domain with metadata fallback (engine 0.1.12+)."""
+    return (row.get("outlet_domain") or meta.get("outlet_domain") or row.get("domain") or meta.get("domain") or "").strip()
+
+
+def _extract_wire_id(row: dict, meta: dict) -> str:
+    """First-class wire_id with metadata fallback (engine 0.1.12+)."""
+    return (row.get("wire_id") or meta.get("wire_id") or "").strip()
+
+
 def _derive_independence_group(
-    row: dict, meta: dict, family_id: str = "", event_id: str = ""
+    row: dict,
+    meta: dict,
+    family_id: str = "",
+    event_id: str = "",
+    wire_id: str = "",
+    outlet_domain: str = "",
 ) -> str:
-    """When independence_group is empty, derive from wire/domain/family/event metadata."""
-    wire = (meta.get("wire_id") or row.get("wire_id") or "").strip()
+    """When independence_group is empty, derive from wire/domain/family/event fields."""
+    wire = (wire_id or meta.get("wire_id") or row.get("wire_id") or "").strip()
     if wire:
         return f"wire:{wire}"
-    domain = (meta.get("outlet_domain") or row.get("outlet_domain") or "").strip()
+    domain = (outlet_domain or meta.get("outlet_domain") or row.get("outlet_domain") or "").strip()
     if domain:
         return f"domain:{domain}"
     family = (family_id or meta.get("family_id") or row.get("family_id") or "").strip()
@@ -243,10 +258,24 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             event_id = _extract_event_id(row, meta)
             if event_id and meta.get("event_id") == event_id:
                 meta.pop("event_id", None)
+            outlet_domain = _extract_outlet_domain(row, meta)
+            if outlet_domain and meta.get("outlet_domain") == outlet_domain:
+                meta.pop("outlet_domain", None)
+            # also drop alias key when promoted
+            if outlet_domain and meta.get("domain") == outlet_domain:
+                meta.pop("domain", None)
+            wire_id = _extract_wire_id(row, meta)
+            if wire_id and meta.get("wire_id") == wire_id:
+                meta.pop("wire_id", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
                 indep = _derive_independence_group(
-                    row, meta, family_id=family_id, event_id=event_id
+                    row,
+                    meta,
+                    family_id=family_id,
+                    event_id=event_id,
+                    wire_id=wire_id,
+                    outlet_domain=outlet_domain,
                 )
             sources[sid] = Source(
                 source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
@@ -254,7 +283,8 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), family_id=family_id,
-                event_date=event_date, event_id=event_id, metadata=meta,
+                event_date=event_date, event_id=event_id,
+                outlet_domain=outlet_domain, wire_id=wire_id, metadata=meta,
             )
         if "ref" in row:
             ref_to_sid[row["ref"]] = sid

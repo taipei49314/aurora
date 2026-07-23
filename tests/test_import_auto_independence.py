@@ -55,8 +55,33 @@ def test_wire_id_metadata_groups_reprints():
     assert snap.import_errors == []
     groups = {s.independence_group for s in snap.sources}
     assert groups == {"wire:reuters-x"}
+    assert all(s.wire_id == "reuters-x" for s in snap.sources)
+    assert all("wire_id" not in (s.metadata or {}) for s in snap.sources)
     assert snap.counts["independent_source_count"] == 1
     assert snap.counts["raw_source_count"] == 2
+
+
+@pytest.mark.unit
+def test_top_level_outlet_domain_and_wire_id():
+    """Engine 0.1.12+: outlet_domain / wire_id are first-class on Source."""
+    pkg = _pkg([{
+        "ref": "a",
+        "source_type": "NEWS",
+        "publisher": "Wire",
+        "title": "Top-level outlet fields",
+        "excerpt": "body",
+        "published_at": "2024-03-01",
+        "outlet_domain": "news.example",
+        "wire_id": "wire-top",
+    }])
+    snap = import_package(pkg)
+    src = snap.sources[0]
+    assert src.outlet_domain == "news.example"
+    assert src.wire_id == "wire-top"
+    # wire wins over domain for independence
+    assert src.independence_group == "wire:wire-top"
+    assert "outlet_domain" not in (src.metadata or {})
+    assert "wire_id" not in (src.metadata or {})
 
 
 @pytest.mark.unit
@@ -86,6 +111,8 @@ def test_outlet_domain_derives_domain_group():
     }])
     snap = import_package(pkg)
     assert snap.sources[0].independence_group == "domain:gridtech.example"
+    assert snap.sources[0].outlet_domain == "gridtech.example"
+    assert "outlet_domain" not in (snap.sources[0].metadata or {})
 
 
 @pytest.mark.unit
