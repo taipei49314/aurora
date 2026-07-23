@@ -1,0 +1,52 @@
+{
+  "_comment": "Offline USPTO-shaped fixture. Fictional. No network fetch.",
+  "patents": [
+    {
+      "publication_number": "US20220123456A1",
+      "family_id": "ironair-ferro-2022",
+      "title": "Porous iron electrode for multi-day iron-air storage",
+      "abstract": "A porous iron electrode enables reversible iron oxidation for hundred-hour depth-discharge grid-dispatch storage with alkaline electrolyte.",
+      "application_date": "2021-11-02",
+      "publication_date": "2022-04-12",
+      "assignees": [
+        {"name": "FerroGrid Power", "country": "US"}
+      ],
+      "cpc": ["H01M4/86", "H01M12/06"],
+      "url": "https://patents.example/US20220123456A1",
+      "technologies": ["reversible iron oxidation"],
+      "components": ["porous iron electrode"],
+      "materials": ["food-grade iron powder"]
+    },
+    {
+      "publication_number": "EP4123456A1",
+      "family_id": "oxa-o2-2023",
+      "title": "Oxygen electrode stack for long-duration iron-air cells",
+      "abstract": "Oxygen-electrode architecture for long-duration multi-day iron-air cells with reversible oxidation and grid-dispatch duty cycles.",
+      "application_date": "2022-08-01",
+      "publication_date": "2023-01-18",
+      "assignees": [
+        {"name": "OxaCell Systems", "country": "DE"}
+      ],
+      "cpc": ["H01M4/86", "H01M12/06"],
+      "publisher": "EPO",
+      "url": "https://patents.example/EP4123456A1",
+      "technologies": ["reversible iron oxidation"]
+    },
+    {
+      "publication_number": "US20230111222A1",
+      "family_id": "ironair-ferro-2022",
+      "title": "Alkaline electrolyte formulation for iron-air depth discharge",
+      "abstract": "Electrolyte additives improve reversible iron oxidation stability over hundred-hour discharge for grid-dispatch modules.",
+      "application_date": "2022-03-15",
+      "publication_date": "2023-05-01",
+      "assignees": [
+        {"name": "FerroGrid Power", "country": "US"},
+        {"name": "LongHaul Energy", "country": "US"}
+      ],
+      "cpc": ["H01M10/26", "H01M12/06"],
+      "url": "https://patents.example/US20230111222A1",
+      "technologies": ["reversible iron oxidation"],
+      "materials": ["food-grade iron powder"]
+    }
+  ]
+}

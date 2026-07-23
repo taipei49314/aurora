@@ -1,0 +1,524 @@
+{
+  "entities": [
+    {
+      "entity_type": "TECHNOLOGY",
+      "canonical_name": "reversible iron oxidation",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "COMPONENT",
+      "canonical_name": "porous iron electrode",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "LongHaul Energy",
+      "aliases": [],
+      "description": "",
+      "country": "US",
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "uspto_assignee_name",
+            "id": "LongHaul Energy"
+          }
+        ]
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "OxaCell Systems",
+      "aliases": [],
+      "description": "",
+      "country": "DE",
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "uspto_assignee_name",
+            "id": "OxaCell Systems"
+          }
+        ]
+      }
+    },
+    {
+      "entity_type": "MATERIAL",
+      "canonical_name": "food-grade iron powder",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "FerroGrid Power",
+      "aliases": [],
+      "description": "",
+      "country": "US",
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "uspto_assignee_name",
+            "id": "FerroGrid Power"
+          }
+        ]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "ref": "pat-10476080",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Metal-air electrochemical cell with iron anode for multi-day discharge",
+      "published_at": "2019-11-12",
+      "excerpt": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
+      "independence_group": "family:fam-ironair-2018",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.google.com/patent/US10476080",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "10476080"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-ironair-2018"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-ironair-2018",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ],
+        "event_date": "2018-03-20",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1",
+        "inventors": [
+          "A. Researcher"
+        ]
+      }
+    },
+    {
+      "ref": "pat-10930940",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Oxygen electrode stack for long-duration iron-air modules",
+      "published_at": "2021-02-23",
+      "excerpt": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
+      "independence_group": "family:fam-oxa-2019",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.google.com/patent/US10930940",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "10930940"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-oxa-2019"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-oxa-2019",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M12/06"
+        ],
+        "event_date": "2019-07-01",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1"
+      }
+    },
+    {
+      "ref": "pat-11271215",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Porous iron electrode structures for hundred-hour storage",
+      "published_at": "2022-03-08",
+      "excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "independence_group": "family:fam-ironair-2018",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.google.com/patent/US11271215",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "11271215"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-ironair-2018"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-ironair-2018",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "event_date": "2020-09-15",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1"
+      }
+    },
+    {
+      "ref": "pat-11575128",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Alkaline electrolyte additives for iron-air grid modules",
+      "published_at": "2023-02-07",
+      "excerpt": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
+      "independence_group": "family:fam-ferro-elyte-2021",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.google.com/patent/US11575128",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "11575128"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-ferro-elyte-2021"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-ferro-elyte-2021",
+        "classification_codes": [
+          "H01M10/26",
+          "H01M12/06"
+        ],
+        "event_date": "2021-05-10",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "source_ref": "pat-10476080",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2018-03-20",
+      "text_excerpt": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-10476080",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-10476080",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2018-03-20",
+      "text_excerpt": "LongHaul Energy discloses reversible iron oxidation: Metal-air electrochemical cell with iron anode for multi-day discharge",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-10476080",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-10476080",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "porous iron electrode",
+      "observed_at": "2018-03-20",
+      "text_excerpt": "Metal-air electrochemical cell with iron anode for multi-day discharge — component porous iron electrode",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "pat-10476080",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-10930940",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2019-07-01",
+      "text_excerpt": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-10930940",
+        "event_id": "evt_fam-oxa-2019",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M12/06"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-10930940",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2019-07-01",
+      "text_excerpt": "OxaCell Systems discloses reversible iron oxidation: Oxygen electrode stack for long-duration iron-air modules",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-10930940",
+        "event_id": "evt_fam-oxa-2019",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M12/06"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "FerroGrid Power discloses reversible iron oxidation: Porous iron electrode structures for hundred-hour storage",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "porous iron electrode",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "Porous iron electrode structures for hundred-hour storage — component porous iron electrode",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "porous iron electrode",
+      "object": "food-grade iron powder",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "Depends on material food-grade iron powder",
+      "confidence": 0.7,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "LongHaul Energy discloses reversible iron oxidation: Porous iron electrode structures for hundred-hour storage",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "porous iron electrode",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "Porous iron electrode structures for hundred-hour storage — component porous iron electrode",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11271215",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "porous iron electrode",
+      "object": "food-grade iron powder",
+      "observed_at": "2020-09-15",
+      "text_excerpt": "Depends on material food-grade iron powder",
+      "confidence": 0.7,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11575128",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2021-05-10",
+      "text_excerpt": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-11575128",
+        "event_id": "evt_fam-ferro-elyte-2021",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M10/26",
+          "H01M12/06"
+        ]
+      }
+    },
+    {
+      "source_ref": "pat-11575128",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2021-05-10",
+      "text_excerpt": "FerroGrid Power discloses reversible iron oxidation: Alkaline electrolyte additives for iron-air grid modules",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-11575128",
+        "event_id": "evt_fam-ferro-elyte-2021",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M10/26",
+          "H01M12/06"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "_comment": "Offline news fixture: primary wire + reprint share independence; supplier claim.",
+  "articles": [
+    {
+      "id": "reuter-ferro-supply-2024",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "body": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes for multi-day grid firming modules.",
+      "published_at": "2024-07-02",
+      "publisher": "Example Reuter Wire",
+      "outlet_domain": "news.example",
+      "wire_id": "example-reuter",
+      "url": "https://news.example/reuter/ferrogrid-supply",
+      "event_id": "evt_ferro_purechitin_supply_2024",
+      "reliability_tier": "C",
+      "entity_types": {
+        "FerroGrid Power": "COMPANY",
+        "PureChitin Bio": "COMPANY",
+        "food-grade iron powder": "MATERIAL",
+        "grid firming": "APPLICATION",
+        "regional utility": "MARKET"
+      },
+      "claims": [
+        {
+          "observation_type": "SUPPLIER_RELATIONSHIP",
+          "subject": "FerroGrid Power",
+          "object": "PureChitin Bio",
+          "confidence": 0.85,
+          "text_excerpt": "Multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock."
+        },
+        {
+          "observation_type": "SUPPLIER_RELATIONSHIP",
+          "subject": "FerroGrid Power",
+          "object": "food-grade iron powder",
+          "object_type": "MATERIAL",
+          "confidence": 0.8,
+          "text_excerpt": "Feedstock contract covers food-grade iron powder for porous iron electrodes."
+        },
+        {
+          "observation_type": "DEMAND_SIGNAL",
+          "subject": "grid firming",
+          "object": "regional utility",
+          "object_type": "MARKET",
+          "subject_type": "APPLICATION",
+          "confidence": 0.6,
+          "text_excerpt": "Modules aimed at multi-day grid firming for utilities."
+        }
+      ]
+    },
+    {
+      "id": "regional-reprint-supply-2024",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "body": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes for multi-day grid firming modules.",
+      "published_at": "2024-07-02",
+      "publisher": "Regional Energy Daily",
+      "outlet_domain": "regional.example",
+      "wire_id": "example-reuter",
+      "is_reprint_of": "reuter-ferro-supply-2024",
+      "url": "https://regional.example/reprint/ferrogrid-supply",
+      "event_id": "evt_ferro_purechitin_supply_2024",
+      "reliability_tier": "D",
+      "entity_types": {
+        "FerroGrid Power": "COMPANY",
+        "PureChitin Bio": "COMPANY"
+      },
+      "claims": [
+        {
+          "observation_type": "SUPPLIER_RELATIONSHIP",
+          "subject": "FerroGrid Power",
+          "object": "PureChitin Bio",
+          "confidence": 0.7,
+          "text_excerpt": "Multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock."
+        }
+      ]
+    },
+    {
+      "id": "gridtech-longhaul-2023",
+      "title": "LongHaul Energy pilots hundred-hour iron-air with utilities",
+      "body": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts using reversible iron oxidation.",
+      "published_at": "2023-09-15",
+      "publisher": "GridTech Chronicle",
+      "outlet_domain": "gridtech.example",
+      "url": "https://gridtech.example/longhaul-pilot",
+      "event_id": "evt_longhaul_pilot_2023",
+      "reliability_tier": "C",
+      "entity_types": {
+        "LongHaul Energy": "COMPANY",
+        "regional utility": "MARKET",
+        "grid firming": "APPLICATION",
+        "reversible iron oxidation": "TECHNOLOGY"
+      },
+      "claims": [
+        {
+          "observation_type": "ADOPTION_SIGNAL",
+          "subject": "LongHaul Energy",
+          "object": "regional utility",
+          "object_type": "MARKET",
+          "confidence": 0.75
+        },
+        {
+          "observation_type": "PRODUCT_LAUNCH",
+          "subject": "LongHaul Energy",
+          "object": "grid firming",
+          "object_type": "APPLICATION",
+          "confidence": 0.7
+        },
+        {
+          "observation_type": "TECHNICAL_DEPENDENCY",
+          "subject": "LongHaul Energy",
+          "object": "reversible iron oxidation",
+          "object_type": "TECHNOLOGY",
+          "confidence": 0.8
+        }
+      ]
+    }
+  ]
+}

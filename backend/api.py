@@ -141,6 +141,17 @@ def export_package():
     source content hash (and thus every derived id) recomputes identically."""
     s = REPO.snapshot
     name_by_id = {e.entity_id: e.canonical_name for e in s.entities}
+    entities = []
+    for e in s.entities:
+        entities.append({
+            "entity_type": e.entity_type,
+            "canonical_name": e.canonical_name,
+            "aliases": list(e.aliases or []),
+            "description": e.description,
+            "country": e.country,
+            "external_ids": list(e.external_ids or []),
+            "metadata": dict(e.metadata or {}),
+        })
     sources = []
     for src in s.sources:
         meta = dict(src.metadata)
@@ -166,9 +177,6 @@ def export_package():
             "unit": o.unit, "text_excerpt": o.text_excerpt,
             "confidence": o.confidence, "metadata": meta,
         })
-    entities = [{"entity_type": e.entity_type, "canonical_name": e.canonical_name,
-                 "aliases": e.aliases, "description": e.description,
-                 "country": e.country, "metadata": e.metadata} for e in s.entities]
     return {"entities": entities, "sources": sources, "observations": observations}
 
 

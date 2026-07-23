@@ -1,0 +1,21 @@
+{
+  "case_id": "iron-air-mini",
+  "loop": 2,
+  "purpose": "Multi-source adapter merge smoke case (not historical retro)",
+  "gates": {
+    "import_errors_max": 0,
+    "require_observation_types": [
+      "PATENT_ACTIVITY",
+      "HIRING_ACTIVITY",
+      "SUPPLIER_RELATIONSHIP"
+    ],
+    "independent_lt_raw": true,
+    "min_sources": 9
+  },
+  "adapters": ["uspto", "jobs", "news"],
+  "fixtures": [
+    "adapters/fixtures/uspto_sample.json",
+    "adapters/fixtures/jobs_sample.json",
+    "adapters/fixtures/news_sample.json"
+  ]
+}

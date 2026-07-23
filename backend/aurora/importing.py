@@ -23,6 +23,24 @@ _REQUIRED_SOURCE = {"source_type", "publisher", "title"}
 _REQUIRED_OBS = {"source_ref", "observation_type", "subject"}
 
 
+def _derive_independence_group(row: dict, meta: dict) -> str:
+    """When independence_group is empty, derive from wire/domain/family metadata.
+
+    Does not invent groups from free-text publishers (too noisy). Explicit
+    ``independence_group`` on the row always wins (caller should set it when known).
+    """
+    wire = (meta.get("wire_id") or row.get("wire_id") or "").strip()
+    if wire:
+        return f"wire:{wire}"
+    domain = (meta.get("outlet_domain") or row.get("outlet_domain") or "").strip()
+    if domain:
+        return f"domain:{domain}"
+    family = (meta.get("family_id") or row.get("family_id") or "").strip()
+    if family:
+        return f"family:{family}"
+    return ""
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -54,18 +72,34 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                                    f"unknown entity_type {row['entity_type']}", str(row["entity_type"])))
             continue
         eid = prefixed_id("ent", row["entity_type"], normalize_text(row["canonical_name"]))
+        meta = dict(row.get("metadata") or {})
+        # Prefer first-class external_ids; fall back to metadata.external_ids (v0 convention)
+        ext_ids = list(row.get("external_ids") or meta.pop("external_ids", None) or [])
         if eid not in entities:
             entities[eid] = Entity(
                 entity_id=eid, entity_type=row["entity_type"], canonical_name=row["canonical_name"],
                 aliases=list(row.get("aliases", [])), description=row.get("description", ""),
-                country=row.get("country", ""), created_at=created_at, metadata=row.get("metadata", {}),
+                country=row.get("country", ""), created_at=created_at,
+                external_ids=ext_ids, metadata=meta,
             )
         else:
-            # merge aliases on re-import (idempotent union)
+            # merge aliases + external_ids on re-import (idempotent union)
             existing = entities[eid]
             for a in row.get("aliases", []):
                 if a not in existing.aliases:
                     existing.aliases.append(a)
+            seen = {
+                (x.get("system"), x.get("id"))
+                for x in (existing.external_ids or [])
+                if isinstance(x, dict)
+            }
+            for x in ext_ids:
+                if not isinstance(x, dict):
+                    continue
+                key = (x.get("system"), x.get("id"))
+                if key not in seen:
+                    existing.external_ids.append(x)
+                    seen.add(key)
 
     resolver = EntityResolver(entities.values())
     amb = resolver.ambiguities()
@@ -96,11 +130,15 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             meta = dict(row.get("metadata", {}))
             if "excerpt" in row:
                 meta["excerpt"] = row["excerpt"]
+            indep = (row.get("independence_group") or "").strip()
+            if not indep:
+                # Auto-derive from common adapter/metadata conventions (engine 0.1.1+)
+                indep = _derive_independence_group(row, meta)
             sources[sid] = Source(
                 source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
                 title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=created_at,
                 url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
-                independence_group=row.get("independence_group", ""), reliability_tier=row.get("reliability_tier", "C"),
+                independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), metadata=meta,
             )
         # map the raw ref key (given by caller) to the resolved source id
@@ -140,6 +178,8 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         meta = dict(row.get("metadata", {}))
         meta["source_type"] = src.source_type
         meta["independence_group"] = resolved_group.get(sid, sid)
+        # Stamp tier so scoring/data-quality works even if source rows are later subset
+        meta.setdefault("reliability_tier", src.reliability_tier or "C")
         oid = prefixed_id("obs", sid, row["observation_type"], subj, obj or "",
                           row.get("observed_at") or "", normalize_text(row.get("text_excerpt", "")))
         if oid not in observations:

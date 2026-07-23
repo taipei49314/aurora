@@ -1,0 +1,365 @@
+# AURORA Import Schema
+
+Canonical contract for packages accepted by `import_package()` (`backend/aurora/importing.py`).
+
+This document freezes **what the engine accepts today**, **how fields are used**,
+**conventions for real-world adapters**, and **known gaps** before a schema bump.
+
+Related code: `backend/aurora/models.py`, `importing.py`, `dedup.py`.
+Examples: `examples/`. Machine-readable schema: `examples/schemas/import-package.schema.json`.
+
+---
+
+## 1. Package shape
+
+Top-level JSON object:
+
+```json
+{
+  "entities": [ /* EntityRow */ ],
+  "sources": [ /* SourceRow */ ],
+  "observations": [ /* ObservationRow */ ]
+}
+```
+
+| Key | Required | Notes |
+|-----|----------|--------|
+| `entities` | yes (may be `[]`) | Canonical actors; ids are derived, not caller-supplied |
+| `sources` | yes (may be `[]`) | Documents / records; linked from observations via `ref` |
+| `observations` | yes (may be `[]`) | Atomic evidence rows |
+
+There is **no** first-class `documents`, `mentions`, or `events` layer in v0.
+Adapters must extract observations *before* import.
+
+Import is **idempotent**: re-importing the same content yields the same
+content-addressed ids and does not double-count evidence.
+
+---
+
+## 2. Date and time conventions (freeze these)
+
+| Field | Meaning | Rule |
+|-------|---------|------|
+| `Source.published_at` | When the **document** was published or became public | ISO date `YYYY-MM-DD` preferred; full ISO datetime accepted (first 10 chars used) |
+| `Observation.observed_at` | When the **underlying event** occurred | Prefer event date over crawl date; use `null` if unknown — **do not** invent with retrieve time |
+| `Source.retrieved_at` | Set by importer to import wall-clock | Callers cannot override today |
+
+**Leakage rule:** cutoff runs keep only observations with `observed_at <= cutoff`
+(and treat missing dates per `leakage.py` / pipeline data-quality penalty).
+
+Invalid date strings are recorded as import row errors (`SOURCE_DATE_MISSING`)
+but do not always hard-fail the whole package.
+
+---
+
+## 3. Entity row
+
+### Required
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `entity_type` | string enum | See §6 |
+| `canonical_name` | non-empty string | Display + identity; normalized for ids |
+
+### Optional
+
+| Field | Type | Default | Engine use |
+|-------|------|---------|------------|
+| `aliases` | string[] | `[]` | Entity resolution / renames |
+| `description` | string | `""` | Stored; light influence on features only if text is reused elsewhere |
+| `country` | string | `""` | **Stored only** (not used in scoring/clustering today) |
+| `external_ids` | `{system,id}[]` | `[]` | **First-class** (engine 0.1.1+); also accepted under `metadata.external_ids` |
+| `metadata` | object | `{}` | Opaque passthrough (`external_ids` lifted out if nested) |
+
+### Derived (engine)
+
+- `entity_id` = content-addressed from `(entity_type, normalize(canonical_name))`
+- `created_at` = import timestamp
+
+### Real-data conventions (metadata, v0)
+
+Until first-class fields exist, put stable crosswalks here:
+
+```json
+"metadata": {
+  "external_ids": [
+    {"system": "lei", "id": "5493001KJTIIGC8Y1R12"},
+    {"system": "cik", "id": "0000320193"},
+    {"system": "openalex_org", "id": "I123"},
+    {"system": "uspto_assignee", "id": "123456"}
+  ],
+  "domains": ["example.com"],
+  "hq_geo": {"country": "US", "region": "CA"}
+}
+```
+
+**Do not** invent industry labels in `metadata` that the engine should treat as ground truth.
+
+---
+
+## 4. Source row
+
+### Required
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `source_type` | string enum | See §6 |
+| `publisher` | non-empty string | Outlet, assignee office, journal, board, etc. |
+| `title` | non-empty string | Document title |
+
+### Strongly recommended
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ref` | string | Caller key; **observations must set `source_ref` to this value** |
+
+Without `ref`, observations cannot attach to the source.
+
+### Optional
+
+| Field | Type | Default | Engine use |
+|-------|------|---------|------------|
+| `published_at` | string \| null | null | Dating / audit |
+| `excerpt` | string | `""` | **Part of content hash** + near-duplicate tokens (also stored in `metadata.excerpt`) |
+| `independence_group` | string | auto or `""` | Declared non-independence; if empty, engine derives from `metadata.wire_id` → `wire:…`, `outlet_domain` → `domain:…`, or `family_id` → `family:…` (0.1.1+) |
+| `reliability_tier` | `"A"\|"B"\|"C"\|"D"` | `"C"` | **Scored** via data_quality_penalty (engine 0.1.1+); stamped onto observation metadata at import |
+| `url_or_local_path` | string | `""` | Provenance |
+| `language` | string | `"en"` | **Stored only** today |
+| `metadata` | object | `{}` | Opaque passthrough |
+
+### Derived (engine)
+
+- `content_hash` = hash(`source_type`, normalized `title`, normalized `excerpt`, `publisher`)
+- `source_id` = content-addressed from that hash
+- `retrieved_at` = import time
+
+**Warning:** changing excerpt truncation length changes `content_hash` and thus `source_id`.
+Adapters should canonicalize excerpt (e.g. first 500 chars of abstract, stable whitespace).
+
+### Real-data conventions (metadata + independence)
+
+```json
+"independence_group": "wire:reuters",
+"metadata": {
+  "outlet_domain": "reuters.com",
+  "wire_id": "reuters",
+  "external_ids": [{"system": "doi", "id": "10.1234/foo"}],
+  "license": "cc-by-4.0",
+  "extractor_id": "patent-adapter",
+  "extractor_version": "0.1.0"
+}
+```
+
+Suggested `independence_group` prefixes (adapters should set these, not leave empty when known):
+
+| Prefix | Meaning |
+|--------|---------|
+| `wire:<name>` | Same news wire / syndication family |
+| `domain:<host>` | Same digital outlet |
+| `family:<patent_family_id>` | Same patent family |
+| `reprint:<hash>` | Known republication of identical body |
+
+---
+
+## 5. Observation row
+
+### Required
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `source_ref` | string | Must match a source `ref` (or, after export, a `source_id`) |
+| `observation_type` | string enum | See §6; **semantic label, not raw API field** |
+| `subject` | string | Name resolving to exactly one entity (canonical or alias) |
+
+### Optional
+
+| Field | Type | Default | Engine use |
+|-------|------|---------|------------|
+| `object` | string \| null | null | Other entity name for relational edges |
+| `observed_at` | string \| null | null | Temporal signals, leakage, fade |
+| `text_excerpt` | string | `""` | **Primary feature text** (TF-IDF / naming) |
+| `confidence` | number 0..1 | `0.7` | Edge weights for relational types |
+| `numeric_value` | number \| null | null | Lead-time / capacity heuristics |
+| `unit` | string \| null | null | Free string today; see §8 |
+| `metadata` | object | `{}` | Import merges `source_type` + resolved independence |
+
+### Resolution rules
+
+- `subject` / `object` are resolved by **normalized name / alias**.
+- Unknown name → row error, observation dropped.
+- Ambiguous name (maps to >1 entity) → error, not a silent pick.
+
+### Real-data conventions (metadata)
+
+```json
+"metadata": {
+  "document_id": "doc_us2024123456a1",
+  "char_span": [120, 480],
+  "event_id": "evt_ferrogrid_plant_2024q2",
+  "classification_codes": ["H01M-10/054", "H01M-4/58"],
+  "currency": "USD",
+  "amount_original": 120000000,
+  "geo": {"country": "US", "region": "AZ"},
+  "valid_from": "2024-01-15",
+  "valid_to": "2024-06-30"
+}
+```
+
+---
+
+## 6. Controlled vocabularies
+
+### `source_type`
+
+`COMPANY_FILING` · `PATENT` · `PAPER` · `JOB_POSTING` ·
+`NEWS` · `GOVERNMENT_PROGRAM` · `STANDARD` · `RESEARCH_NOTE`
+
+### `entity_type`
+
+`COMPANY` · `RESEARCH_INSTITUTE` · `UNIVERSITY` · `GOVERNMENT` · `STANDARD_BODY` ·
+`PRODUCT` · `TECHNOLOGY` · `MATERIAL` · `COMPONENT` · `PROCESS` · `FACILITY` ·
+`APPLICATION` · `MARKET`
+
+There is **no** `PERSON` type. Inventors/authors stay in source/obs metadata or as free text.
+
+### `observation_type`
+
+| Group | Types | Role in engine |
+|-------|-------|----------------|
+| Real investment | `PATENT_ACTIVITY`, `HIRING_ACTIVITY`, `CAPEX_ACTIVITY`, `CAPACITY_EXPANSION`, `SUPPLIER_RELATIONSHIP`, `STANDARD_ACTIVITY` | Counter-hype, candidate gates |
+| Demand | `CUSTOMER_RELATIONSHIP`, `ADOPTION_SIGNAL`, `DEMAND_SIGNAL` | Demand score |
+| Narrative | `PRODUCT_LAUNCH`, `STRATEGIC_INVESTMENT` (+ NEWS sources) | Hype if dominant |
+| Negative | `CANCELLATION_SIGNAL`, `SHUTDOWN_SIGNAL`, `PRICE_PRESSURE`, `LEAD_TIME_PRESSURE` | Counterevidence / constraints |
+| Structural | `TECHNICAL_DEPENDENCY`, `RESEARCH_ACTIVITY`, `REGULATORY_SUPPORT` | Graph / chain / regulation |
+
+Relational types that **should** set `object` when known:
+
+`SUPPLIER_RELATIONSHIP` · `CUSTOMER_RELATIONSHIP` · `TECHNICAL_DEPENDENCY` · `STRATEGIC_INVESTMENT`
+
+### `reliability_tier` (stored)
+
+| Tier | Intent |
+|------|--------|
+| A | Official filings, primary legal/patent registers |
+| B | Reproducible technical docs, peer-reviewed |
+| C | News / secondary reporting |
+| D | Social, unverified blogs, pure syndication sinks |
+
+---
+
+## 7. Independence and dedup (what adapters must get right)
+
+Pipeline (`dedup.py`):
+
+1. **Exact** — same `content_hash`
+2. **Declared** — same non-empty `independence_group`
+3. **Near-dup** — high token overlap on `title` + `excerpt` (MinHash-LSH)
+
+Scoring uses **independent source counts**, not raw row counts.
+If adapters leave `independence_group` empty for wire reprints, independence is **overstated**.
+
+---
+
+## 8. Units and numbers (v0 freeform)
+
+Preferred `unit` strings when `numeric_value` is set:
+
+| Context | unit | numeric_value meaning |
+|---------|------|------------------------|
+| Open roles | `openings` | headcount openings |
+| Capex | `USD` / `TWD` / `EUR` | amount in that currency (**no FX normalization in engine**) |
+| Lead time | `months` | months (bottleneck scales `/24`) |
+| Capacity delta | `pct` or physical unit | negative used as capacity stress signal |
+
+Document currency also under `metadata.currency` when unit is ambiguous.
+
+---
+
+## 9. Real-source mapping cheat sheet
+
+| Real source | `source_type` | Typical `observation_type` | Must carry |
+|-------------|---------------|----------------------------|------------|
+| Patent office | `PATENT` | `PATENT_ACTIVITY` | abstract→excerpt; assignee→entity; codes→metadata |
+| Job board | `JOB_POSTING` | `HIRING_ACTIVITY` | skills in `text_excerpt`; openings numeric |
+| 10-K / 重大訊息 | `COMPANY_FILING` | `CAPEX_ACTIVITY`, `CAPACITY_EXPANSION` | tier `A`; amount+currency |
+| News / wire | `NEWS` | often mirrors event type, or narrative-only | **wire independence_group** |
+| Standard body | `STANDARD` | `STANDARD_ACTIVITY` | standard id in metadata |
+| Paper | `PAPER` | `RESEARCH_ACTIVITY` | DOI in external_ids |
+| Supply contract note | filing/news | `SUPPLIER_RELATIONSHIP` | **object** required for graph credit |
+
+See also:
+
+- `examples/real_mini_package.json` — hand-authored multi-source package
+- `adapters/` — offline converters (`uspto`, `patentsview`, `jobs`, `news`, `merge`)
+- `adapters/fixtures/uspto_sample.json` — simple USPTO-shaped input
+- `adapters/fixtures/patentsview_sample.json` — PatentsView field names (swap for real export)
+- `cases/patentsview-sample/` — end-to-end dump → package → scorecard
+
+---
+
+## 10. What is intentionally missing (v0 gaps)
+
+Do **not** assume these exist as first-class fields:
+
+| Gap | Workaround today | Candidate future field |
+|-----|------------------|------------------------|
+| External IDs | **done** first-class `external_ids[]` (+ metadata fallback) | use in ER join rules |
+| Full document + span | short excerpt only | `documents[]` + `document_id`/`char_span` |
+| Unresolved mentions | must pre-resolve names | staging / `subject_raw` |
+| Patent family | independence_group / metadata | `family_id` |
+| Dual dates (app vs grant) | pick one; document in metadata | `event_date` vs `published_at` |
+| Outlet auto-independence | manual group | `outlet_domain`, `wire_id` |
+| Event-level dedup | `metadata.event_id` | `event_id` |
+| Geo / jurisdiction in model | metadata / unused country | first-class geo |
+| reliability in score | **done (engine 0.1.1)** via data_quality_penalty | optional: tier-weighted independence |
+| License for redistribution | metadata.license | required for public corpora |
+| PERSON entities | metadata / free text | optional type or out of scope |
+
+Engine evolution should prefer **small schema increments** listed in the project
+schema gap analysis over adding many unused columns.
+
+---
+
+## 11. Validation and CLI
+
+```bash
+# structural + engine import (recommended)
+PYTHONPATH=backend python scripts/validate_package.py examples/real_mini_package.json
+
+# optional: also run a discovery pass (needs taxonomy)
+PYTHONPATH=backend python scripts/validate_package.py examples/real_mini_package.json --run
+
+# JSON Schema only (if jsonschema installed)
+PYTHONPATH=backend python scripts/validate_package.py examples/real_mini_package.json --schema-only
+```
+
+Makefile: `make validate-example`
+
+---
+
+## 12. Export round-trip
+
+`GET /api/exports` emits the same three arrays with:
+
+- source `ref` = internal `source_id`
+- observation `subject`/`object` as **canonical names**
+- `excerpt` lifted out of source metadata so content hashes recompute identically
+
+Feed the export back into `POST /api/imports` for a round-trip check.
+
+---
+
+## 13. Versioning
+
+| Item | Value |
+|------|-------|
+| Document | import-schema 0.1.0 |
+| Engine package | see `config.ENGINE_VERSION` |
+| Breaking changes | require engine minor bump + example updates |
+
+When adding first-class fields, update:
+
+1. `models.py` / `importing.py`
+2. this document
+3. `examples/schemas/import-package.schema.json`
+4. at least one example package + `scripts/validate_package.py` expectations

@@ -38,13 +38,65 @@ def _generated_name(cluster, vectors, entities) -> str:
     return f"{label} (auto)"
 
 
-def _data_quality_penalty(cluster_obs) -> float:
+# Cost of source reliability for data-quality penalty (A clean … D weak).
+# Applied as an average over cluster observations, then scaled into 0..15.
+_RELIABILITY_COST = {"A": 0.0, "B": 0.25, "C": 0.5, "D": 1.0}
+
+
+def _obs_reliability_tier(obs, sources_by_id=None) -> str:
+    """Resolve reliability tier for one observation (metadata, else source)."""
+    tier = (obs.metadata or {}).get("reliability_tier")
+    if tier:
+        return str(tier).upper()
+    if sources_by_id is not None:
+        src = sources_by_id.get(obs.source_id)
+        if src is not None and getattr(src, "reliability_tier", None):
+            return str(src.reliability_tier).upper()
+    return "C"
+
+
+def _data_quality_assessment(cluster_obs, sources_by_id=None) -> dict:
+    """Return penalty plus a transparent factor breakdown (engine 0.1.1+)."""
     if not cluster_obs:
-        return 0.0
+        return {
+            "data_quality_penalty": 0.0,
+            "factors": {
+                "missing_date_frac": 0.0,
+                "low_confidence_frac": 0.0,
+                "reliability_cost_mean": 0.0,
+                "tier_counts": {},
+            },
+        }
+    n = len(cluster_obs)
     missing = sum(1 for o in cluster_obs if not o.observed_at)
     lowconf = sum(1 for o in cluster_obs if (o.confidence or 0) < 0.4)
-    frac = (missing + lowconf) / (2 * len(cluster_obs))
-    return round(25.0 * frac, 2)
+    tiers = [_obs_reliability_tier(o, sources_by_id) for o in cluster_obs]
+    weak = sum(_RELIABILITY_COST.get(t, 0.5) for t in tiers)
+    missing_frac = missing / n
+    lowconf_frac = lowconf / n
+    rel_mean = weak / n
+    # date+conf share the original 25-point budget equally via (m+l)/(2n)
+    date_conf_pen = 25.0 * (missing + lowconf) / (2 * n)
+    rel_pen = 15.0 * rel_mean
+    tier_counts: dict = {}
+    for t in tiers:
+        tier_counts[t] = tier_counts.get(t, 0) + 1
+    return {
+        "data_quality_penalty": round(date_conf_pen + rel_pen, 2),
+        "factors": {
+            "missing_date_frac": round(missing_frac, 4),
+            "low_confidence_frac": round(lowconf_frac, 4),
+            "reliability_cost_mean": round(rel_mean, 4),
+            "date_conf_penalty": round(date_conf_pen, 2),
+            "reliability_penalty": round(rel_pen, 2),
+            "tier_counts": tier_counts,
+        },
+    }
+
+
+def _data_quality_penalty(cluster_obs, sources_by_id=None) -> float:
+    """Penalty 0..~40 from missing dates, low confidence, and weak source tiers."""
+    return float(_data_quality_assessment(cluster_obs, sources_by_id)["data_quality_penalty"])
 
 
 def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEFAULT_CONFIG,
@@ -61,6 +113,8 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
     # --- cutoff / leakage ---
     cut = leakage.apply_cutoff(snapshot.observations, snapshot.sources, cutoff_date)
     observations = cut["observations"]
+    sources = cut["sources"]
+    sources_by_id = {s.source_id: s for s in sources}
     leakage.assert_no_leakage(observations, cutoff_date)
     entities = snapshot.entities
     resolved_group = snapshot.resolved_group
@@ -122,8 +176,9 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
             "cluster_stability_score": round(100.0 * stab, 2),
             "hype_risk_score": hy["hype_risk_score"],
             "contradiction_score": ce["contradiction_score"],
-            "data_quality_penalty": _data_quality_penalty(cluster_obs),
         }
+        dq = _data_quality_assessment(cluster_obs, sources_by_id)
+        components["data_quality_penalty"] = dq["data_quality_penalty"]
         scored = scoring.assemble(components, cfg.scoring)
 
         status, reasons = classify.classify(
@@ -153,7 +208,7 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
             confidence_band=scored["confidence_band"], entity_ids=sorted(cluster),
             observation_ids=sorted(o.observation_id for o in cluster_obs),
             score_explanation={"scoring": scored, "naming_gap": ng, "hype": hy, "match": match,
-                               "value_chain_roles": vc["roles_present"]},
+                               "value_chain_roles": vc["roles_present"], "data_quality": dq},
             strongest_supporting_evidence=ce["strongest_supporting_evidence"],
             strongest_counterevidence=ce["strongest_counterevidence"],
             missing_evidence=ce["missing_evidence"],

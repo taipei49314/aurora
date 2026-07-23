@@ -93,10 +93,14 @@ def save_snapshot(engine, snap: Snapshot) -> None:
                           counts=snap.counts, resolved_group=snap.resolved_group,
                           import_errors=snap.import_errors))
         for e in snap.entities:
+            # external_ids is first-class on Entity; fold into meta for the row schema
+            meta = dict(e.metadata or {})
+            if e.external_ids:
+                meta["external_ids"] = list(e.external_ids)
             s.add(EntityRow(entity_id=e.entity_id, snapshot_id=snap.snapshot_id,
                             entity_type=e.entity_type, canonical_name=e.canonical_name,
                             aliases=e.aliases, description=e.description, country=e.country,
-                            created_at=e.created_at, meta=e.metadata))
+                            created_at=e.created_at, meta=meta))
         for src in snap.sources:
             s.add(SourceRow(source_id=src.source_id, snapshot_id=snap.snapshot_id,
                             payload=json.loads(json.dumps(src.__dict__))))
@@ -112,11 +116,16 @@ def load_snapshot(engine, snapshot_id: str) -> Snapshot:
         row = s.get(SnapshotRow, snapshot_id)
         if not row:
             raise KeyError(snapshot_id)
-        entities = [Entity(entity_id=r.entity_id, entity_type=r.entity_type,
-                           canonical_name=r.canonical_name, aliases=list(r.aliases),
-                           description=r.description, country=r.country, created_at=r.created_at,
-                           metadata=dict(r.meta))
-                    for r in s.scalars(select(EntityRow).where(EntityRow.snapshot_id == snapshot_id))]
+        entities = []
+        for r in s.scalars(select(EntityRow).where(EntityRow.snapshot_id == snapshot_id)):
+            meta = dict(r.meta or {})
+            ext = list(meta.pop("external_ids", None) or [])
+            entities.append(Entity(
+                entity_id=r.entity_id, entity_type=r.entity_type,
+                canonical_name=r.canonical_name, aliases=list(r.aliases),
+                description=r.description, country=r.country, created_at=r.created_at,
+                external_ids=ext, metadata=meta,
+            ))
         sources = [Source(**r.payload)
                    for r in s.scalars(select(SourceRow).where(SourceRow.snapshot_id == snapshot_id))]
         observations = [Observation(**r.payload)

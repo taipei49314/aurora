@@ -1,0 +1,208 @@
+"""Job-board shaped postings -> AURORA import package.
+
+Offline only. Expected shape::
+
+    {
+      "postings": [
+        {
+          "id": "job-ferro-ee",                 # required (stable ref seed)
+          "company": "FerroGrid Power",         # required
+          "title": "Electrochemical engineer",  # required
+          "description": "...",                 # optional -> excerpt / text
+          "posted_at": "2024-03-01",
+          "closed_at": "2024-09-01",
+          "openings": 6,
+          "location": {"country": "US", "region": "AZ"},
+          "url": "https://...",
+          "domain": "ferrogrid.example",
+          "related_technologies": ["reversible iron oxidation"],
+          "related_components": ["porous iron electrode"]
+        }
+      ]
+    }
+"""
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+from .package_util import Package
+
+ADAPTER_ID = "jobs-offline"
+ADAPTER_VERSION = "0.1.0"
+
+
+def _date(value: Optional[str]) -> Optional[str]:
+    if value in (None, ""):
+        return None
+    s = str(value).strip()
+    return s[:10] if len(s) >= 10 else s
+
+
+def convert_jobs(raw: dict) -> Package:
+    postings = raw.get("postings")
+    if postings is None:
+        raise ValueError("jobs payload must contain a top-level 'postings' array")
+    if not isinstance(postings, list):
+        raise ValueError("'postings' must be an array")
+
+    entities: Dict[str, dict] = {}
+    sources: List[dict] = []
+    observations: List[dict] = []
+
+    def ensure(name: str, etype: str, *, country: str = "", meta_extra: Optional[dict] = None) -> str:
+        key = name.strip()
+        if not key:
+            raise ValueError("entity name must be non-empty")
+        if key not in entities:
+            meta = {
+                "extractor_id": ADAPTER_ID,
+                "extractor_version": ADAPTER_VERSION,
+            }
+            if meta_extra:
+                meta.update(meta_extra)
+            entities[key] = {
+                "entity_type": etype,
+                "canonical_name": key,
+                "aliases": [],
+                "description": "",
+                "country": country or "",
+                "metadata": meta,
+            }
+        return key
+
+    for i, row in enumerate(postings):
+        if not isinstance(row, dict):
+            raise ValueError(f"postings[{i}] must be an object")
+        job_id = (row.get("id") or "").strip()
+        company = (row.get("company") or "").strip()
+        title = (row.get("title") or "").strip()
+        if not job_id:
+            raise ValueError(f"postings[{i}] missing id")
+        if not company:
+            raise ValueError(f"postings[{i}] missing company")
+        if not title:
+            raise ValueError(f"postings[{i}] missing title")
+
+        desc = (row.get("description") or row.get("excerpt") or "").strip()
+        posted = _date(row.get("posted_at") or row.get("published_at"))
+        closed = _date(row.get("closed_at"))
+        loc = row.get("location") or {}
+        if isinstance(loc, str):
+            loc = {"raw": loc}
+        country = (loc.get("country") or row.get("country") or "").strip()
+        domain = (row.get("domain") or row.get("outlet_domain") or "").strip()
+        if not domain and row.get("url"):
+            # best-effort host — adapters stay deterministic, no network
+            try:
+                from urllib.parse import urlparse
+
+                host = urlparse(str(row["url"])).hostname or ""
+                domain = host
+            except Exception:  # noqa: BLE001
+                domain = ""
+        indep = f"domain:{domain}" if domain else f"job:{job_id}"
+        ref = f"job-{job_id.lower().replace(' ', '-')}"
+        openings = row.get("openings")
+        try:
+            openings_n = float(openings) if openings is not None else None
+        except (TypeError, ValueError):
+            openings_n = None
+
+        ensure(
+            company,
+            "COMPANY",
+            country=country,
+            meta_extra={
+                "external_ids": (
+                    [{"system": "domain", "id": domain}] if domain else []
+                ),
+                "domains": [domain] if domain else [],
+            },
+        )
+        techs = [str(t).strip() for t in (row.get("related_technologies") or []) if str(t).strip()]
+        comps = [str(t).strip() for t in (row.get("related_components") or []) if str(t).strip()]
+        for t in techs:
+            ensure(t, "TECHNOLOGY")
+        for c in comps:
+            ensure(c, "COMPONENT")
+
+        source_meta: Dict[str, Any] = {
+            "extractor_id": ADAPTER_ID,
+            "extractor_version": ADAPTER_VERSION,
+            "external_ids": [{"system": "job_id", "id": job_id}],
+        }
+        if domain:
+            source_meta["outlet_domain"] = domain
+        if closed:
+            source_meta["valid_to"] = closed
+        if posted:
+            source_meta["valid_from"] = posted
+        if loc:
+            source_meta["geo"] = loc
+
+        sources.append({
+            "ref": ref,
+            "source_type": "JOB_POSTING",
+            "publisher": row.get("publisher") or f"{company} careers",
+            "title": title,
+            "published_at": posted,
+            "excerpt": (desc or title)[:800],
+            "independence_group": indep,
+            "reliability_tier": row.get("reliability_tier") or "B",
+            "url_or_local_path": row.get("url") or f"local://jobs/{job_id}",
+            "language": row.get("language") or "en",
+            "metadata": source_meta,
+        })
+
+        obj = comps[0] if comps else (techs[0] if techs else None)
+        obs_meta: Dict[str, Any] = {
+            "document_id": ref,
+            "extractor_id": ADAPTER_ID,
+            "extractor_version": ADAPTER_VERSION,
+            "event_id": f"evt_hire_{job_id}",
+        }
+        if posted:
+            obs_meta["valid_from"] = posted
+        if closed:
+            obs_meta["valid_to"] = closed
+        if loc:
+            obs_meta["geo"] = loc
+
+        obs: Dict[str, Any] = {
+            "source_ref": ref,
+            "observation_type": "HIRING_ACTIVITY",
+            "subject": company,
+            "object": obj,
+            "observed_at": posted,
+            "text_excerpt": (desc or title)[:400],
+            "confidence": float(row.get("confidence") or 0.8),
+            "metadata": obs_meta,
+        }
+        if openings_n is not None:
+            obs["numeric_value"] = openings_n
+            obs["unit"] = "openings"
+        observations.append(obs)
+
+        for tech in techs:
+            observations.append({
+                "source_ref": ref,
+                "observation_type": "TECHNICAL_DEPENDENCY",
+                "subject": company,
+                "object": tech,
+                "observed_at": posted,
+                "text_excerpt": f"Hiring for skills related to {tech}: {title}",
+                "confidence": 0.55,
+                "metadata": dict(obs_meta),
+            })
+
+    return {
+        "entities": list(entities.values()),
+        "sources": sources,
+        "observations": observations,
+        "_adapter": {
+            "id": ADAPTER_ID,
+            "version": ADAPTER_VERSION,
+            "source_format": "jobs-offline-v1",
+            "posting_count": len(postings),
+        },
+    }

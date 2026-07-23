@@ -29,7 +29,11 @@ overall      = clip( weighted_sum
 - **hype** and **contradiction** scale the weighted sum down — loud noise or
   counterevidence can never *raise* the score (verified by
   `test_penalties_never_increase_score`).
-- **data_quality_penalty** subtracts for missing dates / low-confidence obs.
+- **data_quality_penalty** subtracts for:
+  - missing `observed_at` / low `confidence` (up to 25), and
+  - weak `reliability_tier` on the observation's source (A=0 … D=1 average,
+    scaled by 15 → up to +15). Engine **0.1.1+**; import stamps
+    `metadata.reliability_tier` from the source row.
 
 ## Transparency (UI/API)
 `hypothesis.score_explanation.scoring` returns every component score, its weight,

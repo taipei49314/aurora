@@ -1,0 +1,487 @@
+{
+  "_comment": "Realistic-shaped mini package for adapter dry-runs. Fictional entities; not market advice. Imports with zero schema extensions — external ids / spans live in metadata per docs/import-schema.md.",
+  "entities": [
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "FerroGrid Power",
+      "aliases": ["FerroGrid", "Ferro Grid Power Inc."],
+      "description": "Long-duration iron-air grid storage developer",
+      "country": "US",
+      "metadata": {
+        "external_ids": [
+          {"system": "lei", "id": "549300EXAMPLEFERRO01"},
+          {"system": "domain", "id": "ferrogrid.example"}
+        ],
+        "domains": ["ferrogrid.example"]
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "OxaCell Systems",
+      "aliases": ["OxaCell"],
+      "description": "Oxygen electrode and stack manufacturer",
+      "country": "DE",
+      "metadata": {
+        "external_ids": [{"system": "domain", "id": "oxacell.example"}]
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "PureChitin Bio",
+      "aliases": ["PureChitin"],
+      "country": "NL",
+      "metadata": {
+        "external_ids": [{"system": "domain", "id": "purechitin.example"}]
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "LongHaul Energy",
+      "aliases": ["LongHaul"],
+      "country": "US"
+    },
+    {
+      "entity_type": "TECHNOLOGY",
+      "canonical_name": "reversible iron oxidation",
+      "aliases": ["iron-air redox", "rust-cycle storage"],
+      "description": "Multi-day grid storage via reversible iron oxidation"
+    },
+    {
+      "entity_type": "COMPONENT",
+      "canonical_name": "porous iron electrode",
+      "aliases": ["iron air cathode structure"]
+    },
+    {
+      "entity_type": "MATERIAL",
+      "canonical_name": "food-grade iron powder",
+      "aliases": ["iron powder feedstock"]
+    },
+    {
+      "entity_type": "FACILITY",
+      "canonical_name": "FerroGrid Arizona pilot plant",
+      "aliases": ["AZ pilot line"],
+      "country": "US",
+      "metadata": {
+        "geo": {"country": "US", "region": "AZ"}
+      }
+    },
+    {
+      "entity_type": "APPLICATION",
+      "canonical_name": "grid firming",
+      "aliases": ["multi-day firming", "dispatchable firming"]
+    },
+    {
+      "entity_type": "MARKET",
+      "canonical_name": "regional utility",
+      "aliases": ["IOU utility buyers"]
+    },
+    {
+      "entity_type": "STANDARD_BODY",
+      "canonical_name": "grid interconnection working group",
+      "aliases": ["GIWG"]
+    }
+  ],
+  "sources": [
+    {
+      "ref": "pat-us-ferro-2022",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Porous iron electrode for multi-day iron-air storage",
+      "published_at": "2022-04-12",
+      "excerpt": "A porous iron electrode enables reversible iron oxidation for hundred-hour depth-discharge grid-dispatch storage with alkaline electrolyte.",
+      "independence_group": "family:ironair-ferro-2022",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.example/US20220123456A1",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "patents.example",
+        "external_ids": [
+          {"system": "us_publication", "id": "US20220123456A1"},
+          {"system": "patent_family", "id": "ironair-ferro-2022"}
+        ],
+        "classification_codes": ["H01M-4/86", "H01M-12/06"],
+        "event_date": "2021-11-02",
+        "license": "public-patent-text",
+        "extractor_id": "example-patent-adapter",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "ref": "pat-ep-oxa-2023",
+      "source_type": "PATENT",
+      "publisher": "EPO",
+      "title": "Oxygen electrode stack for long-duration iron-air cells",
+      "published_at": "2023-01-18",
+      "excerpt": "Oxygen-electrode architecture for long-duration multi-day iron-air cells with reversible oxidation and grid-dispatch duty cycles.",
+      "independence_group": "family:oxa-o2-2023",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.example/EP4123456A1",
+      "language": "en",
+      "metadata": {
+        "external_ids": [
+          {"system": "ep_publication", "id": "EP4123456A1"},
+          {"system": "patent_family", "id": "oxa-o2-2023"}
+        ],
+        "classification_codes": ["H01M-4/86", "H01M-12/06"],
+        "extractor_id": "example-patent-adapter",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "ref": "job-ferro-2024-chem",
+      "source_type": "JOB_POSTING",
+      "publisher": "FerroGrid careers",
+      "title": "Electrochemical engineer — iron-air stack scale-up",
+      "published_at": "2024-03-01",
+      "excerpt": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona.",
+      "independence_group": "domain:ferrogrid.example",
+      "reliability_tier": "B",
+      "url_or_local_path": "https://ferrogrid.example/careers/ee-stack",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "ferrogrid.example",
+        "valid_from": "2024-03-01",
+        "valid_to": "2024-09-01",
+        "geo": {"country": "US", "region": "AZ"},
+        "extractor_id": "example-jobs-adapter",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "ref": "job-oxa-2024-mfg",
+      "source_type": "JOB_POSTING",
+      "publisher": "OxaCell careers",
+      "title": "Manufacturing technician — oxygen electrode lines",
+      "published_at": "2024-05-10",
+      "excerpt": "Expand oxygen electrode manufacturing for multi-day iron-air storage customers.",
+      "independence_group": "domain:oxacell.example",
+      "reliability_tier": "B",
+      "url_or_local_path": "https://oxacell.example/jobs/mfg-o2",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "oxacell.example",
+        "geo": {"country": "DE", "region": "BY"}
+      }
+    },
+    {
+      "ref": "filing-ferro-2024-capex",
+      "source_type": "COMPANY_FILING",
+      "publisher": "FerroGrid Power",
+      "title": "Material event: Arizona pilot plant capacity expansion",
+      "published_at": "2024-06-20",
+      "excerpt": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.",
+      "independence_group": "domain:ferrogrid.example",
+      "reliability_tier": "A",
+      "url_or_local_path": "local://filings/ferrogrid-2024-06-20.html",
+      "language": "en",
+      "metadata": {
+        "external_ids": [{"system": "internal_filing", "id": "FG-8K-2024-0620"}],
+        "currency": "USD",
+        "amount_original": 120000000,
+        "license": "company-release"
+      }
+    },
+    {
+      "ref": "news-reuters-2024-supply",
+      "source_type": "NEWS",
+      "publisher": "Example Reuter Wire",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "published_at": "2024-07-02",
+      "excerpt": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes.",
+      "independence_group": "wire:example-reuter",
+      "reliability_tier": "C",
+      "url_or_local_path": "https://news.example/reuter/ferrogrid-supply",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "news.example",
+        "wire_id": "example-reuter",
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "extractor_id": "example-news-adapter",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "ref": "news-outlet-reprint-2024-supply",
+      "source_type": "NEWS",
+      "publisher": "Regional Energy Daily",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "published_at": "2024-07-02",
+      "excerpt": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes.",
+      "independence_group": "wire:example-reuter",
+      "reliability_tier": "D",
+      "url_or_local_path": "https://regional.example/reprint/ferrogrid-supply",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "regional.example",
+        "wire_id": "example-reuter",
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "_note": "Same wire group + near-identical title/excerpt → not independent of the primary wire item"
+      }
+    },
+    {
+      "ref": "news-longhaul-2023-pilot",
+      "source_type": "NEWS",
+      "publisher": "GridTech Chronicle",
+      "title": "LongHaul Energy pilots hundred-hour iron-air with utilities",
+      "published_at": "2023-09-15",
+      "excerpt": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts.",
+      "independence_group": "domain:gridtech.example",
+      "reliability_tier": "C",
+      "url_or_local_path": "https://gridtech.example/longhaul-pilot",
+      "language": "en",
+      "metadata": {
+        "outlet_domain": "gridtech.example",
+        "event_id": "evt_longhaul_pilot_2023"
+      }
+    },
+    {
+      "ref": "std-giwg-2024",
+      "source_type": "STANDARD",
+      "publisher": "grid interconnection working group",
+      "title": "Draft note: multi-day storage interconnection test profile",
+      "published_at": "2024-02-01",
+      "excerpt": "Working group draft defines interconnection test profiles for multi-day long-duration storage including iron-air dispatchable firming.",
+      "independence_group": "domain:giwg.example",
+      "reliability_tier": "B",
+      "url_or_local_path": "https://giwg.example/drafts/mdr-storage-2024",
+      "language": "en",
+      "metadata": {
+        "external_ids": [{"system": "std_draft", "id": "GIWG-MDR-2024-02"}],
+        "valid_from": "2024-02-01"
+      }
+    },
+    {
+      "ref": "paper-2021-review",
+      "source_type": "PAPER",
+      "publisher": "Energy Storage Materials Letters",
+      "title": "Reversible iron oxidation pathways for multi-day storage",
+      "published_at": "2021-06-01",
+      "excerpt": "Review of reversible iron oxidation, alkaline electrolyte, and oxygen-electrode limits for multi-day grid storage.",
+      "independence_group": "doi:10.1234/esml.ironair.2021",
+      "reliability_tier": "B",
+      "url_or_local_path": "https://doi.example/10.1234/esml.ironair.2021",
+      "language": "en",
+      "metadata": {
+        "external_ids": [{"system": "doi", "id": "10.1234/esml.ironair.2021"}],
+        "license": "cc-by-4.0"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "source_ref": "pat-us-ferro-2022",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "porous iron electrode",
+      "observed_at": "2021-11-02",
+      "text_excerpt": "Porous iron electrode for reversible iron oxidation and hundred-hour depth-discharge grid-dispatch modules.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-us-ferro-2022",
+        "char_span": [0, 160],
+        "classification_codes": ["H01M-4/86", "H01M-12/06"],
+        "event_id": "evt_ferro_patent_family_2022"
+      }
+    },
+    {
+      "source_ref": "pat-us-ferro-2022",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "porous iron electrode",
+      "object": "food-grade iron powder",
+      "observed_at": "2021-11-02",
+      "text_excerpt": "Electrode performance depends on food-grade iron powder feedstock morphology.",
+      "confidence": 0.85,
+      "metadata": {
+        "document_id": "pat-us-ferro-2022",
+        "char_span": [160, 280]
+      }
+    },
+    {
+      "source_ref": "pat-us-ferro-2022",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2021-11-02",
+      "text_excerpt": "System architecture centers on reversible iron oxidation for multi-day storage.",
+      "confidence": 0.88
+    },
+    {
+      "source_ref": "pat-ep-oxa-2023",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2022-08-01",
+      "text_excerpt": "Oxygen electrode stack optimized for long-duration iron-air duty cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "classification_codes": ["H01M-4/86"]
+      }
+    },
+    {
+      "source_ref": "job-ferro-2024-chem",
+      "observation_type": "HIRING_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "porous iron electrode",
+      "observed_at": "2024-03-01",
+      "text_excerpt": "Hiring for porous iron electrode and long-duration stack scale-up; skills: electrochemistry, alkaline systems, pilot manufacturing.",
+      "confidence": 0.8,
+      "numeric_value": 6,
+      "unit": "openings",
+      "metadata": {
+        "valid_from": "2024-03-01",
+        "valid_to": "2024-09-01",
+        "geo": {"country": "US", "region": "AZ"}
+      }
+    },
+    {
+      "source_ref": "job-oxa-2024-mfg",
+      "observation_type": "HIRING_ACTIVITY",
+      "subject": "OxaCell Systems",
+      "observed_at": "2024-05-10",
+      "text_excerpt": "Manufacturing technicians for oxygen electrode lines serving multi-day iron-air customers.",
+      "confidence": 0.75,
+      "numeric_value": 12,
+      "unit": "openings"
+    },
+    {
+      "source_ref": "filing-ferro-2024-capex",
+      "observation_type": "CAPEX_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "FerroGrid Arizona pilot plant",
+      "observed_at": "2024-06-20",
+      "text_excerpt": "USD 120 million capex approved for Arizona pilot plant iron-air module lines.",
+      "confidence": 0.95,
+      "numeric_value": 120000000,
+      "unit": "USD",
+      "metadata": {
+        "currency": "USD",
+        "amount_original": 120000000,
+        "event_id": "evt_ferro_az_capex_2024"
+      }
+    },
+    {
+      "source_ref": "filing-ferro-2024-capex",
+      "observation_type": "CAPACITY_EXPANSION",
+      "subject": "FerroGrid Arizona pilot plant",
+      "object": "grid firming",
+      "observed_at": "2024-06-20",
+      "text_excerpt": "Pilot plant capacity expansion for multi-day grid firming modules.",
+      "confidence": 0.9,
+      "numeric_value": 40,
+      "unit": "pct",
+      "metadata": {
+        "event_id": "evt_ferro_az_capex_2024"
+      }
+    },
+    {
+      "source_ref": "news-reuters-2024-supply",
+      "observation_type": "SUPPLIER_RELATIONSHIP",
+      "subject": "FerroGrid Power",
+      "object": "PureChitin Bio",
+      "observed_at": "2024-07-02",
+      "text_excerpt": "Multi-year supplier agreement for food-grade iron powder feedstock.",
+      "confidence": 0.85,
+      "metadata": {
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "document_id": "news-reuters-2024-supply",
+        "char_span": [0, 140]
+      }
+    },
+    {
+      "source_ref": "news-reuters-2024-supply",
+      "observation_type": "SUPPLIER_RELATIONSHIP",
+      "subject": "FerroGrid Power",
+      "object": "food-grade iron powder",
+      "observed_at": "2024-07-02",
+      "text_excerpt": "Feedstock contract covers food-grade iron powder for porous iron electrodes.",
+      "confidence": 0.8,
+      "metadata": {
+        "event_id": "evt_ferro_purechitin_supply_2024"
+      }
+    },
+    {
+      "source_ref": "news-outlet-reprint-2024-supply",
+      "observation_type": "SUPPLIER_RELATIONSHIP",
+      "subject": "FerroGrid Power",
+      "object": "PureChitin Bio",
+      "observed_at": "2024-07-02",
+      "text_excerpt": "Multi-year supplier agreement for food-grade iron powder feedstock.",
+      "confidence": 0.7,
+      "metadata": {
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "_note": "Reprint of wire item; independence_group matches primary"
+      }
+    },
+    {
+      "source_ref": "news-longhaul-2023-pilot",
+      "observation_type": "ADOPTION_SIGNAL",
+      "subject": "LongHaul Energy",
+      "object": "regional utility",
+      "observed_at": "2023-09-15",
+      "text_excerpt": "Pilot deployments with regional utilities for hundred-hour grid firming.",
+      "confidence": 0.75,
+      "metadata": {
+        "event_id": "evt_longhaul_pilot_2023"
+      }
+    },
+    {
+      "source_ref": "news-longhaul-2023-pilot",
+      "observation_type": "PRODUCT_LAUNCH",
+      "subject": "LongHaul Energy",
+      "object": "grid firming",
+      "observed_at": "2023-09-15",
+      "text_excerpt": "LongHaul pilots hundred-hour depth-discharge iron-air modules for dispatchable firming.",
+      "confidence": 0.7
+    },
+    {
+      "source_ref": "std-giwg-2024",
+      "observation_type": "STANDARD_ACTIVITY",
+      "subject": "grid interconnection working group",
+      "object": "grid firming",
+      "observed_at": "2024-02-01",
+      "text_excerpt": "Draft interconnection test profile for multi-day long-duration storage including iron-air.",
+      "confidence": 0.85
+    },
+    {
+      "source_ref": "std-giwg-2024",
+      "observation_type": "REGULATORY_SUPPORT",
+      "subject": "reversible iron oxidation",
+      "observed_at": "2024-02-01",
+      "text_excerpt": "Interconnection drafts explicitly contemplate multi-day iron-air dispatch profiles.",
+      "confidence": 0.7
+    },
+    {
+      "source_ref": "paper-2021-review",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "reversible iron oxidation",
+      "object": "porous iron electrode",
+      "observed_at": "2021-06-01",
+      "text_excerpt": "Academic review of reversible iron oxidation pathways and electrode limits for multi-day storage.",
+      "confidence": 0.8,
+      "metadata": {
+        "external_ids": [{"system": "doi", "id": "10.1234/esml.ironair.2021"}]
+      }
+    },
+    {
+      "source_ref": "filing-ferro-2024-capex",
+      "observation_type": "DEMAND_SIGNAL",
+      "subject": "grid firming",
+      "object": "regional utility",
+      "observed_at": "2024-06-20",
+      "text_excerpt": "Expansion justified by utility interest in multi-day firming capacity.",
+      "confidence": 0.65
+    },
+    {
+      "source_ref": "job-ferro-2024-chem",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "OxaCell Systems",
+      "observed_at": "2024-03-01",
+      "text_excerpt": "Stack scale-up roles list oxygen electrode integration experience with external stack suppliers.",
+      "confidence": 0.55,
+      "metadata": {
+        "_note": "Weaker inferred dependency from hiring text — low confidence on purpose"
+      }
+    }
+  ]
+}

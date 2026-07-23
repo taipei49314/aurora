@@ -89,6 +89,8 @@ class Entity:
     description: str = ""
     country: str = ""
     created_at: str = ""
+    # Cross-dump joins: [{system, id}, ...] — also accepted under metadata.external_ids at import
+    external_ids: list = field(default_factory=list)
     metadata: dict = field(default_factory=dict)
 
 

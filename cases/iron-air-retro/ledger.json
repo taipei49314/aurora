@@ -1,0 +1,60 @@
+{
+  "case_id": "iron-air-retro",
+  "loop": 3,
+  "title": "Iron-air multi-day storage — curated retro timeline",
+  "honesty": [
+    "Package is hand-curated offline fiction aligned to import-schema conventions.",
+    "It is inspired by public long-duration storage discourse, not scraped patents or news.",
+    "Results measure engine temporal behavior on a designed timeline — not real-world discovery lead time.",
+    "Failure to hit INDUSTRY_CANDIDATE is acceptable; gates focus on leakage, monotonic signal growth, and anti-hype early."
+  ],
+  "cutoffs": [
+    {
+      "date": "2020-12-31",
+      "label": "seed-only (paper + hype)",
+      "expect": {
+        "leakage_violations": 0,
+        "forbid_any_status": ["INDUSTRY_CANDIDATE"],
+        "max_best_overall": 60,
+        "max_included_observations": 5,
+        "min_included_observations": 1
+      }
+    },
+    {
+      "date": "2022-12-31",
+      "label": "formation (patents present)",
+      "expect": {
+        "leakage_violations": 0,
+        "forbid_any_status": [],
+        "min_included_observations": 5,
+        "require_included_types_any": ["PATENT_ACTIVITY"]
+      }
+    },
+    {
+      "date": "2024-12-31",
+      "label": "investment + supply + standard",
+      "expect": {
+        "leakage_violations": 0,
+        "min_included_observations": 15,
+        "require_included_types_any": [
+          "HIRING_ACTIVITY",
+          "CAPEX_ACTIVITY",
+          "SUPPLIER_RELATIONSHIP"
+        ],
+        "min_best_overall": 40,
+        "require_best_status_in": [
+          "EMERGING_CAPABILITY_CLUSTER",
+          "INDUSTRY_CANDIDATE",
+          "SEED",
+          "INSUFFICIENT_EVIDENCE"
+        ],
+        "improve_best_overall_vs": "2020-12-31",
+        "min_overall_delta": 0
+      }
+    }
+  ],
+  "global": {
+    "require_independent_lt_raw_on_full": true,
+    "require_zero_leakage_all_cutoffs": true
+  }
+}

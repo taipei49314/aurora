@@ -1,0 +1,106 @@
+{
+  "_provenance": {
+    "format": "patentsview-compatible-v1",
+    "status": "offline-ci-fixture",
+    "honesty": [
+      "Field names match common PatentsView / patent-bulk JSON exports.",
+      "Record content is synthetic for reproducible CI (not a live API pull).",
+      "Replace this file with a real PatentsView bulk/API export of the same shape; no code changes required.",
+      "US patent text in production dumps is typically public as published patents — verify license for your jurisdiction before redistribution."
+    ],
+    "how_to_replace": [
+      "1. Export or download patents JSON with patents[] array.",
+      "2. Save as adapters/fixtures/patentsview_sample.json or cases/patentsview-sample/dump.json",
+      "3. python -m adapters patentsview <file> --strip --validate --strict"
+    ]
+  },
+  "count": 4,
+  "patents": [
+    {
+      "patent_number": "10476080",
+      "patent_title": "Metal-air electrochemical cell with iron anode for multi-day discharge",
+      "patent_abstract": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
+      "patent_date": "2019-11-12",
+      "app_date": "2018-03-20",
+      "patent_family_id": "fam-ironair-2018",
+      "assignees": [
+        {
+          "assignee_organization": "LongHaul Energy",
+          "assignee_country": "US"
+        }
+      ],
+      "cpcs": [
+        {"cpc_subgroup_id": "H01M12/06"},
+        {"cpc_subgroup_id": "H01M4/86"}
+      ],
+      "inventors": [
+        {"inventor_name_full": "A. Researcher"}
+      ],
+      "technologies": ["reversible iron oxidation"],
+      "components": ["porous iron electrode"]
+    },
+    {
+      "patent_number": "10930940",
+      "patent_title": "Oxygen electrode stack for long-duration iron-air modules",
+      "patent_abstract": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
+      "patent_date": "2021-02-23",
+      "app_date": "2019-07-01",
+      "patent_family_id": "fam-oxa-2019",
+      "assignees": [
+        {
+          "assignee_organization": "OxaCell Systems",
+          "assignee_country": "DE"
+        }
+      ],
+      "cpcs": [
+        {"cpc_subgroup_id": "H01M4/86"},
+        {"cpc_subgroup_id": "H01M12/06"}
+      ],
+      "technologies": ["reversible iron oxidation"]
+    },
+    {
+      "patent_number": "11271215",
+      "patent_title": "Porous iron electrode structures for hundred-hour storage",
+      "patent_abstract": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "patent_date": "2022-03-08",
+      "app_date": "2020-09-15",
+      "patent_family_id": "fam-ironair-2018",
+      "assignees": [
+        {
+          "assignee_organization": "FerroGrid Power",
+          "assignee_country": "US"
+        },
+        {
+          "assignee_organization": "LongHaul Energy",
+          "assignee_country": "US"
+        }
+      ],
+      "cpcs": [
+        {"cpc_subgroup_id": "H01M4/86"},
+        {"cpc_subgroup_id": "H01M4/02"}
+      ],
+      "technologies": ["reversible iron oxidation"],
+      "components": ["porous iron electrode"],
+      "materials": ["food-grade iron powder"]
+    },
+    {
+      "patent_number": "11575128",
+      "patent_title": "Alkaline electrolyte additives for iron-air grid modules",
+      "patent_abstract": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
+      "patent_date": "2023-02-07",
+      "app_date": "2021-05-10",
+      "patent_family_id": "fam-ferro-elyte-2021",
+      "assignees": [
+        {
+          "assignee_organization": "FerroGrid Power",
+          "assignee_country": "US"
+        }
+      ],
+      "cpcs": [
+        {"cpc_subgroup_id": "H01M10/26"},
+        {"cpc_subgroup_id": "H01M12/06"}
+      ],
+      "technologies": ["reversible iron oxidation"]
+    }
+  ]
+}
