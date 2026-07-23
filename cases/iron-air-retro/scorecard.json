@@ -1,0 +1,23 @@
+{
+  "case_id": "iron-air-retro",
+  "loop": 25,
+  "purpose": "Curated multi-year retro timeline with full document + char_span coverage",
+  "gates": {
+    "import_errors_max": 0,
+    "require_observation_types": [
+      "PATENT_ACTIVITY",
+      "HIRING_ACTIVITY",
+      "RESEARCH_ACTIVITY"
+    ],
+    "independent_lt_raw": true,
+    "min_sources": 10,
+    "min_documents": 12,
+    "require_no_orphan_document_ids": true,
+    "min_observations_with_char_span": 21,
+    "min_char_span_ratio": 1.0
+  },
+  "honesty": [
+    "Package is hand-curated offline fiction aligned to import-schema conventions.",
+    "char_span coverage uses progressive align + append_unmatched for demo highlights."
+  ]
+}

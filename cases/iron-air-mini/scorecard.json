@@ -1,7 +1,7 @@
 {
   "case_id": "iron-air-mini",
-  "loop": 23,
-  "purpose": "Multi-source adapter merge smoke case with documents[] (not historical retro)",
+  "loop": 25,
+  "purpose": "Multi-source adapter merge smoke case with documents[] + span coverage",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": [
@@ -12,7 +12,9 @@
     "independent_lt_raw": true,
     "min_sources": 9,
     "min_documents": 9,
-    "require_no_orphan_document_ids": true
+    "require_no_orphan_document_ids": true,
+    "min_observations_with_char_span": 10,
+    "min_char_span_ratio": 0.4
   },
   "adapters": ["uspto", "jobs", "news"],
   "fixtures": [
@@ -21,4 +23,3 @@
     "adapters/fixtures/news_sample.json"
   ]
 }
-

@@ -111,10 +111,18 @@ def main(argv=None) -> int:
         ],
     )
     run("retro-case", [py, "scripts/run_retro_case.py", "cases/iron-air-retro"])
+    run(
+        "retro-scorecard",
+        [py, "scripts/check_case_scorecard.py", "cases/iron-air-retro"],
+    )
     run("multisource-case", [py, "scripts/build_multisource_case.py"])
     run(
         "multisource-scorecard",
         [py, "scripts/check_case_scorecard.py", "cases/multisource-iron-air"],
+    )
+    run(
+        "iron-air-mini-scorecard",
+        [py, "scripts/check_case_scorecard.py", "cases/iron-air-mini"],
     )
     run(
         "patentsview-scorecard",

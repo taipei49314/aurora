@@ -1,18 +1,19 @@
 {
   "case_id": "openalex-sample",
-  "loop": 23,
-  "purpose": "OpenAlex works fixture → PAPER + RESEARCH_ACTIVITY + documents[]",
+  "loop": 25,
+  "purpose": "OpenAlex works fixture → PAPER + RESEARCH_ACTIVITY + documents[] + spans",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": ["RESEARCH_ACTIVITY"],
     "independent_lt_raw": false,
     "min_sources": 2,
     "min_documents": 2,
-    "require_no_orphan_document_ids": true
+    "require_no_orphan_document_ids": true,
+    "min_observations_with_char_span": 3,
+    "min_char_span_ratio": 1.0
   },
   "honesty": [
     "Synthetic OpenAlex-shaped works for CI.",
     "Replace dump with a real OpenAlex export of the same shape."
   ]
 }
-
