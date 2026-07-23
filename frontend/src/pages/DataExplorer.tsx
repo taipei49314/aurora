@@ -1,8 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getEntities, getObservations, getSources, resolveEntity } from "../api";
 
 type Tab = "entities" | "observations" | "sources";
+type Tier = "A" | "B" | "C" | "D";
+
+const TIER_COLORS: Record<Tier, { bg: string; fg: string; label: string }> = {
+  A: { bg: "#dafbe1", fg: "#1a7f37", label: "official / primary legal" },
+  B: { bg: "#ddf4ff", fg: "#0969da", label: "peer-reviewed / technical" },
+  C: { bg: "#fff8c5", fg: "#9a6700", label: "news / secondary" },
+  D: { bg: "#ffebe9", fg: "#cf222e", label: "unverified / social" },
+};
 
 function formatExternalIds(row: any): string {
   const ids = row.external_ids;
@@ -12,8 +20,34 @@ function formatExternalIds(row: any): string {
     .join(" · ");
 }
 
-function cellValue(tab: Tab, col: string, row: any): string {
+function TierBadge({ tier }: { tier: string }) {
+  const t = (tier || "C").toUpperCase() as Tier;
+  const style = TIER_COLORS[t] ?? TIER_COLORS.C;
+  return (
+    <span
+      title={style.label}
+      style={{
+        display: "inline-block",
+        minWidth: 18,
+        textAlign: "center",
+        fontWeight: 700,
+        fontSize: 11,
+        padding: "1px 6px",
+        borderRadius: 10,
+        background: style.bg,
+        color: style.fg,
+      }}
+    >
+      {t}
+    </span>
+  );
+}
+
+function cellValue(tab: Tab, col: string, row: any): ReactNode {
   if (tab === "entities" && col === "external_ids") return formatExternalIds(row);
+  if (tab === "sources" && col === "reliability_tier") {
+    return <TierBadge tier={String(row.reliability_tier || "C")} />;
+  }
   if (tab === "sources" && col === "independence_group") {
     return String(row.independence_group || "—");
   }
@@ -35,6 +69,7 @@ function looksLikeResolveRef(s: string): boolean {
 export function DataExplorer() {
   const [tab, setTab] = useState<Tab>("entities");
   const [q, setQ] = useState("");
+  const [tierFilter, setTierFilter] = useState<"" | Tier>("");
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
@@ -52,8 +87,11 @@ export function DataExplorer() {
     enabled: tab === "observations",
   });
   const sources = useQuery({
-    queryKey: ["sources"],
-    queryFn: getSources,
+    queryKey: ["sources", tierFilter],
+    queryFn: () =>
+      getSources({
+        reliability_tier: tierFilter || undefined,
+      }),
     enabled: tab === "sources",
   });
 
@@ -65,23 +103,27 @@ export function DataExplorer() {
         ? ["observation_type", "subject_entity", "observed_at", "confidence", "observation_id"]
         : ["source_type", "publisher", "reliability_tier", "independence_group", "source_id"];
 
+  // entities / sources / observations use server-side filters when possible
   const filtered = useMemo(() => {
     const rows = data ?? [];
-    if (tab === "entities") {
-      // already filtered server-side (except resolve-shaped queries)
-      if (looksLikeResolveRef(q)) {
-        const needle = q.trim().toLowerCase();
-        return rows.filter((row: any) => JSON.stringify(row).toLowerCase().includes(needle));
-      }
-      return rows;
+    if (tab === "entities" && looksLikeResolveRef(q)) {
+      const needle = q.trim().toLowerCase();
+      return rows.filter((row: any) => JSON.stringify(row).toLowerCase().includes(needle));
     }
-    const needle = q.trim().toLowerCase();
-    if (!needle) return rows;
-    return rows.filter((row: any) => {
-      const blob = JSON.stringify(row).toLowerCase();
-      return blob.includes(needle);
-    });
+    return rows;
   }, [data, q, tab]);
+
+  // Tier histogram for sources tab (from current server response before text filter)
+  const tierCounts = useMemo(() => {
+    if (tab !== "sources") return null;
+    const counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+    for (const row of sources.data ?? []) {
+      const t = String(row.reliability_tier || "C").toUpperCase();
+      if (t in counts) counts[t] += 1;
+      else counts.C += 1;
+    }
+    return counts;
+  }, [tab, sources.data]);
 
   async function runResolve(ref?: string) {
     const target = (ref ?? resolveRef).trim();
@@ -129,7 +171,7 @@ export function DataExplorer() {
           onKeyDown={(e) => {
             if (e.key === "Enter") void runResolve();
           }}
-          placeholder='Name or ext:lei:… / lei:…'
+          placeholder="Name or ext:lei:… / lei:…"
           style={{ padding: "4px 8px", minWidth: 260, border: "1px solid #d0d7de", borderRadius: 6 }}
         />
         <button type="button" onClick={() => void runResolve()}>
@@ -167,14 +209,95 @@ export function DataExplorer() {
           placeholder={
             tab === "entities"
               ? "Filter table… (Enter on lei:… also resolves)"
-              : "Filter…"
+              : tab === "sources"
+                ? "Filter sources (title, publisher…)"
+                : "Filter…"
           }
           style={{ marginLeft: 8, padding: "4px 8px", minWidth: 260, border: "1px solid #d0d7de", borderRadius: 6 }}
         />
         <span style={{ fontSize: 12, color: "#57606a" }}>
-          {filtered.length} rows{q ? " (filtered)" : ""}
+          {filtered.length} rows
+          {q || (tab === "sources" && tierFilter) ? " (filtered)" : ""}
         </span>
       </div>
+
+      {tab === "sources" && (
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            marginBottom: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#f6f8fa",
+            border: "1px solid #d0d7de",
+            borderRadius: 8,
+          }}
+        >
+          <b style={{ fontSize: 12 }}>reliability_tier</b>
+          <button
+            type="button"
+            onClick={() => setTierFilter("")}
+            style={{
+              fontWeight: tierFilter === "" ? 700 : 400,
+              border: tierFilter === "" ? "1px solid #0969da" : "1px solid #d0d7de",
+              borderRadius: 6,
+              padding: "2px 10px",
+              background: tierFilter === "" ? "#ddf4ff" : "white",
+              cursor: "pointer",
+            }}
+          >
+            All
+          </button>
+          {(["A", "B", "C", "D"] as Tier[]).map((t) => {
+            const active = tierFilter === t;
+            const c = TIER_COLORS[t];
+            const n = tierCounts?.[t];
+            return (
+              <button
+                key={t}
+                type="button"
+                title={c.label}
+                onClick={() => setTierFilter(active ? "" : t)}
+                style={{
+                  fontWeight: active ? 700 : 400,
+                  border: active ? `1px solid ${c.fg}` : "1px solid #d0d7de",
+                  borderRadius: 6,
+                  padding: "2px 10px",
+                  background: active ? c.bg : "white",
+                  color: c.fg,
+                  cursor: "pointer",
+                }}
+              >
+                {t}
+                {typeof n === "number" && tierFilter === t ? ` (${n})` : ""}
+              </button>
+            );
+          })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>
+            GET /api/sources?reliability_tier=
+          </span>
+          <a
+            href="https://github.com/taipei49314/aurora/blob/master/docs/scoring-model.md"
+            target="_blank"
+            rel="noreferrer"
+            style={{ fontSize: 11, color: "#0969da" }}
+            title="data_quality_penalty uses A–D tiers"
+          >
+            scoring model · data_quality
+          </a>
+          <span style={{ fontSize: 11, color: "#8c959f" }}>·</span>
+          <a
+            href="https://github.com/taipei49314/aurora/blob/master/docs/import-schema.md"
+            target="_blank"
+            rel="noreferrer"
+            style={{ fontSize: 11, color: "#0969da" }}
+          >
+            import schema §6
+          </a>
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: selected ? "1.4fr 1fr" : "1fr", gap: 16 }}>
         <div style={{ overflowX: "auto", maxHeight: 520, overflowY: "auto" }}>
@@ -282,11 +405,46 @@ export function DataExplorer() {
                 )}
               </>
             )}
-            {tab !== "entities" && !selected.canonical_name && (
+            {tab === "sources" && selected.source_id && (
+              <>
+                <div style={{ marginBottom: 6 }}>
+                  <b>{selected.title || "(untitled)"}</b>
+                </div>
+                <div style={{ color: "#57606a", marginBottom: 8 }}>{selected.source_id}</div>
+                <div style={{ marginBottom: 8, display: "flex", gap: 8, alignItems: "center" }}>
+                  <b>reliability_tier</b>
+                  <TierBadge tier={String(selected.reliability_tier || "C")} />
+                  <span style={{ color: "#57606a" }}>
+                    {TIER_COLORS[(String(selected.reliability_tier || "C").toUpperCase() as Tier)]?.label ??
+                      "secondary"}
+                  </span>
+                </div>
+                <div style={{ marginBottom: 6 }}>
+                  <b>type</b> {selected.source_type || "—"} · <b>publisher</b> {selected.publisher || "—"}
+                </div>
+                <div style={{ marginBottom: 6 }}>
+                  <b>independence_group</b>{" "}
+                  <code>{selected.independence_group || "—"}</code>
+                </div>
+                <div style={{ fontSize: 11, color: "#57606a", marginTop: 10 }}>
+                  Weak tiers raise <code>data_quality_penalty</code> on hypotheses that cite this
+                  source (see scoring model).
+                </div>
+              </>
+            )}
+            {tab === "observations" && selected.observation_id && (
               <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 11 }}>
                 {JSON.stringify(selected, null, 2)}
               </pre>
             )}
+            {tab !== "entities" &&
+              tab !== "sources" &&
+              !selected.canonical_name &&
+              !selected.observation_id && (
+                <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 11 }}>
+                  {JSON.stringify(selected, null, 2)}
+                </pre>
+              )}
           </div>
         )}
       </div>

@@ -6,6 +6,33 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.5] — 2026-07-24
+
+### Added
+
+- `GET /api/sources?reliability_tier=A|B|C|D` (comma lists) and optional `?q=`
+- Data Explorer **sources** tab: tier chips A–D, colored badges, detail pane
+  explanation, links to scoring-model / import-schema
+- README **language policy** (engine English-first; bilingual case notes optional)
+
+### Changed
+
+- Engine / package → **0.1.5**
+
+## [0.1.5] — 2026-07-24
+
+### Added
+
+- `GET /api/stats` — external_ids coverage, reliability tiers, obs type mix
+- `GET /api/sources?q=&reliability_tier=` and `GET /api/observations?q=&observation_type=`
+- Dashboard corpus stat cards + data-quality column
+- Data Explorer source **tier** filter (server-side)
+- `cases/openalex-sample` scorecard in `check_all`
+
+### Changed
+
+- Engine → **0.1.5**
+
 ## [0.1.4] — 2026-07-24
 
 ### Added

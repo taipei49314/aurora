@@ -54,6 +54,50 @@ def test_entities_query_filter(client):
     assert miss == []
 
 
+def test_sources_reliability_tier_filter(client):
+    all_src = client.get("/api/sources?limit=200").json()
+    assert all_src
+    tier = all_src[0].get("reliability_tier") or "C"
+    filtered = client.get(f"/api/sources?reliability_tier={tier}&limit=200").json()
+    assert filtered
+    assert all(str(s.get("reliability_tier", "")).upper() == str(tier).upper() for s in filtered)
+
+
+def test_stats_endpoint(client):
+    r = client.get("/api/stats")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["entities_total"] > 0
+    assert "reliability_tier_counts" in body
+    assert "engine" in body
+
+
+def test_sources_reliability_tier_filter(client):
+    all_src = client.get("/api/sources?limit=500").json()
+    assert all_src
+    # Northstar corpus uses mixed tiers; every returned tier must match filter
+    for tier in ("A", "B", "C", "D"):
+        filtered = client.get(f"/api/sources?reliability_tier={tier}&limit=500").json()
+        assert all(str(s.get("reliability_tier", "C")).upper() == tier for s in filtered)
+        # filter should not invent rows
+        assert len(filtered) <= len(all_src)
+    multi = client.get("/api/sources?reliability_tier=A,B&limit=500").json()
+    assert all(str(s.get("reliability_tier", "C")).upper() in {"A", "B"} for s in multi)
+    bad = client.get("/api/sources?reliability_tier=Z")
+    assert bad.status_code == 422
+
+
+def test_sources_query_filter(client):
+    all_src = client.get("/api/sources?limit=50").json()
+    assert all_src
+    publisher = all_src[0].get("publisher") or ""
+    assert publisher
+    hit = client.get(f"/api/sources?q={publisher[: min(6, len(publisher))]}&limit=50").json()
+    assert any(s.get("publisher") == publisher for s in hit)
+    miss = client.get("/api/sources?q=___no_match_src_xyz___&limit=50").json()
+    assert miss == []
+
+
 def test_export_is_round_trippable_via_import_upload(client):
     pkg = client.get("/api/exports").json()
     assert set(pkg) == {"entities", "sources", "observations"}
