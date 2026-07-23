@@ -31,7 +31,7 @@ from .package_util import Package
 from .uspto import convert_uspto
 
 ADAPTER_ID = "patentsview-offline"
-ADAPTER_VERSION = "0.1.0"
+ADAPTER_VERSION = "0.1.1"
 
 
 def _first(*vals: Any) -> Any:

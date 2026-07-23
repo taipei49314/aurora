@@ -35,10 +35,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from .package_util import Package, strip_package
+from .package_util import Package, ensure_documents, strip_package
 
 ADAPTER_ID = "uspto-offline"
-ADAPTER_VERSION = "0.1.0"
+ADAPTER_VERSION = "0.1.1"
 
 
 def _date(value: Optional[str]) -> Optional[str]:
@@ -304,8 +304,9 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             "patent_count": len(patents),
         },
     }
+    # Auto-build documents[] from source excerpts (0.1.19+ / adapter 0.1.1+)
     # Engine-facing view is strip_package; keep _adapter for diagnostics.
-    return pkg
+    return ensure_documents(pkg)
 
 
 def convert_uspto_file(path: str, **kwargs) -> Package:

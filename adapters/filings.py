@@ -29,10 +29,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from .package_util import Package
+from .package_util import Package, ensure_documents
 
 ADAPTER_ID = "filings-offline"
-ADAPTER_VERSION = "0.1.0"
+ADAPTER_VERSION = "0.1.1"
 
 _ALLOWED_TYPES = {
     "CAPEX_ACTIVITY",
@@ -183,7 +183,7 @@ def convert_filings(raw: dict) -> Package:
                 pass
         observations.append(obs)
 
-    return {
+    return ensure_documents({
         "entities": list(entities.values()),
         "sources": sources,
         "observations": observations,
@@ -193,4 +193,4 @@ def convert_filings(raw: dict) -> Package:
             "source_format": "filings-offline-v1",
             "filing_count": len(filings),
         },
-    }
+    })

@@ -1,7 +1,7 @@
 # AURORA adapters (offline)
 
 Convert **caller-supplied** source dumps into import packages
-(`{entities, sources, observations}`). See [`docs/import-schema.md`](../docs/import-schema.md).
+(`{entities, sources, observations, documents?}`). See [`docs/import-schema.md`](../docs/import-schema.md).
 
 ## Rules
 
@@ -9,6 +9,8 @@ Convert **caller-supplied** source dumps into import packages
 - No LLM at runtime
 - Do not invent facts not present in the input JSON
 - Prefer explicit ontology hooks / claims over keyword guessing
+- Call `ensure_documents(pkg)` before return so `documents[]` is built from
+  source excerpts (`document_id` == `source.ref`; engine 0.1.19+)
 
 ## Commands
 
@@ -69,7 +71,7 @@ News reprints: set `is_reprint_of` to the primary article `id` **and** share `wi
 ## Adding another source
 
 1. Define offline JSON shape under `adapters/fixtures/`
-2. Implement `convert_<source>(raw: dict) -> package`
+2. Implement `convert_<source>(raw: dict) -> package` (end with `ensure_documents`)
 3. Register subcommand in `adapters/__main__.py`
 4. Export from `adapters/__init__.py`
-5. Add `tests/test_adapters_<source>.py` (zero import row errors)
+5. Add `tests/test_adapters_<source>.py` (zero import row errors; documents import)

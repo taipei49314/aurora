@@ -35,10 +35,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from .package_util import Package
+from .package_util import Package, ensure_documents
 
 ADAPTER_ID = "news-offline"
-ADAPTER_VERSION = "0.1.0"
+ADAPTER_VERSION = "0.1.1"
 
 # Entity type hints when claims introduce free names
 _DEFAULT_ENTITY_TYPE = "COMPANY"
@@ -236,7 +236,7 @@ def convert_news(raw: dict) -> Package:
                 obs_row["event_id"] = event_id
             observations.append(obs_row)
 
-    return {
+    return ensure_documents({
         "entities": list(entities.values()),
         "sources": sources,
         "observations": observations,
@@ -246,4 +246,4 @@ def convert_news(raw: dict) -> Package:
             "source_format": "news-offline-v1",
             "article_count": len(articles),
         },
-    }
+    })

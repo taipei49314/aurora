@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.19] — 2026-07-24
+
+### Added
+
+- Adapters **auto-build `documents[]`** from source excerpts (`document_id` == `source.ref`)
+- `adapters.package_util.ensure_documents` / `build_documents_from_sources`
+- `strip_package` keeps `documents[]`; `merge_packages` merges documents by id
+- `package_stats` reports `documents` / `documents_with_text`
+
+### Changed
+
+- Engine / feature → **0.1.19**
+- Offline adapter versions → 0.1.1 (OpenAlex 0.1.2); adapters package 0.1.6
+- Multisource case export includes documents + observation `document_id`
+
 ## [0.1.18] — 2026-07-24
 
 ### Added
