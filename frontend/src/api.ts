@@ -98,6 +98,10 @@ export const getSources = (opts?: {
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/sources?${params.toString()}`);
 };
+export const getDocument = (documentId: string) =>
+  j<any>(`/api/documents/${encodeURIComponent(documentId)}`);
+export const getDocuments = (q?: string) =>
+  j<any[]>(`/api/documents?limit=200${q ? `&q=${encodeURIComponent(q)}` : ""}`);
 export const getGraph = (id: string) => j<{ nodes: any[]; edges: any[] }>(`/api/hypotheses/${id}/graph`);
 export const getTimeline = (id: string) => j<{ timeline: any[] }>(`/api/hypotheses/${id}/timeline`);
 export const getBottlenecks = (id: string) => j<any[]>(`/api/hypotheses/${id}/bottlenecks`);

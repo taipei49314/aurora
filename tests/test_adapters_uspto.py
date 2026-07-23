@@ -132,3 +132,10 @@ def test_missing_patents_key_raises():
 def test_missing_publication_number_raises():
     with pytest.raises(ValueError, match="publication_number"):
         convert_uspto({"patents": [{"title": "x"}]})
+
+
+@pytest.mark.unit
+def test_inventors_become_person_entities(uspto_pkg):
+    people = [e for e in uspto_pkg["entities"] if e.get("entity_type") == "PERSON"]
+    names = {e["canonical_name"] for e in people}
+    assert "J. Inventor" in names

@@ -1,6 +1,13 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getEntities, getObservations, getSources, getStats, resolveEntity } from "../api";
+import {
+  getDocument,
+  getEntities,
+  getObservations,
+  getSources,
+  getStats,
+  resolveEntity,
+} from "../api";
 
 type Tab = "entities" | "observations" | "sources";
 type Tier = "A" | "B" | "C" | "D";
@@ -597,9 +604,7 @@ export function DataExplorer() {
               </>
             )}
             {tab === "observations" && selected.observation_id && (
-              <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 11 }}>
-                {JSON.stringify(selected, null, 2)}
-              </pre>
+              <ObservationDetail obs={selected} />
             )}
             {tab !== "entities" &&
               tab !== "sources" &&
@@ -613,6 +618,116 @@ export function DataExplorer() {
         )}
       </div>
       {!data && <p>Loading…</p>}
+    </div>
+  );
+}
+
+function highlightSpan(text: string, span: any): ReactNode {
+  if (!text) return <span style={{ color: "#8c959f" }}>(no document text)</span>;
+  let start = 0;
+  let end = 0;
+  if (Array.isArray(span) && span.length >= 2) {
+    start = Number(span[0]) || 0;
+    end = Number(span[1]) || 0;
+  } else if (span && typeof span === "object") {
+    start = Number(span.start) || 0;
+    end = Number(span.end) || 0;
+  } else {
+    return <span style={{ whiteSpace: "pre-wrap" }}>{text}</span>;
+  }
+  if (start < 0) start = 0;
+  if (end < start) end = start;
+  if (end > text.length) end = text.length;
+  if (start >= text.length) {
+    return <span style={{ whiteSpace: "pre-wrap" }}>{text}</span>;
+  }
+  return (
+    <span style={{ whiteSpace: "pre-wrap" }}>
+      {text.slice(0, start)}
+      <mark style={{ background: "#fff8c5", padding: "0 1px" }}>{text.slice(start, end)}</mark>
+      {text.slice(end)}
+    </span>
+  );
+}
+
+function ObservationDetail({ obs }: { obs: any }) {
+  const docId = obs.document_id || obs.metadata?.document_id || "";
+  const span = obs.char_span || obs.metadata?.char_span;
+  const doc = useQuery({
+    queryKey: ["document", docId],
+    queryFn: () => getDocument(docId),
+    enabled: !!docId,
+    retry: false,
+  });
+
+  return (
+    <div>
+      <div style={{ marginBottom: 6 }}>
+        <b>{obs.observation_type}</b>
+        {obs.subject_entity ? ` · subject ${String(obs.subject_entity).slice(0, 16)}…` : ""}
+      </div>
+      <div style={{ color: "#57606a", marginBottom: 8, fontSize: 11 }}>{obs.observation_id}</div>
+      <div style={{ marginBottom: 6 }}>
+        <b>observed_at</b> {obs.observed_at || "—"} · <b>event_id</b> {obs.event_id || "—"}
+      </div>
+      <div style={{ marginBottom: 6 }}>
+        <b>document_id</b> <code>{docId || "—"}</code>
+        {span != null && (
+          <>
+            {" "}
+            · <b>char_span</b>{" "}
+            <code>{Array.isArray(span) ? `[${span[0]}, ${span[1]}]` : JSON.stringify(span)}</code>
+          </>
+        )}
+      </div>
+      <div style={{ marginBottom: 8 }}>
+        <b>text_excerpt</b>
+        <div style={{ color: "#57606a", marginTop: 2 }}>{obs.text_excerpt || "—"}</div>
+      </div>
+      {docId && (
+        <div
+          style={{
+            marginTop: 10,
+            padding: 10,
+            background: "white",
+            border: "1px solid #d0d7de",
+            borderRadius: 6,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+            <b style={{ fontSize: 11 }}>Document text</b>
+            <span style={{ fontSize: 10, color: "#8c959f" }}>GET /api/documents/…</span>
+          </div>
+          {doc.isLoading && <span style={{ color: "#57606a" }}>Loading document…</span>}
+          {doc.isError && (
+            <span style={{ color: "#57606a" }}>
+              No full document in snapshot (path-only or not imported). Span still recorded on
+              observation.
+            </span>
+          )}
+          {doc.data && (
+            <>
+              {doc.data.title && (
+                <div style={{ marginBottom: 6, fontWeight: 600 }}>{doc.data.title}</div>
+              )}
+              {doc.data.license && (
+                <div style={{ fontSize: 11, color: "#57606a", marginBottom: 6 }}>
+                  license: {doc.data.license}
+                </div>
+              )}
+              <div style={{ fontSize: 12, lineHeight: 1.45 }}>
+                {highlightSpan(String(doc.data.text || ""), span)}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+      <details style={{ marginTop: 10 }}>
+        <summary style={{ cursor: "pointer", fontSize: 11, color: "#57606a" }}>raw JSON</summary>
+        <pre style={{ whiteSpace: "pre-wrap", margin: "6px 0 0", fontSize: 11 }}>
+          {JSON.stringify(obs, null, 2)}
+        </pre>
+      </details>
     </div>
   );
 }

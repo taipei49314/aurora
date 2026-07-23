@@ -11,6 +11,9 @@
       "assignees": [
         {"name": "FerroGrid Power", "country": "US"}
       ],
+      "inventors": [
+        {"name": "J. Inventor", "country": "US"}
+      ],
       "cpc": ["H01M4/86", "H01M12/06"],
       "url": "https://patents.example/US20220123456A1",
       "technologies": ["reversible iron oxidation"],

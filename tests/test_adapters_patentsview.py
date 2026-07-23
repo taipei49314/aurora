@@ -88,3 +88,10 @@ def test_patentsview_cutoff_leakage_zero(pv_pkg):
 def test_missing_patents_raises():
     with pytest.raises(ValueError, match="patents"):
         convert_patentsview({})
+
+
+@pytest.mark.unit
+def test_patentsview_inventors_are_person_entities(pv_pkg):
+    people = [e for e in pv_pkg["entities"] if e.get("entity_type") == "PERSON"]
+    assert people, "expected at least one PERSON from patentsview inventors fixture"
+    assert any("Researcher" in e.get("canonical_name", "") for e in people)
