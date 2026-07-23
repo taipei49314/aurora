@@ -87,6 +87,32 @@ def health():
             "snapshot": REPO.snapshot.snapshot_id, "runs": len(REPO.runs)}
 
 
+class ResolveBody(BaseModel):
+    ref: str
+    external_ids: Optional[list] = None
+
+
+@app.post("/api/resolve")
+def resolve_entity(body: ResolveBody):
+    """Dry-run entity resolution against the current snapshot (name / ext ids)."""
+    from aurora.entity_resolution import EntityResolver, parse_entity_ref
+
+    resolver = EntityResolver(REPO.snapshot.entities)
+    name, ext = parse_entity_ref(body.ref)
+    extra = list(body.external_ids or [])
+    eid = resolver.resolve(name, external_ids=list(ext) + extra)
+    if eid is None:
+        raise HTTPException(404, f"cannot resolve {body.ref!r}")
+    ent = next(e for e in REPO.snapshot.entities if e.entity_id == eid)
+    return {
+        "ref": body.ref,
+        "entity_id": eid,
+        "canonical_name": ent.canonical_name,
+        "aliases": list(ent.aliases or []),
+        "external_ids": list(ent.external_ids or []),
+    }
+
+
 @app.get("/api/entities")
 def entities(limit: int = 200):
     return [to_dict(e) for e in REPO.snapshot.entities[:limit]]

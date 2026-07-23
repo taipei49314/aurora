@@ -1,0 +1,1057 @@
+{
+  "_comment": "Multi-adapter iron-air demo with shared LEI/domain external_ids. Built by scripts/build_multisource_case.py from offline fixtures.",
+  "entities": [
+    {
+      "entity_type": "MATERIAL",
+      "canonical_name": "food-grade iron powder",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [],
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "MARKET",
+      "canonical_name": "regional utility",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [],
+      "metadata": {
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "TECHNOLOGY",
+      "canonical_name": "reversible iron oxidation",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [],
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "APPLICATION",
+      "canonical_name": "grid firming",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [],
+      "metadata": {
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "FerroGrid Power",
+      "aliases": [],
+      "description": "",
+      "country": "US",
+      "external_ids": [
+        {
+          "system": "uspto_assignee_name",
+          "id": "FerroGrid Power"
+        },
+        {
+          "system": "lei",
+          "id": "LEI-FERRO-DEMO"
+        },
+        {
+          "system": "domain",
+          "id": "ferrogrid.example"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "domains": [
+          "ferrogrid.example"
+        ]
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "LongHaul Energy",
+      "aliases": [],
+      "description": "",
+      "country": "US",
+      "external_ids": [
+        {
+          "system": "uspto_assignee_name",
+          "id": "LongHaul Energy"
+        },
+        {
+          "system": "lei",
+          "id": "LEI-LONG-DEMO"
+        },
+        {
+          "system": "domain",
+          "id": "longhaul.example"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "domains": [
+          "longhaul.example"
+        ]
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "PureChitin Bio",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [
+        {
+          "system": "lei",
+          "id": "LEI-PURE-DEMO"
+        },
+        {
+          "system": "domain",
+          "id": "purechitin.example"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0"
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "OxaCell Systems",
+      "aliases": [],
+      "description": "",
+      "country": "DE",
+      "external_ids": [
+        {
+          "system": "uspto_assignee_name",
+          "id": "OxaCell Systems"
+        },
+        {
+          "system": "lei",
+          "id": "LEI-OXA-DEMO"
+        },
+        {
+          "system": "domain",
+          "id": "oxacell.example"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "domains": [
+          "oxacell.example"
+        ]
+      }
+    },
+    {
+      "entity_type": "COMPONENT",
+      "canonical_name": "porous iron electrode",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [],
+      "metadata": {
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "ref": "src_33428391eeb853f0",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Alkaline electrolyte additives for iron-air grid modules",
+      "published_at": "2023-02-07",
+      "url_or_local_path": "https://patents.google.com/patent/US11575128",
+      "independence_group": "family:fam-ferro-elyte-2021",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "11575128"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-ferro-elyte-2021"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-ferro-elyte-2021",
+        "classification_codes": [
+          "H01M10/26",
+          "H01M12/06"
+        ],
+        "event_date": "2021-05-10",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1"
+      }
+    },
+    {
+      "ref": "src_3b85822b9689cb77",
+      "source_type": "NEWS",
+      "publisher": "Regional Energy Daily",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "published_at": "2024-07-02",
+      "url_or_local_path": "https://regional.example/reprint/ferrogrid-supply",
+      "independence_group": "wire:example-reuter",
+      "reliability_tier": "D",
+      "language": "en",
+      "excerpt": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes for multi-day grid firming modules.",
+      "metadata": {
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "article_id",
+            "id": "regional-reprint-supply-2024"
+          }
+        ],
+        "outlet_domain": "regional.example",
+        "wire_id": "example-reuter",
+        "is_reprint_of": "reuter-ferro-supply-2024",
+        "primary_ref": "news-reuter-ferro-supply-2024",
+        "event_id": "evt_ferro_purechitin_supply_2024"
+      }
+    },
+    {
+      "ref": "src_793b0dc5a70aa830",
+      "source_type": "NEWS",
+      "publisher": "Example Reuter Wire",
+      "title": "FerroGrid signs iron powder supply with PureChitin Bio",
+      "published_at": "2024-07-02",
+      "url_or_local_path": "https://news.example/reuter/ferrogrid-supply",
+      "independence_group": "wire:example-reuter",
+      "reliability_tier": "C",
+      "language": "en",
+      "excerpt": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes for multi-day grid firming modules.",
+      "metadata": {
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "article_id",
+            "id": "reuter-ferro-supply-2024"
+          }
+        ],
+        "outlet_domain": "news.example",
+        "wire_id": "example-reuter",
+        "event_id": "evt_ferro_purechitin_supply_2024"
+      }
+    },
+    {
+      "ref": "src_a43b90633ee579fc",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Oxygen electrode stack for long-duration iron-air modules",
+      "published_at": "2021-02-23",
+      "url_or_local_path": "https://patents.google.com/patent/US10930940",
+      "independence_group": "family:fam-oxa-2019",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "10930940"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-oxa-2019"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-oxa-2019",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M12/06"
+        ],
+        "event_date": "2019-07-01",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1"
+      }
+    },
+    {
+      "ref": "src_bf2873a2fbf1bd9e",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Metal-air electrochemical cell with iron anode for multi-day discharge",
+      "published_at": "2019-11-12",
+      "url_or_local_path": "https://patents.google.com/patent/US10476080",
+      "independence_group": "family:fam-ironair-2018",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "10476080"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-ironair-2018"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-ironair-2018",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ],
+        "event_date": "2018-03-20",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1",
+        "inventors": [
+          "A. Researcher"
+        ]
+      }
+    },
+    {
+      "ref": "src_d432196dd2a0759f",
+      "source_type": "NEWS",
+      "publisher": "GridTech Chronicle",
+      "title": "LongHaul Energy pilots hundred-hour iron-air with utilities",
+      "published_at": "2023-09-15",
+      "url_or_local_path": "https://gridtech.example/longhaul-pilot",
+      "independence_group": "domain:gridtech.example",
+      "reliability_tier": "C",
+      "language": "en",
+      "excerpt": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts using reversible iron oxidation.",
+      "metadata": {
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "article_id",
+            "id": "gridtech-longhaul-2023"
+          }
+        ],
+        "outlet_domain": "gridtech.example",
+        "event_id": "evt_longhaul_pilot_2023"
+      }
+    },
+    {
+      "ref": "src_e0fb39fc74b348be",
+      "source_type": "JOB_POSTING",
+      "publisher": "LongHaul Energy careers",
+      "title": "Applications engineer — utility firming pilots",
+      "published_at": "2024-04-01",
+      "url_or_local_path": "https://longhaul.example/jobs/apps",
+      "independence_group": "domain:longhaul.example",
+      "reliability_tier": "B",
+      "language": "en",
+      "excerpt": "Support hundred-hour depth-discharge iron-air pilots with regional utility grid firming contracts.",
+      "metadata": {
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "job_id",
+            "id": "longhaul-2024-apps"
+          }
+        ],
+        "outlet_domain": "longhaul.example",
+        "valid_from": "2024-04-01",
+        "geo": {
+          "country": "US",
+          "region": "TX"
+        }
+      }
+    },
+    {
+      "ref": "src_e33259975b8fde0e",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Porous iron electrode structures for hundred-hour storage",
+      "published_at": "2022-03-08",
+      "url_or_local_path": "https://patents.google.com/patent/US11271215",
+      "independence_group": "family:fam-ironair-2018",
+      "reliability_tier": "A",
+      "language": "en",
+      "excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "metadata": {
+        "outlet_domain": "uspto",
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "11271215"
+          },
+          {
+            "system": "patent_family",
+            "id": "fam-ironair-2018"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.1.0",
+        "license": "public-patent-text",
+        "family_id": "fam-ironair-2018",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "event_date": "2020-09-15",
+        "date_policy": "observed_at=application_date; published_at=publication_date",
+        "source_format": "patentsview-compatible-v1"
+      }
+    },
+    {
+      "ref": "src_fe0917cbe1439be5",
+      "source_type": "JOB_POSTING",
+      "publisher": "OxaCell Systems careers",
+      "title": "Manufacturing technician — oxygen electrode lines",
+      "published_at": "2024-05-10",
+      "url_or_local_path": "https://oxacell.example/jobs/mfg-o2",
+      "independence_group": "domain:oxacell.example",
+      "reliability_tier": "B",
+      "language": "en",
+      "excerpt": "Expand oxygen electrode manufacturing for multi-day iron-air storage customers.",
+      "metadata": {
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "job_id",
+            "id": "oxa-2024-mfg"
+          }
+        ],
+        "outlet_domain": "oxacell.example",
+        "valid_from": "2024-05-10",
+        "geo": {
+          "country": "DE",
+          "region": "BY"
+        }
+      }
+    },
+    {
+      "ref": "src_ffdbd1cba1932729",
+      "source_type": "JOB_POSTING",
+      "publisher": "FerroGrid Power careers",
+      "title": "Electrochemical engineer — iron-air stack scale-up",
+      "published_at": "2024-03-01",
+      "url_or_local_path": "https://ferrogrid.example/careers/ee-stack",
+      "independence_group": "domain:ferrogrid.example",
+      "reliability_tier": "B",
+      "language": "en",
+      "excerpt": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona. Skills: electrochemistry, alkaline systems, pilot manufacturing.",
+      "metadata": {
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "external_ids": [
+          {
+            "system": "job_id",
+            "id": "ferro-2024-chem"
+          }
+        ],
+        "outlet_domain": "ferrogrid.example",
+        "valid_to": "2024-09-01",
+        "valid_from": "2024-03-01",
+        "geo": {
+          "country": "US",
+          "region": "AZ"
+        }
+      }
+    }
+  ],
+  "observations": [
+    {
+      "source_ref": "src_3b85822b9689cb77",
+      "observation_type": "SUPPLIER_RELATIONSHIP",
+      "subject": "FerroGrid Power",
+      "object": "PureChitin Bio",
+      "observed_at": "2024-07-02",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock.",
+      "confidence": 0.7,
+      "metadata": {
+        "document_id": "news-regional-reprint-supply-2024",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "is_reprint_of": "reuter-ferro-supply-2024",
+        "reliability_tier": "D"
+      }
+    },
+    {
+      "source_ref": "src_fe0917cbe1439be5",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2024-05-10",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Hiring for skills related to reversible iron oxidation: Manufacturing technician — oxygen electrode lines",
+      "confidence": 0.55,
+      "metadata": {
+        "document_id": "job-oxa-2024-mfg",
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_hire_oxa-2024-mfg",
+        "valid_from": "2024-05-10",
+        "geo": {
+          "country": "DE",
+          "region": "BY"
+        },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_793b0dc5a70aa830",
+      "observation_type": "SUPPLIER_RELATIONSHIP",
+      "subject": "FerroGrid Power",
+      "object": "food-grade iron powder",
+      "observed_at": "2024-07-02",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Feedstock contract covers food-grade iron powder for porous iron electrodes.",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "news-reuter-ferro-supply-2024",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "reliability_tier": "C"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "porous iron electrode",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Porous iron electrode structures for hundred-hour storage — component porous iron electrode",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "LongHaul Energy discloses reversible iron oxidation: Porous iron electrode structures for hundred-hour storage",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_e0fb39fc74b348be",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2024-04-01",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Hiring for skills related to reversible iron oxidation: Applications engineer — utility firming pilots",
+      "confidence": 0.55,
+      "metadata": {
+        "document_id": "job-longhaul-2024-apps",
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_hire_longhaul-2024-apps",
+        "valid_from": "2024-04-01",
+        "geo": {
+          "country": "US",
+          "region": "TX"
+        },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "porous iron electrode",
+      "object": "food-grade iron powder",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Depends on material food-grade iron powder",
+      "confidence": 0.7,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_bf2873a2fbf1bd9e",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2018-03-20",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-10476080",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_33428391eeb853f0",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2021-05-10",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-11575128",
+        "event_id": "evt_fam-ferro-elyte-2021",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M10/26",
+          "H01M12/06"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_33428391eeb853f0",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2021-05-10",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "FerroGrid Power discloses reversible iron oxidation: Alkaline electrolyte additives for iron-air grid modules",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-11575128",
+        "event_id": "evt_fam-ferro-elyte-2021",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M10/26",
+          "H01M12/06"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_ffdbd1cba1932729",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2024-03-01",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Hiring for skills related to reversible iron oxidation: Electrochemical engineer — iron-air stack scale-up",
+      "confidence": 0.55,
+      "metadata": {
+        "document_id": "job-ferro-2024-chem",
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_hire_ferro-2024-chem",
+        "valid_from": "2024-03-01",
+        "valid_to": "2024-09-01",
+        "geo": {
+          "country": "US",
+          "region": "AZ"
+        },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_bf2873a2fbf1bd9e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2018-03-20",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "LongHaul Energy discloses reversible iron oxidation: Metal-air electrochemical cell with iron anode for multi-day discharge",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-10476080",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_fe0917cbe1439be5",
+      "observation_type": "HIRING_ACTIVITY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2024-05-10",
+      "numeric_value": 12.0,
+      "unit": "openings",
+      "text_excerpt": "Expand oxygen electrode manufacturing for multi-day iron-air storage customers.",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "job-oxa-2024-mfg",
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_hire_oxa-2024-mfg",
+        "valid_from": "2024-05-10",
+        "geo": {
+          "country": "DE",
+          "region": "BY"
+        },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_793b0dc5a70aa830",
+      "observation_type": "DEMAND_SIGNAL",
+      "subject": "grid firming",
+      "object": "regional utility",
+      "observed_at": "2024-07-02",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Modules aimed at multi-day grid firming for utilities.",
+      "confidence": 0.6,
+      "metadata": {
+        "document_id": "news-reuter-ferro-supply-2024",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "reliability_tier": "C"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_e0fb39fc74b348be",
+      "observation_type": "HIRING_ACTIVITY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2024-04-01",
+      "numeric_value": 3.0,
+      "unit": "openings",
+      "text_excerpt": "Support hundred-hour depth-discharge iron-air pilots with regional utility grid firming contracts.",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "job-longhaul-2024-apps",
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_hire_longhaul-2024-apps",
+        "valid_from": "2024-04-01",
+        "geo": {
+          "country": "US",
+          "region": "TX"
+        },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_bf2873a2fbf1bd9e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "porous iron electrode",
+      "observed_at": "2018-03-20",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Metal-air electrochemical cell with iron anode for multi-day discharge — component porous iron electrode",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "pat-10476080",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M12/06",
+          "H01M4/86"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "FerroGrid Power discloses reversible iron oxidation: Porous iron electrode structures for hundred-hour storage",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_d432196dd2a0759f",
+      "observation_type": "ADOPTION_SIGNAL",
+      "subject": "LongHaul Energy",
+      "object": "regional utility",
+      "observed_at": "2023-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts using reversible iron oxidation.",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "news-gridtech-longhaul-2023",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_longhaul_pilot_2023",
+        "reliability_tier": "C"
+      }
+    },
+    {
+      "source_ref": "src_d432196dd2a0759f",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2023-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts using reversible iron oxidation.",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "news-gridtech-longhaul-2023",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_longhaul_pilot_2023",
+        "reliability_tier": "C"
+      }
+    },
+    {
+      "source_ref": "src_ffdbd1cba1932729",
+      "observation_type": "HIRING_ACTIVITY",
+      "subject": "FerroGrid Power",
+      "object": "porous iron electrode",
+      "observed_at": "2024-03-01",
+      "numeric_value": 6.0,
+      "unit": "openings",
+      "text_excerpt": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona. Skills: electrochemistry, alkaline systems, pilot manufacturing.",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "job-ferro-2024-chem",
+        "extractor_id": "jobs-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_hire_ferro-2024-chem",
+        "valid_from": "2024-03-01",
+        "valid_to": "2024-09-01",
+        "geo": {
+          "country": "US",
+          "region": "AZ"
+        },
+        "reliability_tier": "B"
+      }
+    },
+    {
+      "source_ref": "src_793b0dc5a70aa830",
+      "observation_type": "SUPPLIER_RELATIONSHIP",
+      "subject": "FerroGrid Power",
+      "object": "PureChitin Bio",
+      "observed_at": "2024-07-02",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock.",
+      "confidence": 0.85,
+      "metadata": {
+        "document_id": "news-reuter-ferro-supply-2024",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_ferro_purechitin_supply_2024",
+        "reliability_tier": "C"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "LongHaul Energy",
+      "object": "reversible iron oxidation",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_a43b90633ee579fc",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2019-07-01",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "OxaCell Systems discloses reversible iron oxidation: Oxygen electrode stack for long-duration iron-air modules",
+      "confidence": 0.8,
+      "metadata": {
+        "document_id": "pat-10930940",
+        "event_id": "evt_fam-oxa-2019",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M12/06"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_a43b90633ee579fc",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "OxaCell Systems",
+      "object": "reversible iron oxidation",
+      "observed_at": "2019-07-01",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
+      "confidence": 0.9,
+      "metadata": {
+        "document_id": "pat-10930940",
+        "event_id": "evt_fam-oxa-2019",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M12/06"
+        ],
+        "reliability_tier": "A"
+      }
+    },
+    {
+      "source_ref": "src_d432196dd2a0759f",
+      "observation_type": "PRODUCT_LAUNCH",
+      "subject": "LongHaul Energy",
+      "object": "grid firming",
+      "observed_at": "2023-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts using reversible iron oxidation.",
+      "confidence": 0.7,
+      "metadata": {
+        "document_id": "news-gridtech-longhaul-2023",
+        "extractor_id": "news-offline",
+        "extractor_version": "0.1.0",
+        "event_id": "evt_longhaul_pilot_2023",
+        "reliability_tier": "C"
+      }
+    },
+    {
+      "source_ref": "src_e33259975b8fde0e",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "FerroGrid Power",
+      "object": "porous iron electrode",
+      "observed_at": "2020-09-15",
+      "numeric_value": null,
+      "unit": null,
+      "text_excerpt": "Porous iron electrode structures for hundred-hour storage — component porous iron electrode",
+      "confidence": 0.75,
+      "metadata": {
+        "document_id": "pat-11271215",
+        "event_id": "evt_fam-ironair-2018",
+        "extractor_id": "uspto-offline",
+        "extractor_version": "0.1.0",
+        "classification_codes": [
+          "H01M4/86",
+          "H01M4/02"
+        ],
+        "reliability_tier": "A"
+      }
+    }
+  ]
+}

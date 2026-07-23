@@ -31,23 +31,27 @@ def _merge_entity(a: dict, b: dict) -> dict:
         out["description"] = b["description"]
     if not out.get("country") and b.get("country"):
         out["country"] = b["country"]
+    # first-class external_ids (preferred) + legacy metadata.external_ids
+    ids = list(out.get("external_ids") or [])
+    seen = {(x.get("system"), x.get("id")) for x in ids if isinstance(x, dict)}
+    for src in (
+        b.get("external_ids") or [],
+        (out.get("metadata") or {}).get("external_ids") or [],
+        (b.get("metadata") or {}).get("external_ids") or [],
+    ):
+        for x in src:
+            if not isinstance(x, dict):
+                continue
+            key = (x.get("system"), x.get("id"))
+            if key not in seen and key[0] and key[1]:
+                ids.append(x)
+                seen.add(key)
+    out["external_ids"] = ids
     meta = dict(out.get("metadata") or {})
     other = dict(b.get("metadata") or {})
-    # merge external_ids by (system, id)
-    ids = list(meta.get("external_ids") or [])
-    seen = {(x.get("system"), x.get("id")) for x in ids if isinstance(x, dict)}
-    for x in other.get("external_ids") or []:
-        if not isinstance(x, dict):
-            continue
-        key = (x.get("system"), x.get("id"))
-        if key not in seen:
-            ids.append(x)
-            seen.add(key)
-    if ids:
-        meta["external_ids"] = ids
+    meta.pop("external_ids", None)
+    other.pop("external_ids", None)
     for k, v in other.items():
-        if k == "external_ids":
-            continue
         if k not in meta:
             meta[k] = v
     out["metadata"] = meta

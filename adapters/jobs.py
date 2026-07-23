@@ -49,7 +49,14 @@ def convert_jobs(raw: dict) -> Package:
     sources: List[dict] = []
     observations: List[dict] = []
 
-    def ensure(name: str, etype: str, *, country: str = "", meta_extra: Optional[dict] = None) -> str:
+    def ensure(
+        name: str,
+        etype: str,
+        *,
+        country: str = "",
+        external_ids: Optional[List[dict]] = None,
+        meta_extra: Optional[dict] = None,
+    ) -> str:
         key = name.strip()
         if not key:
             raise ValueError("entity name must be non-empty")
@@ -59,15 +66,34 @@ def convert_jobs(raw: dict) -> Package:
                 "extractor_version": ADAPTER_VERSION,
             }
             if meta_extra:
-                meta.update(meta_extra)
+                # do not bury external_ids only in metadata
+                extra = dict(meta_extra)
+                ext = list(external_ids or []) + list(extra.pop("external_ids", None) or [])
+                meta.update(extra)
+            else:
+                ext = list(external_ids or [])
             entities[key] = {
                 "entity_type": etype,
                 "canonical_name": key,
                 "aliases": [],
                 "description": "",
                 "country": country or "",
+                "external_ids": ext,
                 "metadata": meta,
             }
+        else:
+            ent = entities[key]
+            if country and not ent.get("country"):
+                ent["country"] = country
+            if external_ids:
+                ids = list(ent.get("external_ids") or [])
+                seen = {(x.get("system"), x.get("id")) for x in ids if isinstance(x, dict)}
+                for x in external_ids:
+                    k = (x.get("system"), x.get("id"))
+                    if k not in seen:
+                        ids.append(x)
+                        seen.add(k)
+                ent["external_ids"] = ids
         return key
 
     for i, row in enumerate(postings):
@@ -112,12 +138,10 @@ def convert_jobs(raw: dict) -> Package:
             company,
             "COMPANY",
             country=country,
-            meta_extra={
-                "external_ids": (
-                    [{"system": "domain", "id": domain}] if domain else []
-                ),
-                "domains": [domain] if domain else [],
-            },
+            external_ids=(
+                [{"system": "domain", "id": domain}] if domain else []
+            ),
+            meta_extra={"domains": [domain] if domain else []},
         )
         techs = [str(t).strip() for t in (row.get("related_technologies") or []) if str(t).strip()]
         comps = [str(t).strip() for t in (row.get("related_components") or []) if str(t).strip()]

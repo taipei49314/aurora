@@ -14,6 +14,10 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
   and `subject_external_ids` disambiguation
 - **Import merge** of entity rows that share the same external id (aliases union)
 - Collision reporting: `EXTERNAL_ID_COLLISION`
+- Adapters emit **first-class** `external_ids` (USPTO/jobs/news/PatentsView)
+- `scripts/resolve_entities.py` dry-run CLI; `POST /api/resolve`
+- Case `cases/multisource-iron-air` (patents+jobs+news joined by demo LEI)
+- `scripts/build_multisource_case.py`, `make multisource-case`
 
 ### Changed
 
