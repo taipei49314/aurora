@@ -276,9 +276,11 @@ Not required for scoring; enables span-level provenance for real dumps.
 
 `COMPANY` · `RESEARCH_INSTITUTE` · `UNIVERSITY` · `GOVERNMENT` · `STANDARD_BODY` ·
 `PRODUCT` · `TECHNOLOGY` · `MATERIAL` · `COMPONENT` · `PROCESS` · `FACILITY` ·
-`APPLICATION` · `MARKET`
+`APPLICATION` · `MARKET` · **`PERSON`** (engine 0.1.16+)
 
-There is **no** `PERSON` type. Inventors/authors stay in source/obs metadata or as free text.
+`PERSON` is for inventors, authors, and founders. They are **not** industry-clusterable
+(`CLUSTERABLE_TYPES` excludes them) so they do not form industry hypotheses alone.
+USPTO / PatentsView adapters emit `PERSON` entities from inventor lists.
 
 ### `observation_type`
 
@@ -371,7 +373,7 @@ Do **not** assume these exist as first-class fields:
 | Geo / jurisdiction in model | **done** first-class `geo` on Source + Observation | entity.country already first-class |
 | reliability in score | **done (engine 0.1.1)** via data_quality_penalty | optional: tier-weighted independence |
 | License for redistribution | **done** first-class `Source.license` + package default | `lint_package --public-corpus` |
-| PERSON entities | metadata / free text | optional type or out of scope |
+| PERSON entities | **done** optional `PERSON` type (not clusterable) | inventors via patent adapters |
 
 Engine evolution should prefer **small schema increments** listed in the project
 schema gap analysis over adding many unused columns.

@@ -427,3 +427,35 @@ def test_document_id_and_char_span_first_class():
     assert by_type["TECHNICAL_DEPENDENCY"].char_span == [40, 55]
     assert "document_id" not in (by_type["PATENT_ACTIVITY"].metadata or {})
     assert "char_span" not in (by_type["PATENT_ACTIVITY"].metadata or {})
+
+
+@pytest.mark.unit
+def test_person_entity_type_imports_and_is_not_required_for_clusters():
+    """Engine 0.1.16+: PERSON is a valid entity_type (not industry-clusterable)."""
+    from aurora.clustering import CLUSTERABLE_TYPES
+
+    assert "PERSON" not in CLUSTERABLE_TYPES
+    pkg = _pkg([{
+        "ref": "a",
+        "source_type": "PATENT",
+        "publisher": "USPTO",
+        "title": "T",
+        "excerpt": "E",
+    }])
+    # replace entities with person + company
+    pkg["entities"] = [
+        {"entity_type": "COMPANY", "canonical_name": "Acme"},
+        {"entity_type": "PERSON", "canonical_name": "Ada Inventor", "country": "US"},
+    ]
+    pkg["observations"] = [{
+        "source_ref": "a",
+        "observation_type": "PATENT_ACTIVITY",
+        "subject": "Acme",
+        "observed_at": "2020-01-01",
+        "text_excerpt": "filed",
+    }]
+    snap = import_package(pkg)
+    assert snap.import_errors == []
+    people = [e for e in snap.entities if e.entity_type == "PERSON"]
+    assert len(people) == 1
+    assert people[0].canonical_name == "Ada Inventor"

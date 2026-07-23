@@ -193,6 +193,34 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
         for m in mat_names:
             ensure_entity(m, "MATERIAL")
 
+        # Inventors as PERSON entities (engine 0.1.16+); not clusterable industries
+        inventors = patent.get("inventors") or patent.get("_inventors") or []
+        inventor_names: List[str] = []
+        for inv in inventors:
+            if isinstance(inv, str):
+                iname = inv.strip()
+                icountry = ""
+            elif isinstance(inv, dict):
+                iname = (
+                    inv.get("name")
+                    or inv.get("inventor_name_full")
+                    or inv.get("inventor_last_name")
+                    or ""
+                ).strip()
+                icountry = (inv.get("country") or inv.get("inventor_country") or "").strip()
+            else:
+                continue
+            if not iname:
+                continue
+            inventor_names.append(iname)
+            ensure_entity(
+                iname,
+                "PERSON",
+                country=icountry,
+                external_ids=[{"system": "person_name", "id": iname}],
+                description="Inventor / individual",
+            )
+
         for asg in assignees:
             if isinstance(asg, str):
                 asg = {"name": asg}
@@ -222,6 +250,8 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             }
             if codes:
                 obs_meta["classification_codes"] = codes
+            if inventor_names:
+                obs_meta["inventors"] = inventor_names
 
             def _obs(otype: str, subject: str, obj, text: str, conf: float) -> Dict[str, Any]:
                 return {

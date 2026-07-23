@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.16] — 2026-07-24
+
+### Added
+
+- Optional entity type **`PERSON`** (inventors/authors/founders; **not** industry-clusterable)
+- USPTO + PatentsView adapters emit `PERSON` entities from inventor lists
+- Data Explorer observation detail: load document via `/api/documents/{id}` and **highlight `char_span`**
+
+### Changed
+
+- Engine / feature → **0.1.16**
+- Import-schema PERSON gap closed
+
 ## [0.1.15] — 2026-07-24
 
 ### Added

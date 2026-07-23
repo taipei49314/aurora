@@ -59,9 +59,14 @@ license; `lint_package --public-corpus` / `--require-license`.
 `Observation.document_id` + `char_span`; optional package `documents[]`;
 API `/api/documents`; adapters emit top-level `document_id`.
 
+## 13. PERSON entity type + document highlight UI — **done (v0.1.16)**
+
+Optional `PERSON` type (not industry-clusterable); patent adapters emit inventors;
+Data Explorer observation detail loads document text and highlights `char_span`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- PERSON entities optional type
-- Document text retrieval UI (open document + highlight span)
+- Author PERSON entities from OpenAlex authorships
+- Entity-type filter chips in Data Explorer

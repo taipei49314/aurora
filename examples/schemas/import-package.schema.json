@@ -35,7 +35,7 @@
       "enum": [
         "COMPANY", "RESEARCH_INSTITUTE", "UNIVERSITY", "GOVERNMENT", "STANDARD_BODY",
         "PRODUCT", "TECHNOLOGY", "MATERIAL", "COMPONENT", "PROCESS", "FACILITY",
-        "APPLICATION", "MARKET"
+        "APPLICATION", "MARKET", "PERSON"
       ]
     },
     "sourceType": {

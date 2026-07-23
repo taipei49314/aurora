@@ -26,6 +26,8 @@ ENTITY_TYPES = [
     "COMPANY", "RESEARCH_INSTITUTE", "UNIVERSITY", "GOVERNMENT", "STANDARD_BODY",
     "PRODUCT", "TECHNOLOGY", "MATERIAL", "COMPONENT", "PROCESS", "FACILITY",
     "APPLICATION", "MARKET",
+    # Optional people (inventors, authors, founders) — not clusterable as industries
+    "PERSON",
 ]
 
 OBSERVATION_TYPES = [

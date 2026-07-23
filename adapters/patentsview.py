@@ -18,7 +18,7 @@ Per-patent fields (any subset; missing optionals are fine)::
     patent_family_id | family_id
     assignees: [{assignee_organization|assignee_name|name, assignee_country|country}]
     cpcs: [{cpc_subgroup_id|cpc_group_id}]  or cpc: ["H01M4/86", ...]
-    inventors: ignored for entities (no PERSON type) — names kept in metadata only
+    inventors: PERSON entities (engine 0.1.16+) + provenance on observations
 
 Conversion reuses ``convert_uspto`` after field normalization so mapping rules
 stay single-sourced (import-schema patent conventions).
@@ -232,21 +232,19 @@ def convert_patentsview(raw: dict) -> Package:
             inventor_by_pub[pub] = inv
         clean_patents.append(rec)
 
+    # Re-attach inventors so convert_uspto can emit PERSON entities (0.1.16+)
+    for rec in clean_patents:
+        pub = rec.get("publication_number")
+        if pub and pub in inventor_by_pub:
+            rec["inventors"] = [{"name": n} for n in inventor_by_pub[pub]]
+
     pkg = convert_uspto({"patents": clean_patents}, publisher="USPTO")
-    # annotate sources with patentsview provenance + inventors
+    # annotate sources with patentsview provenance
     for src in pkg["sources"]:
         meta = dict(src.get("metadata") or {})
         meta["extractor_id"] = ADAPTER_ID
         meta["extractor_version"] = ADAPTER_VERSION
         meta["source_format"] = "patentsview-compatible-v1"
-        # publication number from external_ids
-        pub = None
-        for eid in meta.get("external_ids") or []:
-            if eid.get("system") == "us_publication":
-                pub = eid.get("id")
-                break
-        if pub and pub in inventor_by_pub:
-            meta["inventors"] = inventor_by_pub[pub]
         src["metadata"] = meta
 
     pkg["_adapter"] = {
