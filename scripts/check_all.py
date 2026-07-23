@@ -88,6 +88,8 @@ def main(argv=None) -> int:
             "cases/multisource-iron-air/package.json",
             "--strict",
             "--require-documents",
+            "--min-char-span-ratio",
+            "0.5",
         ],
     )
     run(
@@ -98,6 +100,8 @@ def main(argv=None) -> int:
             "cases/iron-air-mini/package.json",
             "--strict",
             "--require-documents",
+            "--min-char-span-ratio",
+            "0.4",
         ],
     )
     run(
@@ -108,6 +112,7 @@ def main(argv=None) -> int:
             "cases/iron-air-retro/package.json",
             "--strict",
             "--require-documents",
+            "--require-char-spans",
         ],
     )
     run("retro-case", [py, "scripts/run_retro_case.py", "cases/iron-air-retro"])
@@ -147,6 +152,8 @@ def main(argv=None) -> int:
             "cases/patentsview-sample/package.json",
             "--strict",
             "--require-documents",
+            "--min-char-span-ratio",
+            "0.4",
         ],
     )
     run(
@@ -187,6 +194,7 @@ def main(argv=None) -> int:
             "cases/openalex-sample/package.json",
             "--strict",
             "--require-documents",
+            "--require-char-spans",
         ],
     )
     print("=" * 72)

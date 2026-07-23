@@ -48,8 +48,29 @@ def main(argv=None) -> int:
             "(span/provenance policy; engine 0.1.22+)"
         ),
     )
+    ap.add_argument(
+        "--require-char-spans",
+        action="store_true",
+        help=(
+            "Fail if any observation with document_id lacks char_span after import "
+            "(engine auto-align counts; 0.1.26+)"
+        ),
+    )
+    ap.add_argument(
+        "--min-char-span-ratio",
+        type=float,
+        default=None,
+        metavar="R",
+        help=(
+            "Fail if observations_with_char_span / observations < R "
+            "(0..1; post-import, includes auto-align; 0.1.26+)"
+        ),
+    )
     args = ap.parse_args(argv)
     require_license = args.require_license or args.public_corpus
+    if args.min_char_span_ratio is not None:
+        if not (0.0 <= args.min_char_span_ratio <= 1.0):
+            ap.error("--min-char-span-ratio must be between 0 and 1")
 
     sys.path.insert(0, str(ROOT / "backend"))
     from aurora import import_package
@@ -73,6 +94,8 @@ def main(argv=None) -> int:
         "document_ids_referenced": 0,
         "observations_with_document_id": 0,
         "observations_with_char_span": 0,
+        "observations_missing_char_span": 0,
+        "char_span_ratio": 0.0,
         "orphan_document_ids": [],
         "orphan_document_id_count": 0,
     }
@@ -181,12 +204,23 @@ def main(argv=None) -> int:
             1 for d in snap_docs if (getattr(d, "text", None) or "").strip()
         )
     # Post-import span count (includes auto-aligned)
-    report["observations_with_char_span"] = sum(
+    n_obs = len(snap.observations)
+    n_spans = sum(
         1 for o in snap.observations if getattr(o, "char_span", None) is not None
     )
-    report["observations_with_document_id"] = sum(
+    n_with_doc = sum(
         1 for o in snap.observations if (getattr(o, "document_id", None) or "").strip()
     )
+    missing_span_with_doc = sum(
+        1
+        for o in snap.observations
+        if (getattr(o, "document_id", None) or "").strip()
+        and getattr(o, "char_span", None) is None
+    )
+    report["observations_with_char_span"] = n_spans
+    report["observations_with_document_id"] = n_with_doc
+    report["observations_missing_char_span"] = missing_span_with_doc
+    report["char_span_ratio"] = (n_spans / n_obs) if n_obs else 0.0
     report["char_spans_auto_aligned"] = int(
         (snap.counts or {}).get("char_spans_auto_aligned") or 0
     )
@@ -218,6 +252,22 @@ def main(argv=None) -> int:
             f"{sample}{more} "
             f"(use ensure_documents / --require-documents policy)"
         )
+    if args.require_char_spans and missing_span_with_doc:
+        report["ok"] = False
+        report["issues"].append(
+            f"{missing_span_with_doc} observation(s) with document_id lack char_span "
+            f"(post-import; try progressive align / append_unmatched / "
+            f"--require-char-spans policy)"
+        )
+    if args.min_char_span_ratio is not None:
+        ratio = report["char_span_ratio"]
+        if ratio + 1e-12 < float(args.min_char_span_ratio):
+            report["ok"] = False
+            report["issues"].append(
+                f"char_span_ratio={ratio:.3f} < min-char-span-ratio "
+                f"{args.min_char_span_ratio} "
+                f"({n_spans}/{n_obs} observations)"
+            )
     if args.strict and report["import_errors"]:
         report["ok"] = False
         report["issues"].append(f"{report['import_errors']} import_errors")
@@ -246,8 +296,10 @@ def main(argv=None) -> int:
             f"referenced={report['document_ids_referenced']} · "
             f"orphan_ids={report['orphan_document_id_count']} · "
             f"obs_with_doc={report['observations_with_document_id']} · "
-            f"spans={report['observations_with_char_span']}"
-            f" (auto={report.get('char_spans_auto_aligned', 0)})"
+            f"spans={report['observations_with_char_span']}/{n_obs} "
+            f"({report['char_span_ratio']:.0%}) "
+            f"missing_on_doc={report['observations_missing_char_span']} "
+            f"auto={report.get('char_spans_auto_aligned', 0)}"
         )
         print(f"  import_errors: {report['import_errors']}")
         for i in report["issues"][:20]:

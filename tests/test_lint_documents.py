@@ -132,3 +132,116 @@ def test_case_packages_require_documents(rel):
     body = json.loads(r.stdout)
     assert body["orphan_document_id_count"] == 0
     assert body["documents_total"] >= 1
+
+
+@pytest.mark.unit
+def test_require_char_spans_fails_when_missing(tmp_path):
+    """0.1.26+: --require-char-spans fails when document_id obs has no span."""
+    pkg = {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
+        "sources": [{
+            "ref": "s1",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "T",
+            "excerpt": "short abstract body text here for patent",
+            "license": "public-patent-text",
+        }],
+        "documents": [{
+            "document_id": "s1",
+            "source_ref": "s1",
+            "text": "short abstract body text here for patent",
+        }],
+        "observations": [
+            {
+                "source_ref": "s1",
+                "observation_type": "PATENT_ACTIVITY",
+                "subject": "Acme",
+                "observed_at": "2020-01-01",
+                "text_excerpt": "short abstract body text here for patent",
+                "document_id": "s1",
+                # will auto-align
+            },
+            {
+                "source_ref": "s1",
+                "observation_type": "TECHNICAL_DEPENDENCY",
+                "subject": "Acme",
+                "object": "Acme",
+                "observed_at": "2020-01-01",
+                "text_excerpt": "zzz totally missing from document xyz",
+                "document_id": "s1",
+                # no align possible
+            },
+        ],
+    }
+    p = tmp_path / "no_span.json"
+    p.write_text(json.dumps(pkg), encoding="utf-8")
+
+    # soft: reports missing but ok
+    r = _run(p, "--json")
+    assert r.returncode == 0, r.stdout + r.stderr
+    body = json.loads(r.stdout)
+    assert body["ok"] is True
+    assert body["observations_missing_char_span"] >= 1
+    assert "char_span_ratio" in body
+
+    r2 = _run(p, "--require-char-spans", "--json")
+    assert r2.returncode != 0
+    body2 = json.loads(r2.stdout)
+    assert body2["ok"] is False
+    assert any("char_span" in i for i in body2["issues"])
+
+
+@pytest.mark.unit
+def test_min_char_span_ratio_fails_below_floor(tmp_path):
+    pkg = {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
+        "sources": [{
+            "ref": "s1",
+            "source_type": "NEWS",
+            "publisher": "P",
+            "title": "T",
+            "excerpt": "hello world excerpt body",
+        }],
+        "documents": [{
+            "document_id": "s1",
+            "text": "hello world excerpt body",
+        }],
+        "observations": [
+            {
+                "source_ref": "s1",
+                "observation_type": "ADOPTION_SIGNAL",
+                "subject": "Acme",
+                "observed_at": "2020-01-01",
+                "text_excerpt": "hello world excerpt body",
+                "document_id": "s1",
+            },
+            {
+                "source_ref": "s1",
+                "observation_type": "DEMAND_SIGNAL",
+                "subject": "Acme",
+                "observed_at": "2020-01-01",
+                "text_excerpt": "no match for this claim",
+                "document_id": "s1",
+            },
+        ],
+    }
+    p = tmp_path / "ratio.json"
+    p.write_text(json.dumps(pkg), encoding="utf-8")
+    r = _run(p, "--min-char-span-ratio", "0.9", "--json")
+    assert r.returncode != 0
+    body = json.loads(r.stdout)
+    assert body["ok"] is False
+    assert body["char_span_ratio"] < 0.9
+
+
+@pytest.mark.unit
+def test_retro_passes_require_char_spans():
+    pkg = ROOT / "cases" / "iron-air-retro" / "package.json"
+    if not pkg.is_file():
+        pytest.skip("retro missing")
+    r = _run(pkg, "--require-documents", "--require-char-spans", "--json", "--strict")
+    assert r.returncode == 0, r.stdout + r.stderr
+    body = json.loads(r.stdout)
+    assert body["observations_missing_char_span"] == 0
+    assert body["char_span_ratio"] >= 0.99

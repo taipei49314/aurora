@@ -112,8 +112,13 @@ align_char_span adds progressive word/char prefix match. Curated packages may
 Gates `min_observations_with_char_span` and `min_char_span_ratio` on all cases;
 iron-air-retro gains scorecard.json; check_all runs mini + retro scorecards.
 
+## 23. lint_package char_span policy — **done (v0.1.26)**
+
+`--require-char-spans` (document_id rows must have spans) and
+`--min-char-span-ratio R`. Soft fields always reported. check_all wired.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: lint_package --require-char-spans soft/hard policy
+- Optional: Dashboard span coverage quality panel
