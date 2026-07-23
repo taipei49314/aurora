@@ -80,8 +80,14 @@ Adapters call `ensure_documents` so packages include full `documents[]` rows
 built from source title/excerpt/url/license (`document_id` == `source.ref`).
 `strip_package` / `merge_packages` preserve and merge documents.
 
+## 17. char_span auto-align — **done (v0.1.20)**
+
+When `char_span` is missing but `document_id` + `text_excerpt` and document
+text are present, locate the excerpt (exact → casefold → whitespace-flexible)
+and set `[start, end]` with `metadata.char_span_auto`. Engine import + adapters.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: char_span auto-align from text_excerpt against document text
+- Optional: Data Explorer badge for auto-aligned spans

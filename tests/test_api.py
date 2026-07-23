@@ -238,6 +238,16 @@ def test_stats_document_ids_referenced(client):
     assert isinstance(body["document_ids_referenced"], int)
 
 
+def test_stats_char_span_auto_field(client):
+    """0.1.20+: stats exposes observations_with_char_span_auto."""
+    r = client.get("/api/stats")
+    assert r.status_code == 200
+    body = r.json()
+    assert "observations_with_char_span_auto" in body
+    assert isinstance(body["observations_with_char_span_auto"], int)
+    assert body["observations_with_char_span_auto"] >= 0
+
+
 def test_import_upload_rejects_non_json(client):
     r = client.post("/api/imports", files={"file": ("x.bin", b"\xff\xfe not json", "application/octet-stream")})
     assert r.status_code == 400

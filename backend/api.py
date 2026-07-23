@@ -127,6 +127,7 @@ def stats():
     obs_with_geo = 0
     obs_with_document_id = 0
     obs_with_char_span = 0
+    obs_with_char_span_auto = 0
     unique_event_ids: set = set()
     country_counts: dict = {}
     for o in s.observations:
@@ -145,6 +146,8 @@ def stats():
             obs_with_document_id += 1
         if getattr(o, "char_span", None) or (o.metadata or {}).get("char_span"):
             obs_with_char_span += 1
+            if (o.metadata or {}).get("char_span_auto"):
+                obs_with_char_span_auto += 1
     with_ext = sum(1 for e in s.entities if e.external_ids)
     entities_with_country = sum(1 for e in s.entities if (e.country or "").strip())
     entity_country_counts: dict = {}
@@ -181,6 +184,7 @@ def stats():
         "observations_with_geo": obs_with_geo,
         "observations_with_document_id": obs_with_document_id,
         "observations_with_char_span": obs_with_char_span,
+        "observations_with_char_span_auto": obs_with_char_span_auto,
         "documents_total": len(getattr(s, "documents", None) or []),
         "document_ids_referenced": len({
             (getattr(o, "document_id", None) or (o.metadata or {}).get("document_id") or "").strip()

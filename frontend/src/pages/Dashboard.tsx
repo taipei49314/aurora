@@ -107,7 +107,11 @@ export function Dashboard() {
           <StatCard
             label="documents"
             value={st.document_ids_referenced ?? st.documents_total ?? "—"}
-            sub={`${st.documents_total ?? 0} full · ${st.observations_with_document_id ?? 0} obs · ${st.observations_with_char_span ?? 0} spans`}
+            sub={`${st.documents_total ?? 0} full · ${st.observations_with_document_id ?? 0} obs · ${st.observations_with_char_span ?? 0} spans${
+              st.observations_with_char_span_auto
+                ? ` (${st.observations_with_char_span_auto} auto)`
+                : ""
+            }`}
           />
         </div>
       )}

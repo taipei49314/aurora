@@ -65,6 +65,7 @@ export interface CorpusStats {
   observations_with_geo?: number;
   observations_with_document_id?: number;
   observations_with_char_span?: number;
+  observations_with_char_span_auto?: number;
   documents_total?: number;
   document_ids_referenced?: number;
   observation_country_counts?: Record<string, number>;

@@ -249,6 +249,13 @@ source `excerpt` (title/url/license copied). Existing rows with text are
 never overwritten. `metadata.auto_built=true` marks generated rows.
 `strip_package` and `merge_packages` preserve / merge `documents[]`.
 
+**char_span auto-align (0.1.20+):** when an observation has `document_id` and
+`text_excerpt` but no `char_span`, the engine (and `ensure_documents`) locate
+the excerpt inside document text — exact, then case-insensitive, then
+whitespace-flexible — and set `[start, end]` with `metadata.char_span_auto`.
+Explicit spans are never overwritten. Snapshot count:
+`char_spans_auto_aligned`.
+
 ### Resolution rules
 
 - `subject` / `object` are resolved by **normalized name / alias**.
