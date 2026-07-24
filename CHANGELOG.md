@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.33] — 2026-07-24
+
+### Added
+
+- Dashboard **status count chips** deep-link to Hypothesis Explorer
+  (`/hypotheses?status=<STATUS>`)
+- Hypothesis Explorer **status filter chips** + URL `?status=` / `?s=`
+  (shareable; works with `?id=` deep-links)
+
+### Changed
+
+- Engine / feature → **0.1.33**
+- README engine badge version aligned
+
 ## [0.1.32] — 2026-07-24
 
 ### Added

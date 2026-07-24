@@ -19,3 +19,14 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.32; pytest engine suite green).
 - **Commit:** `2b72540` (code + docs already on master; this note documents cycle-2 UX slice inside that ship).
 - **Next suggestion:** Status count chips → Hypothesis Explorer `?status=` filter; or `subject_raw` staging; human: PatentsView real dump / Actions PAT.
+
+## 2026-07-24 cycle-3
+
+- **Planned:** Dashboard status count chips → Hypothesis Explorer `?status=` filter (GOOD_FIRST_ISSUES / evolution-loop next).
+- **Shipped (v0.1.33):**
+  - Dashboard status cards link to `/hypotheses?status=<STATUS>`
+  - Hypothesis Explorer All / per-status chips; URL `?status=` / `?s=`; composes with `?id=`
+  - Docs: CHANGELOG, GOOD_FIRST_ISSUES #31, evolution-loop, README badge
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.33).
+- **Commit:** (pending this cycle)
+- **Next suggestion:** Table Status badge dual deep-link; or `subject_raw` staging; human: PatentsView dump / Actions PAT.

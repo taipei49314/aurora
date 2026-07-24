@@ -145,10 +145,28 @@ export function Dashboard() {
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", margin: "12px 0 20px" }}>
         {Object.entries(c).map(([s, n]) => (
-          <div key={s} style={{ border: "1px solid #d0d7de", borderRadius: 8, padding: "8px 12px" }}>
-            <div style={{ fontSize: 22, fontWeight: 700 }}>{n}</div>
+          <Link
+            key={s}
+            to={`/hypotheses?status=${encodeURIComponent(s)}`}
+            title={`Open ${s} hypotheses in Hypothesis Explorer`}
+            style={{
+              border: "1px solid #d0d7de",
+              borderRadius: 8,
+              padding: "8px 12px",
+              textDecoration: "none",
+              color: "inherit",
+              display: "block",
+              transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+            }}
+          >
+            <div style={{ fontSize: 22, fontWeight: 700 }}>
+              {n}
+              <span style={{ marginLeft: 4, fontSize: 11, color: "#0969da", fontWeight: 600 }} aria-hidden>
+                ↗
+              </span>
+            </div>
             <Badge status={s} />
-          </div>
+          </Link>
         ))}
       </div>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>

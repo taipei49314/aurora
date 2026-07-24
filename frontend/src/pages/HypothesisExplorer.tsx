@@ -83,26 +83,52 @@ function parseOpenId(params: URLSearchParams): string | null {
   return params.get("id") || params.get("hypothesis_id") || params.get("h") || null;
 }
 
+/** Normalize status filter from URL (`status` or `s`); empty = all. Case-insensitive match. */
+function parseStatusFilter(params: URLSearchParams): string {
+  return (params.get("status") || params.get("s") || "").trim();
+}
+
+function statusMatches(hStatus: string, filter: string): boolean {
+  if (!filter) return true;
+  return hStatus.toUpperCase() === filter.toUpperCase();
+}
+
 export function HypothesisExplorer() {
   const { hyps } = useCurrentRun();
   const [searchParams, setSearchParams] = useSearchParams();
   const openId = parseOpenId(searchParams);
+  const statusFilter = parseStatusFilter(searchParams);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const scrolledFor = useRef<string | null>(null);
 
-  const setOpen = (id: string | null) => {
+  const patchParams = (mutate: (next: URLSearchParams) => void) => {
     setSearchParams(
       (prev) => {
         const next = new URLSearchParams(prev);
-        // Normalize to a single canonical param.
-        next.delete("hypothesis_id");
-        next.delete("h");
-        if (id) next.set("id", id);
-        else next.delete("id");
+        mutate(next);
         return next;
       },
       { replace: true },
     );
+  };
+
+  const setOpen = (id: string | null) => {
+    patchParams((next) => {
+      // Normalize to a single canonical param.
+      next.delete("hypothesis_id");
+      next.delete("h");
+      if (id) next.set("id", id);
+      else next.delete("id");
+    });
+  };
+
+  const setStatusFilter = (status: string | null) => {
+    patchParams((next) => {
+      next.delete("s");
+      if (status) next.set("status", status);
+      else next.delete("status");
+      // Clear open id if it would not match the new filter (handled after data loads via filter).
+    });
   };
 
   // Scroll the deep-linked card into view once per id (Dashboard → Explorer).
@@ -113,21 +139,86 @@ export function HypothesisExplorer() {
     if (!el) return;
     scrolledFor.current = openId;
     el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [openId, hyps.data]);
+  }, [openId, hyps.data, statusFilter]);
 
   if (!hyps.data) return <p>Loading…</p>;
 
-  const known = openId && hyps.data.some((h) => h.hypothesis_id === openId);
+  const statusCounts: Record<string, number> = {};
+  for (const h of hyps.data) {
+    statusCounts[h.status] = (statusCounts[h.status] ?? 0) + 1;
+  }
+  const statusKeys = Object.keys(statusCounts).sort();
+
+  const filtered = hyps.data.filter((h) => statusMatches(h.status, statusFilter));
+  const knownId = openId && hyps.data.some((h) => h.hypothesis_id === openId);
+  const idVisible = openId && filtered.some((h) => h.hypothesis_id === openId);
+  const statusKnown =
+    !statusFilter || statusKeys.some((s) => s.toUpperCase() === statusFilter.toUpperCase());
 
   return (
     <div>
       <h2>Hypothesis Explorer</h2>
-      {openId && !known && (
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "0 0 14px", alignItems: "center" }}>
+        <Chip
+          active={!statusFilter}
+          label={`All (${hyps.data.length})`}
+          onClick={() => setStatusFilter(null)}
+        />
+        {statusKeys.map((s) => (
+          <Chip
+            key={s}
+            active={statusFilter.toUpperCase() === s.toUpperCase()}
+            label={`${s} (${statusCounts[s]})`}
+            color={STATUS_COLORS[s]}
+            onClick={() =>
+              setStatusFilter(statusFilter.toUpperCase() === s.toUpperCase() ? null : s)
+            }
+          />
+        ))}
+        {statusFilter && (
+          <span style={{ fontSize: 11, color: "#57606a" }}>
+            filter <code>?status={statusFilter}</code>
+          </span>
+        )}
+      </div>
+
+      {statusFilter && !statusKnown && (
+        <p style={{ fontSize: 12, color: "#9a6700", marginBottom: 10 }}>
+          No hypotheses with status <code>{statusFilter}</code> for this run.
+        </p>
+      )}
+      {openId && !knownId && (
         <p style={{ fontSize: 12, color: "#9a6700", marginBottom: 10 }}>
           No hypothesis matches <code>?id={openId}</code> for this run.
         </p>
       )}
-      {hyps.data.map((h) => {
+      {openId && knownId && !idVisible && statusFilter && (
+        <p style={{ fontSize: 12, color: "#9a6700", marginBottom: 10 }}>
+          Open id is hidden by status filter —{" "}
+          <button
+            type="button"
+            onClick={() => setStatusFilter(null)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#0969da",
+              cursor: "pointer",
+              padding: 0,
+              fontSize: 12,
+              textDecoration: "underline",
+            }}
+          >
+            clear status filter
+          </button>
+        </p>
+      )}
+
+      {filtered.length === 0 && statusKnown && (
+        <p style={{ fontSize: 13, color: "#57606a" }}>No hypotheses in this filter.</p>
+      )}
+
+      {filtered.map((h) => {
         const isOpen = openId === h.hypothesis_id;
         return (
           <div
@@ -168,5 +259,37 @@ export function HypothesisExplorer() {
         );
       })}
     </div>
+  );
+}
+
+function Chip({
+  label,
+  active,
+  onClick,
+  color,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  color?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        border: active ? `1px solid ${color ?? "#0969da"}` : "1px solid #d0d7de",
+        background: active ? (color ? `${color}18` : "#ddf4ff") : "#ffffff",
+        color: active ? (color ?? "#0969da") : "#1f2328",
+        borderRadius: 16,
+        padding: "4px 10px",
+        fontSize: 11,
+        fontWeight: 600,
+        cursor: "pointer",
+      }}
+      title={active ? "Clear status filter" : `Filter by ${label}`}
+    >
+      {label}
+    </button>
   );
 }
