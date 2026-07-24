@@ -137,9 +137,14 @@ Provenance quality panel links to missing-on-doc / observations / documents.
 Observations chips All / with doc / no doc (`?has_document_id=`); observation
 detail links `document_id` into documents tab; Dashboard document_id bar deep-link.
 
+## 28. Table document_id + StatCard deep-links — **done (v0.1.31)**
+
+Observations table `document_id` cell → documents tab; Dashboard coverage
+StatCards link into Data Explorer tabs (entities/sources/observations/documents).
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Table-row document_id click → documents tab
-- Dashboard documents StatCard deep-link
+- Hypothesis table row → Hypothesis Explorer deep-link
+- `subject_raw` staging field for unresolved entity mentions

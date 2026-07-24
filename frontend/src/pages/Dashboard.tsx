@@ -59,38 +59,59 @@ export function Dashboard() {
             margin: "12px 0 16px",
           }}
         >
-          <StatCard label="entities" value={st.entities_total} sub={`${st.entities_with_external_ids} with external_ids`} />
-          <StatCard label="sources" value={st.counts?.sources ?? "—"} sub={tierLine(st.reliability_tier_counts)} />
-          <StatCard label="observations" value={st.counts?.observations ?? "—"} sub={`${Object.keys(st.observation_type_counts || {}).length} types`} />
+          <StatCard
+            label="entities"
+            value={st.entities_total}
+            sub={`${st.entities_with_external_ids} with external_ids`}
+            to="/data?tab=entities"
+          />
+          <StatCard
+            label="sources"
+            value={st.counts?.sources ?? "—"}
+            sub={tierLine(st.reliability_tier_counts)}
+            to="/data?tab=sources"
+          />
+          <StatCard
+            label="observations"
+            value={st.counts?.observations ?? "—"}
+            sub={`${Object.keys(st.observation_type_counts || {}).length} types`}
+            to="/data?tab=observations"
+          />
           <StatCard
             label="independent"
             value={st.counts?.independent_source_count ?? "—"}
             sub={`of ${st.counts?.raw_source_count ?? "—"} raw`}
+            to="/data?tab=sources"
           />
           <StatCard
             label="family_id"
             value={st.sources_with_family_id ?? "—"}
             sub={`of ${st.sources_total ?? st.counts?.sources ?? "—"} sources`}
+            to="/data?tab=sources"
           />
           <StatCard
             label="event_date"
             value={st.sources_with_event_date ?? "—"}
             sub="dual-date coverage"
+            to="/data?tab=sources"
           />
           <StatCard
             label="event_id"
             value={st.unique_event_ids ?? "—"}
             sub={`${st.observations_with_event_id ?? 0} obs tagged`}
+            to="/data?tab=observations"
           />
           <StatCard
             label="outlet/wire"
             value={st.sources_with_outlet_domain ?? "—"}
             sub={`${st.sources_with_wire_id ?? 0} with wire_id`}
+            to="/data?tab=sources"
           />
           <StatCard
             label="geo"
             value={st.sources_with_geo ?? "—"}
             sub={`${st.observations_with_geo ?? 0} obs · ${st.entities_with_country ?? 0} ents w/ country`}
+            to="/data?tab=sources"
           />
           <StatCard
             label="license"
@@ -104,6 +125,7 @@ export function Dashboard() {
                     .join(" · ") || "no licenses declared"
                 : "coverage"
             }
+            to="/data?tab=sources"
           />
           <StatCard
             label="documents"
@@ -113,6 +135,8 @@ export function Dashboard() {
                 ? ` (${st.observations_with_char_span_auto} auto)`
                 : ""
             }`}
+            to="/data?tab=documents"
+            title="Open documents in Data Explorer"
           />
         </div>
       )}
@@ -165,17 +189,50 @@ function StatCard({
   label,
   value,
   sub,
+  to,
+  title,
 }: {
   label: string;
   value: string | number;
   sub?: string;
+  /** Deep-link into Data Explorer (0.1.31+) */
+  to?: string;
+  title?: string;
 }) {
-  return (
-    <div style={{ border: "1px solid #d0d7de", borderRadius: 8, padding: "10px 12px", background: "#f6f8fa" }}>
-      <div style={{ fontSize: 11, color: "#57606a", textTransform: "uppercase" }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 700 }}>{value}</div>
+  const card = (
+    <div
+      style={{
+        border: "1px solid #d0d7de",
+        borderRadius: 8,
+        padding: "10px 12px",
+        background: "#f6f8fa",
+        height: "100%",
+        cursor: to ? "pointer" : undefined,
+        transition: to ? "border-color 0.15s ease, box-shadow 0.15s ease" : undefined,
+      }}
+      title={title}
+    >
+      <div style={{ fontSize: 11, color: "#57606a", textTransform: "uppercase" }}>
+        {label}
+        {to ? (
+          <span style={{ marginLeft: 4, color: "#0969da", fontWeight: 600 }} aria-hidden>
+            ↗
+          </span>
+        ) : null}
+      </div>
+      <div style={{ fontSize: 22, fontWeight: 700, color: "#1f2328" }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: "#8c959f" }}>{sub}</div>}
     </div>
+  );
+  if (!to) return card;
+  return (
+    <Link
+      to={to}
+      title={title || `Open ${label} in Data Explorer`}
+      style={{ textDecoration: "none", color: "inherit", display: "block" }}
+    >
+      {card}
+    </Link>
   );
 }
 

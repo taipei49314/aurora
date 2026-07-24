@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.31] — 2026-07-24
+
+### Added
+
+- Data Explorer observations table: **document_id** cell links to documents tab
+- Dashboard coverage **StatCards** deep-link into Data Explorer tabs
+  (entities / sources / observations / documents)
+
+### Changed
+
+- Engine / feature → **0.1.31**
+- README engine badge version aligned
+
 ## [0.1.30] — 2026-07-24
 
 ### Added

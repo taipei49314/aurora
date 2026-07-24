@@ -123,7 +123,22 @@ function cellValue(tab: Tab, col: string, row: any): ReactNode {
     return String(row.license || row.metadata?.license || "—");
   }
   if (col === "document_id") {
-    return String(row.document_id || row.metadata?.document_id || "—");
+    const id = String(row.document_id || row.metadata?.document_id || "").trim();
+    if (!id) return "—";
+    // Table-cell deep-link into documents tab (0.1.31+); stopPropagation so row select still works on other cells
+    if (tab === "observations") {
+      return (
+        <Link
+          to={`/data?tab=documents&q=${encodeURIComponent(id)}`}
+          onClick={(e) => e.stopPropagation()}
+          title="Open in documents tab"
+          style={{ color: "#0969da", textDecoration: "none" }}
+        >
+          {id}
+        </Link>
+      );
+    }
+    return id;
   }
   if (col === "char_span") {
     const sp = row.char_span || row.metadata?.char_span;
