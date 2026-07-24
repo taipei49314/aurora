@@ -152,9 +152,14 @@ MSVC/greenlet can still run demo + non-SQL tests.
 Dashboard hypothesis name links to `/hypotheses?id=`; Explorer opens that card,
 scrolls into view, and keeps expand/collapse in the shareable URL.
 
+## 31. Status chips → Explorer `?status=` filter — **done (v0.1.33)**
+
+Dashboard status count cards link to `/hypotheses?status=`; Explorer has All /
+per-status chips with shareable URL (composes with `?id=`).
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
 - `subject_raw` staging field for unresolved entity mentions
-- Status count chips on Dashboard → Hypothesis Explorer `?status=` filter
+- Hypothesis table Status badge also deep-links with `?status=` + `?id=`
