@@ -122,8 +122,12 @@ iron-air-retro gains scorecard.json; check_all runs mini + retro scorecards.
 Coverage bars for document_id link, char_span, documents-with-text; stats
 ratios for ratios and missing spans on document_id observations.
 
+## 25. Data Explorer missing-on-doc filter — **done (v0.1.28)**
+
+Chip + API ?missing_char_span=true for observations with document_id but no
+char_span; also ?has_document_id=.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: Data Explorer filter preset for missing char_span on document_id
