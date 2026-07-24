@@ -182,15 +182,23 @@ export function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {hyps.data.map((h) => (
+          {hyps.data.map((h) => {
+            const explorerHref = `/hypotheses?status=${encodeURIComponent(h.status)}&id=${encodeURIComponent(h.hypothesis_id)}`;
+            return (
             <tr key={h.hypothesis_id} style={{ borderBottom: "1px solid #eaeef2" }}>
               <td style={{ padding: 6 }}>
-                <Badge status={h.status} />
+                <Link
+                  to={explorerHref}
+                  title={`Open ${h.status} · this hypothesis in Explorer`}
+                  style={{ textDecoration: "none", display: "inline-block" }}
+                >
+                  <Badge status={h.status} />
+                </Link>
               </td>
               <td>
                 <Link
-                  to={`/hypotheses?id=${encodeURIComponent(h.hypothesis_id)}`}
-                  title="Open in Hypothesis Explorer"
+                  to={explorerHref}
+                  title="Open in Hypothesis Explorer (status filter + id)"
                   style={{ color: "#0969da", textDecoration: "none", fontWeight: 600 }}
                 >
                   {h.human_name ?? h.generated_name}
@@ -207,7 +215,8 @@ export function Dashboard() {
                 {(h.existing_industry_similarity?.similarity ?? 0).toFixed(2)}
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>

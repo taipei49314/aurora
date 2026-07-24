@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.34] — 2026-07-24
+
+### Added
+
+- Dashboard hypothesis table **Status badge** and **name** deep-link with combined
+  `/hypotheses?status=<STATUS>&id=<hypothesis_id>` so Explorer opens the row
+  already filtered to its classification class
+
+### Changed
+
+- Engine / feature → **0.1.34**
+- README engine badge version aligned
+
 ## [0.1.33] — 2026-07-24
 
 ### Added

@@ -157,9 +157,14 @@ scrolls into view, and keeps expand/collapse in the shareable URL.
 Dashboard status count cards link to `/hypotheses?status=`; Explorer has All /
 per-status chips with shareable URL (composes with `?id=`).
 
+## 32. Table Status badge dual deep-link — **done (v0.1.34)**
+
+Dashboard table Status badge and name open Explorer with
+`?status=<STATUS>&id=<hypothesis_id>` (filtered list + open card).
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
 - `subject_raw` staging field for unresolved entity mentions
-- Hypothesis table Status badge also deep-links with `?status=` + `?id=`
+- DiscoveryMap / Timeline hypothesis picker → shareable `?id=` URL
