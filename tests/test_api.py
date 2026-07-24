@@ -267,6 +267,61 @@ def test_stats_provenance_quality_fields(client):
     assert body["documents_with_text"] >= 0
 
 
+def test_observations_missing_char_span_filter(client):
+    """0.1.28+: missing_char_span = has document_id but no span."""
+    pkg = {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "GapCo"}],
+        "sources": [{
+            "ref": "s1",
+            "source_type": "PATENT",
+            "publisher": "USPTO",
+            "title": "T",
+            "excerpt": "known abstract text for alignment",
+            "published_at": "2022-01-01",
+        }],
+        "documents": [{
+            "document_id": "s1",
+            "source_ref": "s1",
+            "text": "known abstract text for alignment",
+        }],
+        "observations": [
+            {
+                "source_ref": "s1",
+                "observation_type": "PATENT_ACTIVITY",
+                "subject": "GapCo",
+                "observed_at": "2021-01-01",
+                "text_excerpt": "known abstract text for alignment",
+                "document_id": "s1",
+                # auto-aligns
+            },
+            {
+                "source_ref": "s1",
+                "observation_type": "TECHNICAL_DEPENDENCY",
+                "subject": "GapCo",
+                "object": "GapCo",
+                "observed_at": "2021-01-01",
+                "text_excerpt": "qqq missing from body entirely zzz",
+                "document_id": "s1",
+            },
+        ],
+    }
+    up = client.post(
+        "/api/imports",
+        files={"file": ("p.json", json.dumps(pkg).encode("utf-8"), "application/json")},
+    )
+    assert up.status_code == 200
+    missing = client.get("/api/observations?missing_char_span=true&limit=50").json()
+    assert missing
+    for o in missing:
+        assert (o.get("document_id") or (o.get("metadata") or {}).get("document_id"))
+        assert not (o.get("char_span") or (o.get("metadata") or {}).get("char_span"))
+    with_doc = client.get("/api/observations?has_document_id=true&limit=50").json()
+    assert len(with_doc) >= 2
+    no_doc = client.get("/api/observations?has_document_id=false&limit=50").json()
+    for o in no_doc:
+        assert not (o.get("document_id") or (o.get("metadata") or {}).get("document_id") or "").strip()
+
+
 def test_observations_has_char_span_and_auto_filters(client):
     """0.1.21+: filter observations by span presence / auto-align flag."""
     # Seed a package with one auto span and one without

@@ -392,6 +392,18 @@ def _obs_char_span_auto(row: dict) -> bool:
     return bool((row.get("metadata") or {}).get("char_span_auto"))
 
 
+def _obs_has_document_id(row: dict) -> bool:
+    return bool(
+        (row.get("document_id") or (row.get("metadata") or {}).get("document_id") or "")
+        .strip()
+    )
+
+
+def _obs_missing_char_span(row: dict) -> bool:
+    """Has document_id but no char_span (provenance gap; engine 0.1.28+)."""
+    return _obs_has_document_id(row) and not _obs_has_char_span(row)
+
+
 @app.get("/api/observations")
 def observations(
     limit: int = 500,
@@ -399,6 +411,8 @@ def observations(
     document_id: Optional[str] = None,
     has_char_span: Optional[bool] = None,
     char_span_auto: Optional[bool] = None,
+    has_document_id: Optional[bool] = None,
+    missing_char_span: Optional[bool] = None,
     q: Optional[str] = None,
 ):
     """List observations.
@@ -408,6 +422,8 @@ def observations(
     - ``document_id``: exact match
     - ``has_char_span``: true/false — rows with / without a span (0.1.21+)
     - ``char_span_auto``: true/false — auto-aligned spans only / exclude them
+    - ``has_document_id``: true/false — rows with / without document_id (0.1.28+)
+    - ``missing_char_span``: true — document_id present but no char_span (0.1.28+)
     - ``q``: case-insensitive substring over the serialized row
     """
     rows = [to_dict(o) for o in REPO.snapshot.observations]
@@ -420,10 +436,14 @@ def observations(
             r for r in rows
             if str(r.get("document_id") or (r.get("metadata") or {}).get("document_id") or "").strip() == did
         ]
+    if has_document_id is not None:
+        rows = [r for r in rows if _obs_has_document_id(r) is has_document_id]
     if has_char_span is not None:
         rows = [r for r in rows if _obs_has_char_span(r) is has_char_span]
     if char_span_auto is not None:
         rows = [r for r in rows if _obs_char_span_auto(r) is char_span_auto]
+    if missing_char_span is not None:
+        rows = [r for r in rows if _obs_missing_char_span(r) is missing_char_span]
     if q:
         needle = q.strip().lower()
         if needle:

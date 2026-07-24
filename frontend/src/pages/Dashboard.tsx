@@ -258,7 +258,8 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
       <p style={{ margin: "10px 0 0", fontSize: 11, color: "#57606a" }}>
         Improve span coverage with adapter <code>ensure_documents</code> and progressive
         char_span align; lint with <code>--require-char-spans</code> /{" "}
-        <code>--min-char-span-ratio</code>.
+        <code>--min-char-span-ratio</code>. In Data Explorer, filter observations with{" "}
+        <b>missing on doc</b> (<code>?missing_char_span=true</code>).
       </p>
     </div>
   );

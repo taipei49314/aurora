@@ -97,6 +97,8 @@ export const getObservations = (opts?: {
   document_id?: string;
   has_char_span?: boolean;
   char_span_auto?: boolean;
+  has_document_id?: boolean;
+  missing_char_span?: boolean;
   q?: string;
 }) => {
   const params = new URLSearchParams({ limit: "800" });
@@ -106,6 +108,10 @@ export const getObservations = (opts?: {
   if (opts?.has_char_span === false) params.set("has_char_span", "false");
   if (opts?.char_span_auto === true) params.set("char_span_auto", "true");
   if (opts?.char_span_auto === false) params.set("char_span_auto", "false");
+  if (opts?.has_document_id === true) params.set("has_document_id", "true");
+  if (opts?.has_document_id === false) params.set("has_document_id", "false");
+  if (opts?.missing_char_span === true) params.set("missing_char_span", "true");
+  if (opts?.missing_char_span === false) params.set("missing_char_span", "false");
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/observations?${params.toString()}`);
 };
