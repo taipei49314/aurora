@@ -86,3 +86,17 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.38; includes `tests/test_subject_raw.py`).
 - **Commit:** `0f05a58`
 - **Next suggestion:** provisional entities for unresolved mentions (explicit type policy); human: PatentsView real dump / Actions PAT.
+
+## 2026-07-24 cycle-9 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (import ER behavior + entity type + tests).
+- **Planned:** Opt-in provisional entities for unresolved mentions (explicit type policy).
+- **Shipped (v0.1.39):**
+  - Entity type `PROVISIONAL` (not in CLUSTERABLE_TYPES)
+  - Package/row `stage_unresolved` (+ alias); `provisional_entity_type`; row `subject_entity_type` / `object_entity_type`
+  - `EntityResolver.register` / `name_is_ambiguous`; refuse staging ambiguous names and pure ext-id misses
+  - Snapshot `provisional_entities` count; API stats; schema + import-schema
+  - Tests: `tests/test_provisional_entities.py`
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.39).
+- **Commit:** `6b13189`
+- **Next suggestion:** lint `--no-provisional` / promote provisional in resolve CLI; human: PatentsView dump / Actions PAT.
