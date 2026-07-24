@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.40] — 2026-07-24
+
+### Added
+
+- `lint_package --no-provisional` / `--forbid-provisional` — fail when staged
+  provisional entities remain after import; soft stats always report counts
+- Lint passes through `stage_unresolved` flags so staged packages are visible
+- `resolve_entities --list-provisional` and `--promote NAME --to-type TYPE [-o]`
+  to graduate provisional mentions into real entity rows (`--clear-stage-flag`)
+- Tests: `tests/test_lint_provisional.py`
+
+### Changed
+
+- Engine / feature → **0.1.40**
+- README engine badge version aligned
+
 ## [0.1.39] — 2026-07-24
 
 ### Added

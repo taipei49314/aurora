@@ -118,6 +118,21 @@ Resolution order: unique external id → compact ext ref → name/alias → exte
 
 **Provisional policy:** only *unknown* display names are staged. Ambiguous names and pure external-id misses still error. Staged entities get `metadata.provisional=true` and observation `metadata.subject_provisional` / `object_provisional`.
 
+**Lint / promote (0.1.40+):**
+
+```bash
+# soft stats always include provisional_entities
+PYTHONPATH=backend python scripts/lint_package.py pkg.json --json
+
+# hard fail if any provisional remain
+PYTHONPATH=backend python scripts/lint_package.py pkg.json --no-provisional
+
+# list + graduate
+PYTHONPATH=backend python scripts/resolve_entities.py pkg.json --list-provisional
+PYTHONPATH=backend python scripts/resolve_entities.py pkg.json \
+  --promote "Mystery Corp" --to-type COMPANY --clear-stage-flag -o promoted.json
+```
+
 ---
 
 ## 4. Source row

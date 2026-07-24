@@ -66,7 +66,21 @@ def main(argv=None) -> int:
             "(0..1; post-import, includes auto-align; 0.1.26+)"
         ),
     )
+    ap.add_argument(
+        "--no-provisional",
+        action="store_true",
+        help=(
+            "Fail if any provisional entity remains after import "
+            "(type PROVISIONAL or metadata.provisional; engine 0.1.40+)"
+        ),
+    )
+    ap.add_argument(
+        "--forbid-provisional",
+        action="store_true",
+        help="Alias for --no-provisional",
+    )
     args = ap.parse_args(argv)
+    forbid_provisional = args.no_provisional or args.forbid_provisional
     require_license = args.require_license or args.public_corpus
     if args.min_char_span_ratio is not None:
         if not (0.0 <= args.min_char_span_ratio <= 1.0):
@@ -98,6 +112,8 @@ def main(argv=None) -> int:
         "char_span_ratio": 0.0,
         "orphan_document_ids": [],
         "orphan_document_id_count": 0,
+        "provisional_entities": 0,
+        "provisional_entity_names": [],
     }
 
     for key in ("entities", "sources", "observations"):
@@ -171,6 +187,7 @@ def main(argv=None) -> int:
     report["orphan_document_id_count"] = len(orphan_ids)
 
     # Preserve package-level license default for import; include documents[]
+    # and provisional staging flags (0.1.39+) so lint sees staged entities.
     pkg = {
         "entities": raw.get("entities") or [],
         "sources": raw.get("sources") or [],
@@ -184,6 +201,16 @@ def main(argv=None) -> int:
         pkg["package"] = {"license": raw["package"]["license"]}
     elif isinstance(raw.get("meta"), dict) and raw["meta"].get("license"):
         pkg["meta"] = {"license": raw["meta"]["license"]}
+    for flag in ("stage_unresolved", "stage_unresolved_subjects", "provisional_entity_type"):
+        if flag in raw:
+            pkg[flag] = raw[flag]
+    if isinstance(raw.get("package"), dict):
+        pkg_pkg = dict(pkg.get("package") or {})
+        for flag in ("stage_unresolved", "provisional_entity_type", "license"):
+            if flag in raw["package"] and flag not in pkg_pkg:
+                pkg_pkg[flag] = raw["package"][flag]
+        if pkg_pkg:
+            pkg["package"] = pkg_pkg
 
     snap = import_package(pkg)
     report["import_errors"] = len(snap.import_errors or [])
@@ -237,6 +264,18 @@ def main(argv=None) -> int:
     report["license_counts"] = dict(license_counter)
     report["sources_missing_license"] = missing_license
 
+    # Provisional entities (soft stats always; hard with --no-provisional, 0.1.40+)
+    provisional = [
+        e
+        for e in snap.entities
+        if e.entity_type == "PROVISIONAL" or (e.metadata or {}).get("provisional")
+    ]
+    report["provisional_entities"] = len(provisional)
+    report["provisional_entity_names"] = sorted(
+        {e.canonical_name for e in provisional if e.canonical_name}
+    )
+    report["entities_provisional"] = len(provisional)
+
     if require_license and missing_license:
         report["ok"] = False
         report["issues"].append(
@@ -268,6 +307,19 @@ def main(argv=None) -> int:
                 f"{args.min_char_span_ratio} "
                 f"({n_spans}/{n_obs} observations)"
             )
+    if forbid_provisional and provisional:
+        report["ok"] = False
+        sample = ", ".join(report["provisional_entity_names"][:8])
+        more = (
+            f" (+{len(report['provisional_entity_names']) - 8} more)"
+            if len(report["provisional_entity_names"]) > 8
+            else ""
+        )
+        report["issues"].append(
+            f"{len(provisional)} provisional entit(y/ies) present: {sample}{more} "
+            f"(promote via resolve_entities --promote or remove stage_unresolved; "
+            f"--no-provisional policy)"
+        )
     if args.strict and report["import_errors"]:
         report["ok"] = False
         report["issues"].append(f"{report['import_errors']} import_errors")
@@ -284,6 +336,14 @@ def main(argv=None) -> int:
         print(
             f"  entities_with_external_ids: {report['entities_with_external_ids']}/"
             f"{report['counts'].get('entities', 0)}"
+        )
+        print(
+            f"  provisional_entities: {report['provisional_entities']}"
+            + (
+                f"  names={report['provisional_entity_names'][:5]}"
+                if report["provisional_entities"]
+                else ""
+            )
         )
         print(
             f"  sources_with_license: {report['sources_with_license']}/"
