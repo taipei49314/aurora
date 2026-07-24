@@ -28,6 +28,8 @@ ENTITY_TYPES = [
     "APPLICATION", "MARKET",
     # Optional people (inventors, authors, founders) — not clusterable as industries
     "PERSON",
+    # Staged unresolved mentions (engine 0.1.39+); not industry-clusterable
+    "PROVISIONAL",
 ]
 
 OBSERVATION_TYPES = [

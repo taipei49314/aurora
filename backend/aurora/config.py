@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 
-ENGINE_VERSION = "0.1.38"
-FEATURE_VERSION = "0.1.38"
+ENGINE_VERSION = "0.1.39"
+FEATURE_VERSION = "0.1.39"
 TAXONOMY_VERSION = "2024.1"
 
 

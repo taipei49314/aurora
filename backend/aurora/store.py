@@ -67,12 +67,19 @@ def make_snapshot(
             )
         )
     sid = content_hash(*hash_parts)
+    provisional_n = sum(
+        1
+        for e in entities
+        if getattr(e, "entity_type", None) == "PROVISIONAL"
+        or (getattr(e, "metadata", None) or {}).get("provisional")
+    )
     counts = {
         "entities": len(entities),
         "sources": len(sources),
         "observations": len(observations),
         "documents": len(documents),
         "import_errors": len(import_errors),
+        "provisional_entities": provisional_n,
     }
     return Snapshot(
         snapshot_id=f"snap_{sid}", created_at=created_at, entities=entities, sources=sources,

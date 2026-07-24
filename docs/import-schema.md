@@ -103,8 +103,20 @@ but do not always hard-fail the whole package.
 Optional fields on the observation row:
 
 - `subject_external_ids` / `object_external_ids` — disambiguate when the name is shared by two entities
+- `subject_raw` / `object_raw` — surface-form provenance (0.1.38+)
+- `stage_unresolved` — row-level opt-in to create a **provisional** entity when the name is unknown (0.1.39+)
+- `subject_entity_type` / `object_entity_type` — type for staged provisional (default package `provisional_entity_type` or `PROVISIONAL`)
+
+Package flags (0.1.39+):
+
+| Field | Meaning |
+|-------|---------|
+| `stage_unresolved` / `stage_unresolved_subjects` | Opt-in for all rows |
+| `provisional_entity_type` | Default type for staged entities (`PROVISIONAL` recommended; **not** industry-clusterable) |
 
 Resolution order: unique external id → compact ext ref → name/alias → external disambiguation of ambiguous names.
+
+**Provisional policy:** only *unknown* display names are staged. Ambiguous names and pure external-id misses still error. Staged entities get `metadata.provisional=true` and observation `metadata.subject_provisional` / `object_provisional`.
 
 ---
 
@@ -400,7 +412,7 @@ Do **not** assume these exist as first-class fields:
 |-----|------------------|------------------------|
 | External IDs | **done** first-class `external_ids[]` (+ metadata fallback) | use in ER join rules |
 | Full document + span | **done** `documents[]` + first-class `document_id` / `char_span` | text may still be empty (path-only) |
-| Unresolved mentions | **done** first-class `subject_raw` / `object_raw` (surface form + subject_raw-only resolve); still must resolve to an entity | optional future: provisional entities |
+| Unresolved mentions | **done** `subject_raw` / `object_raw` + opt-in **provisional entities** (`stage_unresolved`, type `PROVISIONAL`, not clusterable) | promote provisional → real types offline |
 | Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
 | Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |
 | Outlet auto-independence | **done** first-class `outlet_domain` + `wire_id` | derive independence_group |

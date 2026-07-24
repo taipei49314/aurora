@@ -6,6 +6,25 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.39] — 2026-07-24
+
+### Added
+
+- Opt-in **provisional entities** for unresolved observation mentions
+  (`stage_unresolved` / `stage_unresolved_subjects` package or row flag)
+- New entity type **`PROVISIONAL`** (not industry-clusterable; like PERSON)
+- Per-row `subject_entity_type` / `object_entity_type`; package
+  `provisional_entity_type` default
+- Ambiguous names and pure external-id failures are **not** staged
+- Snapshot count `provisional_entities`; API stats `entities_provisional`,
+  `observations_subject_provisional`
+- Tests: `tests/test_provisional_entities.py`
+
+### Changed
+
+- Engine / feature → **0.1.39**
+- README engine badge version aligned
+
 ## [0.1.38] — 2026-07-24
 
 ### Added

@@ -182,9 +182,14 @@ links; entity_id searches Data Explorer entities tab.
 First-class surface-form fields on Observation; import derive + subject_raw-only
 resolve; export/stats/Data Explorer; unresolved still requires a resolvable entity.
 
+## 37. Provisional entities for unresolved mentions — **done (v0.1.39)**
+
+Opt-in `stage_unresolved` creates `PROVISIONAL` (non-clusterable) entities from
+unknown names; ambiguous / pure-ext failures still error; stats + tests.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: provisional entities for still-unresolved mentions (type policy)
-- self-audit honesty: keep Windows engine-only gate + Docker PARTIAL accurate
+- Optional: lint rule `--no-provisional` / promote provisional entities in resolve CLI
+- Keep Docker PARTIAL honest until compose is verified on a Docker host

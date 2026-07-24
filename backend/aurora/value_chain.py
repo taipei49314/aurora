@@ -25,8 +25,9 @@ _TYPE_TO_ROLE = {
     "MARKET": "END_CUSTOMER",
     "STANDARD_BODY": "STANDARD_OR_REGULATION",
     "GOVERNMENT": "STANDARD_OR_REGULATION",
-    # PERSON is not an industry value-chain role; if present, keep low-profile
+    # PERSON / PROVISIONAL are not industry value-chain roles; keep low-profile
     "PERSON": "INTEGRATION",
+    "PROVISIONAL": "INTEGRATION",
     "RESEARCH_INSTITUTE": "INTEGRATION",
     "UNIVERSITY": "INTEGRATION",
 }
