@@ -6,7 +6,16 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
 
 - **Planned:** Unblock Windows CI/local gate without MSVC (greenlet/SQLAlchemy install fails); align package version with ENGINE_VERSION.
 - **Shipped:** `requirements-engine-test.txt`, `scripts/check_engine.py`, `--engine-only` on `check_all.py`, Makefile targets, version **0.1.32**, README install path.
-- **Tests:** `python scripts/check_engine.py` → **ALL OK** (demo, version-sync, engine pytest, validate-example, adapters-doctor).
-- **Next suggestion:** Document Windows API/SQLAlchemy PARTIAL in self-audit; PatentsView real-dump smoke when license-clear sample available; keep 30m loop on small provenance/docs items.
+- **Tests:** `python scripts/check_engine.py` — ALL OK (demo, version-sync, pytest-engine ignoring API/persistence, validate-example, adapters doctor).
+- **Next suggestion:** Hypothesis table → Explorer deep-link (provenance UX continuity).
 
+## 2026-07-24 cycle-2
 
+- **Planned:** Dashboard hypothesis table row → Hypothesis Explorer deep-link (GOOD_FIRST_ISSUES suggested next).
+- **Shipped (v0.1.32, combined with engine-only gate):**
+  - Dashboard name column links to `/hypotheses?id=<hypothesis_id>`
+  - Hypothesis Explorer reads `id` / `hypothesis_id` / `h`, highlights open card, scroll-into-view, URL stays shareable on expand/collapse
+  - Docs: CHANGELOG, GOOD_FIRST_ISSUES #30, evolution-loop
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.32; pytest engine suite green).
+- **Commit:** `2b72540` (code + docs already on master; this note documents cycle-2 UX slice inside that ship).
+- **Next suggestion:** Status count chips → Hypothesis Explorer `?status=` filter; or `subject_raw` staging; human: PatentsView real dump / Actions PAT.
