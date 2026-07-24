@@ -30,3 +30,11 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.33).
 - **Commit:** `94cf45c`
 - **Next suggestion:** Table Status badge dual deep-link; or `subject_raw` staging; human: PatentsView dump / Actions PAT.
+
+## 2026-07-24 cycle-4
+
+- **Planned:** Dashboard table Status badge dual deep-link (`?status=` + `?id=`).
+- **Shipped (v0.1.34):** Status badge and name open `/hypotheses?status=&id=`; docs GOOD_FIRST_ISSUES #32, evolution-loop, CHANGELOG, badge.
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.34).
+- **Commit:** (this cycle)
+- **Next suggestion:** DiscoveryMap/Timeline shareable `?id=`; or `subject_raw` staging; human: PatentsView dump / Actions PAT.
