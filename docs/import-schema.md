@@ -215,13 +215,15 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 |-------|------|-------------|
 | `source_ref` | string | Must match a source `ref` (or, after export, a `source_id`) |
 | `observation_type` | string enum | See §6; **semantic label, not raw API field** |
-| `subject` | string | Name resolving to exactly one entity (canonical or alias) |
+| `subject` **or** `subject_raw` | string / object | At least one required (0.1.38+). `subject` is the resolvable ref (name, ext, or structured); `subject_raw` alone is used as the mention string for resolution when `subject` is omitted |
 
 ### Optional
 
 | Field | Type | Default | Engine use |
 |-------|------|---------|------------|
 | `object` | string \| null | null | Other entity name for relational edges |
+| `subject_raw` | string | derived | **First-class** (engine 0.1.38+); surface-form mention as written in the source (alias, trade print, compact ext ref). Explicit top-level / metadata wins; otherwise derived from `subject`. Stored on `Observation.subject_raw`; export round-trips it. Does **not** invent entities — unresolved names still error |
+| `object_raw` | string | derived | **First-class** (engine 0.1.38+); same staging rules for the object mention |
 | `observed_at` | string \| null | null | Temporal signals, leakage, fade |
 | `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event. Metadata fallback; inherits `Source.event_id` when empty |
 | `geo` | object | `{}` | **First-class** (engine 0.1.13+); location/jurisdiction. Inherits `Source.geo` when empty. Accepts `location` / `country` / `jurisdiction` aliases |
@@ -275,8 +277,9 @@ adapter `ensure_documents` or an explicit `documents[]` array.
 
 ### Resolution rules
 
-- `subject` / `object` are resolved by **normalized name / alias**.
-- Unknown name → row error, observation dropped.
+- `subject` / `object` are resolved by **normalized name / alias** (and external ids; see §3).
+- Unknown name → row error, observation dropped; error `value` carries `subject_raw` when known (0.1.38+).
+- `subject_raw` / `object_raw` are **provenance only** after a successful resolve — they do not change content-addressed observation ids.
 - Ambiguous name (maps to >1 entity) → error, not a silent pick.
 
 ### Real-data conventions (metadata)
@@ -397,7 +400,7 @@ Do **not** assume these exist as first-class fields:
 |-----|------------------|------------------------|
 | External IDs | **done** first-class `external_ids[]` (+ metadata fallback) | use in ER join rules |
 | Full document + span | **done** `documents[]` + first-class `document_id` / `char_span` | text may still be empty (path-only) |
-| Unresolved mentions | must pre-resolve names | staging / `subject_raw` |
+| Unresolved mentions | **done** first-class `subject_raw` / `object_raw` (surface form + subject_raw-only resolve); still must resolve to an entity | optional future: provisional entities |
 | Patent family | **done** first-class `family_id` (+ metadata fallback) | use in independence / export |
 | Dual dates (app vs grant) | **done** first-class `event_date` + `published_at` | observe_at fallback uses event_date |
 | Outlet auto-independence | **done** first-class `outlet_domain` + `wire_id` | derive independence_group |

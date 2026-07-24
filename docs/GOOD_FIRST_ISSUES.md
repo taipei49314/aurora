@@ -177,9 +177,14 @@ Timeline link back to Explorer (and each other) with the same `?id=`.
 Cluster names open Explorer with `?status=` + `?id=`; map/timeline secondary
 links; entity_id searches Data Explorer entities tab.
 
+## 36. subject_raw / object_raw mention staging — **done (v0.1.38)**
+
+First-class surface-form fields on Observation; import derive + subject_raw-only
+resolve; export/stats/Data Explorer; unresolved still requires a resolvable entity.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- `subject_raw` staging field for unresolved entity mentions
-- self-audit: document Windows engine-only gate / Docker still PARTIAL
+- Optional: provisional entities for still-unresolved mentions (type policy)
+- self-audit honesty: keep Windows engine-only gate + Docker PARTIAL accurate

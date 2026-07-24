@@ -57,6 +57,11 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
 | 39 | Phase 0 specification-audit docs (§33) | **PARTIAL** | `docs/` | architecture, requirements-matrix, scoring/hype/clustering/leakage models, **import-schema**, offline **adapters** (uspto/jobs/news/merge) + `cases/iron-air-mini`, 2 ADRs; several named model docs still summarized in `architecture.md` |
 
 ## Known limitations / honest gaps
+- **Windows without MSVC:** full `pip install sqlalchemy` may fail on greenlet
+  wheels. Use `backend/requirements-engine-test.txt` + `python scripts/check_engine.py`
+  (or `make check-engine`) for the engine-only gate — demo, version-sync, non-SQL
+  pytest, validate-example, adapters doctor. API/persistence tests still need a
+  full env with SQLAlchemy.
 - **Source dedup near-dup** now uses **MinHash-LSH** (`dedup.py`), so it stays
   near-linear at 3120 sources (import+dedup+ER ≈ 1.0 s). The entity pairwise
   cosine remains O(entities²) = 199² (~1.6 s incl. 8× stability bootstrap);

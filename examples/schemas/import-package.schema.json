@@ -147,14 +147,29 @@
     },
     "observation": {
       "type": "object",
-      "required": ["source_ref", "observation_type", "subject"],
+      "required": ["source_ref", "observation_type"],
       "additionalProperties": true,
+      "description": "Requires subject and/or subject_raw (engine enforces at least one; 0.1.38+)",
       "properties": {
         "source_ref": { "type": "string", "minLength": 1 },
         "observation_type": { "$ref": "#/$defs/observationType" },
-        "subject": { "type": "string", "minLength": 1 },
+        "subject": {
+          "description": "Entity name, ext ref, or structured {name, external_ids}; optional if subject_raw set (0.1.38+)",
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "object", "additionalProperties": true }
+          ]
+        },
         "object": {
-          "type": ["string", "null"]
+          "type": ["string", "object", "null"]
+        },
+        "subject_raw": {
+          "type": "string",
+          "description": "Surface-form mention as written in source; staging / provenance (0.1.38+). May stand in for subject when subject is omitted."
+        },
+        "object_raw": {
+          "type": "string",
+          "description": "Surface-form object mention; staging / provenance (0.1.38+)"
         },
         "observed_at": {
           "type": ["string", "null"]

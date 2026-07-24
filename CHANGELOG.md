@@ -6,6 +6,24 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.38] — 2026-07-24
+
+### Added
+
+- First-class **`subject_raw` / `object_raw`** on `Observation` — surface-form
+  mention staging / provenance (alias, trade print, compact ext ref)
+- Import: derive raw from `subject`/`object` when not explicit; metadata fallback;
+  **`subject_raw` alone** accepted when `subject` is omitted (must still resolve)
+- Unresolved subject errors include `subject_raw` in message/`value`
+- API stats: `observations_with_subject_raw`, `observations_subject_raw_differs`
+- Export round-trips raw mention fields; Data Explorer column + detail
+- JSON Schema + `docs/import-schema.md`; tests in `tests/test_subject_raw.py`
+
+### Changed
+
+- Engine / feature → **0.1.38**
+- README engine badge version aligned
+
 ## [0.1.37] — 2026-07-24
 
 ### Added

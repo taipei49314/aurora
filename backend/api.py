@@ -129,8 +129,11 @@ def stats():
     obs_with_char_span = 0
     obs_with_char_span_auto = 0
     obs_missing_char_span = 0  # has document_id but no span (0.1.27+)
+    obs_with_subject_raw = 0
+    obs_subject_raw_differs = 0  # surface form ≠ resolved canonical (0.1.38+)
     unique_event_ids: set = set()
     country_counts: dict = {}
+    name_by_id = {e.entity_id: e.canonical_name for e in s.entities}
     for o in s.observations:
         type_counts[o.observation_type] = type_counts.get(o.observation_type, 0) + 1
         eid = getattr(o, "event_id", None) or (o.metadata or {}).get("event_id")
@@ -157,6 +160,12 @@ def stats():
             obs_with_char_span += 1
             if (o.metadata or {}).get("char_span_auto"):
                 obs_with_char_span_auto += 1
+        sraw = (getattr(o, "subject_raw", None) or (o.metadata or {}).get("subject_raw") or "").strip()
+        if sraw:
+            obs_with_subject_raw += 1
+            canon = (name_by_id.get(o.subject_entity) or "").strip()
+            if canon and sraw.casefold() != canon.casefold():
+                obs_subject_raw_differs += 1
     n_obs = len(s.observations)
     snap_docs = getattr(s, "documents", None) or []
     docs_with_text = sum(
@@ -200,6 +209,8 @@ def stats():
         "observations_with_char_span": obs_with_char_span,
         "observations_with_char_span_auto": obs_with_char_span_auto,
         "observations_missing_char_span": obs_missing_char_span,
+        "observations_with_subject_raw": obs_with_subject_raw,
+        "observations_subject_raw_differs": obs_subject_raw_differs,
         "char_span_ratio": (obs_with_char_span / n_obs) if n_obs else 0.0,
         "document_link_ratio": (obs_with_document_id / n_obs) if n_obs else 0.0,
         "documents_total": len(snap_docs),
@@ -559,10 +570,18 @@ def export_package():
             char_span = meta.pop("char_span", None)
         else:
             meta.pop("char_span", None)
+        subject_raw = getattr(o, "subject_raw", "") or meta.pop("subject_raw", "") or ""
+        if subject_raw:
+            meta.pop("subject_raw", None)
+        object_raw = getattr(o, "object_raw", "") or meta.pop("object_raw", "") or ""
+        if object_raw:
+            meta.pop("object_raw", None)
         observations.append({
             "source_ref": o.source_id, "observation_type": o.observation_type,
             "subject": name_by_id.get(o.subject_entity, o.subject_entity),
             "object": name_by_id.get(o.object_entity, "") if o.object_entity else "",
+            "subject_raw": subject_raw,
+            "object_raw": object_raw,
             "observed_at": o.observed_at, "numeric_value": o.numeric_value,
             "unit": o.unit, "text_excerpt": o.text_excerpt,
             "confidence": o.confidence, "event_id": event_id, "geo": geo,

@@ -104,6 +104,9 @@ function cellValue(tab: Tab, col: string, row: any): ReactNode {
   if (col === "event_id") {
     return String(row.event_id || row.metadata?.event_id || "—");
   }
+  if (col === "subject_raw" || col === "object_raw") {
+    return String(row[col] || row.metadata?.[col] || "—");
+  }
   if (col === "outlet_domain") {
     return String(row.outlet_domain || row.metadata?.outlet_domain || "—");
   }
@@ -353,7 +356,7 @@ export function DataExplorer() {
     tab === "entities"
       ? ["entity_type", "canonical_name", "country", "external_ids", "entity_id"]
       : tab === "observations"
-        ? ["observation_type", "subject_entity", "observed_at", "document_id", "char_span", "geo", "event_id", "confidence", "observation_id"]
+        ? ["observation_type", "subject_entity", "subject_raw", "observed_at", "document_id", "char_span", "geo", "event_id", "confidence", "observation_id"]
         : tab === "sources"
           ? ["source_type", "publisher", "reliability_tier", "license", "outlet_domain", "wire_id", "geo", "event_date", "published_at", "event_id", "family_id", "independence_group", "source_id"]
           : ["document_id", "title", "stub", "observation_count", "license", "source_id", "text"];
@@ -1248,6 +1251,20 @@ function ObservationDetail({ obs }: { obs: any }) {
         {obs.subject_entity ? ` · subject ${String(obs.subject_entity).slice(0, 16)}…` : ""}
       </div>
       <div style={{ color: "#57606a", marginBottom: 8, fontSize: 11 }}>{obs.observation_id}</div>
+      {(obs.subject_raw || obs.object_raw) && (
+        <div style={{ marginBottom: 6, fontSize: 12 }}>
+          <b>subject_raw</b> {obs.subject_raw || "—"}
+          {obs.object_raw ? (
+            <>
+              {" "}
+              · <b>object_raw</b> {obs.object_raw}
+            </>
+          ) : null}
+          <span style={{ color: "#57606a", marginLeft: 6 }} title="Surface form as written (0.1.38+)">
+            (mention staging)
+          </span>
+        </div>
+      )}
       <div style={{ marginBottom: 6 }}>
         <b>observed_at</b> {obs.observed_at || "—"} · <b>event_id</b> {obs.event_id || "—"}
       </div>

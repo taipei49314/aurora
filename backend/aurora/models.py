@@ -128,6 +128,10 @@ class Observation:
     # Provenance into a full document (engine 0.1.15+)
     document_id: str = ""
     char_span: Optional[list] = None  # [start, end] character offsets into document text
+    # Surface-form mention staging (engine 0.1.38+): raw string as written in source
+    # even when subject_entity resolved via alias / external id
+    subject_raw: str = ""
+    object_raw: str = ""
     metadata: dict = field(default_factory=dict)
 
 
