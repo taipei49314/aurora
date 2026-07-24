@@ -100,3 +100,16 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.39).
 - **Commit:** `6b13189`
 - **Next suggestion:** lint `--no-provisional` / promote provisional in resolve CLI; human: PatentsView dump / Actions PAT.
+
+## 2026-07-24 cycle-10 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (lint rule + resolve CLI + tests).
+- **Planned:** lint `--no-provisional` + promote provisional in resolve CLI.
+- **Shipped (v0.1.40):**
+  - `lint_package --no-provisional` / `--forbid-provisional`; soft provisional stats always
+  - Lint preserves `stage_unresolved` flags on import
+  - `resolve_entities --list-provisional`, `--promote NAME --to-type`, `--clear-stage-flag`, `-o`
+  - Tests: `tests/test_lint_provisional.py`
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.40).
+- **Commit:** `d4a2256`
+- **Next suggestion:** wire `--no-provisional` into check_all for curated cases; human: PatentsView dump / Actions PAT.
