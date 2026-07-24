@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentRun } from "../useRun";
 import { getGraph } from "../api";
@@ -68,6 +68,22 @@ export function DiscoveryMap() {
       {id && (
         <span style={{ marginLeft: 10, fontSize: 11, color: "#8c959f" }}>
           <code>?id={id.slice(0, 12)}…</code>
+          {" · "}
+          <Link
+            to={`/hypotheses?id=${encodeURIComponent(id)}`}
+            style={{ color: "#0969da", fontWeight: 600, textDecoration: "none" }}
+            title="Open this hypothesis in Hypothesis Explorer"
+          >
+            Explorer ↗
+          </Link>
+          {" · "}
+          <Link
+            to={`/timeline?id=${encodeURIComponent(id)}`}
+            style={{ color: "#0969da", fontWeight: 600, textDecoration: "none" }}
+            title="Open Timeline for this hypothesis"
+          >
+            Timeline ↗
+          </Link>
         </span>
       )}
       <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>

@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.35)
+## Shipped (through 0.1.36)
 
 | Ver | Highlights |
 |-----|------------|
@@ -43,13 +43,14 @@
 | 0.1.33 | Dashboard status chips → Explorer `?status=` filter |
 | 0.1.34 | Table Status/name dual deep-link `?status=` + `?id=` |
 | 0.1.35 | DiscoveryMap / Timeline shareable `?id=` picker |
+| 0.1.36 | Explorer ↔ Map / Timeline cross-links with `?id=` |
 
 ## Next
 
 1. Real PatentsView dump (human data)
 2. Enable Actions with workflow-scoped PAT (human)
 3. Optional: `subject_raw` staging for unresolved mentions
-4. Optional: Explorer → Discovery Map / Timeline cross-links with same `?id=`
+4. Optional: Bottleneck Lab cluster → Explorer `?id=` deep-link
 
 ## Out of scope
 

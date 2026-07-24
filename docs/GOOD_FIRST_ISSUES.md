@@ -167,9 +167,14 @@ Dashboard table Status badge and name open Explorer with
 Hypothesis pickers on Discovery Map and Timeline write/read URL `?id=`
 (aliases `hypothesis_id`, `h`) so selections are bookmarkable.
 
+## 34. Explorer ↔ Map / Timeline cross-links — **done (v0.1.36)**
+
+Hypothesis Explorer detail links to Map/Timeline/Bottleneck Lab; Map and
+Timeline link back to Explorer (and each other) with the same `?id=`.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
 - `subject_raw` staging field for unresolved entity mentions
-- Cross-page links: Explorer → Discovery Map / Timeline with same `?id=`
+- Bottleneck Lab cluster name → Explorer `?id=` deep-link

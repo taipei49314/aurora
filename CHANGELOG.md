@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.36] — 2026-07-24
+
+### Added
+
+- Hypothesis Explorer detail: cross-links to **Discovery Map**, **Timeline**, and
+  **Bottleneck Lab** (map/timeline carry the same `?id=`)
+- Discovery Map ↔ Timeline ↔ Explorer reciprocal links with shared `?id=`
+
+### Changed
+
+- Engine / feature → **0.1.36**
+- README engine badge version aligned
+
 ## [0.1.35] — 2026-07-24
 
 ### Added

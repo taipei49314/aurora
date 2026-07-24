@@ -46,3 +46,11 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.35).
 - **Commit:** `2c90757`
 - **Next suggestion:** Explorer → Map/Timeline cross-links with same `?id=`; or `subject_raw`; human: PatentsView / Actions PAT.
+
+## 2026-07-24 cycle-6
+
+- **Planned:** Explorer → Discovery Map / Timeline cross-links with same `?id=`.
+- **Shipped (v0.1.36):** Explorer detail links to Map/Timeline/Bottleneck Lab; Map↔Timeline↔Explorer reciprocal links; docs #34.
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.36).
+- **Commit:** (this cycle)
+- **Next suggestion:** Bottleneck Lab cluster → Explorer `?id=`; or `subject_raw`; human: PatentsView / Actions PAT.

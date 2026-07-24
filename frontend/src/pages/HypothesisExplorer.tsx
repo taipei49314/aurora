@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCurrentRun } from "../useRun";
 import { STATUS_COLORS, Hypothesis } from "../api";
 
@@ -20,9 +20,15 @@ function Detail({ h }: { h: Hypothesis }) {
   const bns = h.score_explanation?.bottlenecks ?? [];
   const sc = h.score_explanation?.scoring ?? {};
   const dq = h.score_explanation?.data_quality ?? {};
+  const idQ = `id=${encodeURIComponent(h.hypothesis_id)}`;
   return (
     <div style={{ borderTop: "1px solid #d0d7de", marginTop: 8, paddingTop: 10, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
       <div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10, fontSize: 12 }}>
+          <CrossLink to={`/map?${idQ}`} label="Discovery Map" />
+          <CrossLink to={`/timeline?${idQ}`} label="Timeline" />
+          <CrossLink to={`/bottlenecks`} label="Bottleneck Lab" />
+        </div>
         <b style={{ fontSize: 12 }}>Score components</b>
         <ScoreBar label="novelty" value={h.novelty_score} />
         <ScoreBar label="cross-source coherence" value={h.coherence_score} />
@@ -259,6 +265,27 @@ export function HypothesisExplorer() {
         );
       })}
     </div>
+  );
+}
+
+function CrossLink({ to, label }: { to: string; label: string }) {
+  return (
+    <Link
+      to={to}
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        color: "#0969da",
+        textDecoration: "none",
+        fontWeight: 600,
+        border: "1px solid #d0d7de",
+        borderRadius: 12,
+        padding: "2px 8px",
+        background: "#ffffff",
+      }}
+      title={`Open ${label} for this hypothesis`}
+    >
+      {label} ↗
+    </Link>
   );
 }
 
