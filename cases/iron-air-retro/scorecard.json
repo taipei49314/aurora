@@ -14,7 +14,8 @@
     "min_documents": 12,
     "require_no_orphan_document_ids": true,
     "min_observations_with_char_span": 21,
-    "min_char_span_ratio": 1.0
+    "min_char_span_ratio": 1.0,
+    "require_no_provisional": true
   },
   "honesty": [
     "Package is hand-curated offline fiction aligned to import-schema conventions.",

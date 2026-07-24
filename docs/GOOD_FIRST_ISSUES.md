@@ -192,9 +192,14 @@ unknown names; ambiguous / pure-ext failures still error; stats + tests.
 `lint_package --no-provisional` hard policy; soft provisional stats; resolve CLI
 `--list-provisional` and `--promote NAME --to-type` package rewrite.
 
+## 39. Curated cases forbid provisional — **done (v0.1.41)**
+
+Scorecard `require_no_provisional` on all cases; check_all / check_engine wire
+`--no-provisional` for curated/example packages.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: wire `--no-provisional` into check_all for curated cases
+- Optional: Data Explorer provisional entity_type chip / filter
 - Keep Docker PARTIAL honest until compose is verified on a Docker host

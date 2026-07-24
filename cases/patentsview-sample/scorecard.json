@@ -10,7 +10,8 @@
     "min_documents": 4,
     "require_no_orphan_document_ids": true,
     "min_observations_with_char_span": 5,
-    "min_char_span_ratio": 0.4
+    "min_char_span_ratio": 0.4,
+    "require_no_provisional": true
   },
   "adapters": ["patentsview"],
   "dump": "cases/patentsview-sample/dump.json",

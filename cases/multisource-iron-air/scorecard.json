@@ -16,7 +16,8 @@
     "min_documents": 12,
     "require_no_orphan_document_ids": true,
     "min_observations_with_char_span": 15,
-    "min_char_span_ratio": 0.5
+    "min_char_span_ratio": 0.5,
+    "require_no_provisional": true
   },
   "adapters": [
     "patentsview",

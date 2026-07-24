@@ -88,6 +88,7 @@ def main(argv=None) -> int:
             "examples/real_mini_package.json",
             "--strict",
             "--require-documents",
+            "--no-provisional",
         ],
     )
     run(
@@ -100,6 +101,7 @@ def main(argv=None) -> int:
             "--require-documents",
             "--min-char-span-ratio",
             "0.5",
+            "--no-provisional",
         ],
     )
     run(
@@ -112,6 +114,7 @@ def main(argv=None) -> int:
             "--require-documents",
             "--min-char-span-ratio",
             "0.4",
+            "--no-provisional",
         ],
     )
     run(
@@ -123,6 +126,7 @@ def main(argv=None) -> int:
             "--strict",
             "--require-documents",
             "--require-char-spans",
+            "--no-provisional",
         ],
     )
     run("retro-case", [py, "scripts/run_retro_case.py", "cases/iron-air-retro"])
@@ -164,6 +168,7 @@ def main(argv=None) -> int:
             "--require-documents",
             "--min-char-span-ratio",
             "0.4",
+            "--no-provisional",
         ],
     )
     run(
@@ -205,6 +210,7 @@ def main(argv=None) -> int:
             "--strict",
             "--require-documents",
             "--require-char-spans",
+            "--no-provisional",
         ],
     )
     print("=" * 72)

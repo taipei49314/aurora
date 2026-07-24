@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.41] — 2026-07-24
+
+### Added
+
+- Scorecard gates **`require_no_provisional`** and **`max_provisional_entities`**
+  (curated cases must not leave staged provisional entities)
+- All shipped cases set `require_no_provisional: true`
+- `check_all` lints curated packages with `--no-provisional`
+- `check_engine` lints example package with `--no-provisional`
+- Tests: `tests/test_scorecard_provisional_gates.py`
+
+### Changed
+
+- Engine / feature → **0.1.41**
+- README engine badge version aligned
+
 ## [0.1.40] — 2026-07-24
 
 ### Added

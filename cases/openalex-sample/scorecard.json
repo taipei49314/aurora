@@ -10,7 +10,8 @@
     "min_documents": 2,
     "require_no_orphan_document_ids": true,
     "min_observations_with_char_span": 3,
-    "min_char_span_ratio": 1.0
+    "min_char_span_ratio": 1.0,
+    "require_no_provisional": true
   },
   "honesty": [
     "Synthetic OpenAlex-shaped works for CI.",
