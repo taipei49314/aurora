@@ -6,6 +6,24 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.42] — 2026-07-24
+
+### Added
+
+- `aurora.provisional` helpers for entity/observation staging flags
+- API: `GET /api/entities?provisional=true|false`;
+  `GET /api/observations?subject_provisional=` / `provisional_mention=`
+- Resolve response includes `entity_type` + `provisional`
+- Data Explorer provisional chips (entities + subject-staged observations) with
+  shareable `?provisional=` URL; provisional badge on entity detail
+- Dashboard provenance panel: resolved-vs-provisional bar + deep-link
+- Tests: `tests/test_provisional_helpers.py` (+ API filter coverage)
+
+### Changed
+
+- Engine / feature → **0.1.42**
+- README engine badge version aligned
+
 ## [0.1.41] — 2026-07-24
 
 ### Added

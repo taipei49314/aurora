@@ -16,6 +16,8 @@ type Tier = "A" | "B" | "C" | "D";
 type SpanFilter = "" | "with" | "auto" | "none" | "missing_on_doc";
 /** document_id presence filter (API has_document_id, 0.1.30+) */
 type DocFilter = "" | "with" | "without";
+/** provisional entity / subject staging filter (API provisional, 0.1.42+) */
+type ProvisionalFilter = "" | "provisional" | "resolved";
 
 const TABS: Tab[] = ["entities", "observations", "sources", "documents"];
 const SPAN_FILTERS: SpanFilter[] = ["", "with", "auto", "none", "missing_on_doc"];
@@ -42,6 +44,20 @@ function parseDocFilter(params: URLSearchParams): DocFilter {
   if (raw === "true") return "with";
   if (raw === "false") return "without";
   return "";
+}
+
+/** Deep-link: ?provisional=true|false or ?prov=provisional|resolved */
+function parseProvisionalFilter(params: URLSearchParams): ProvisionalFilter {
+  const raw = params.get("provisional") ?? params.get("prov");
+  if (raw === "true" || raw === "provisional" || raw === "1") return "provisional";
+  if (raw === "false" || raw === "resolved" || raw === "0") return "resolved";
+  return "";
+}
+
+function rowIsProvisionalEntity(row: any): boolean {
+  if (!row) return false;
+  if (String(row.entity_type || "").toUpperCase() === "PROVISIONAL") return true;
+  return Boolean(row.metadata?.provisional);
 }
 
 function parseTier(v: string | null): "" | Tier {
@@ -201,6 +217,7 @@ export function DataExplorer() {
   const tab = parseTab(searchParams.get("tab"));
   const spanFilter = parseSpanFilter(searchParams);
   const docFilter = parseDocFilter(searchParams);
+  const provisionalFilter = parseProvisionalFilter(searchParams);
   const tierFilter = parseTier(searchParams.get("tier"));
   const sourceType = searchParams.get("source_type") || "";
   const entityType = searchParams.get("entity_type") || "";
@@ -276,6 +293,14 @@ export function DataExplorer() {
     },
     [patchParams],
   );
+  const setProvisionalFilter = useCallback(
+    (p: ProvisionalFilter) => {
+      if (p === "provisional") patchParams({ provisional: "true", prov: null });
+      else if (p === "resolved") patchParams({ provisional: "false", prov: null });
+      else patchParams({ provisional: null, prov: null });
+    },
+    [patchParams],
+  );
   const setObsType = useCallback(
     (t: string) => {
       patchParams({ obs_type: t || null, observation_type: null });
@@ -295,15 +320,23 @@ export function DataExplorer() {
 
   const stats = useQuery({ queryKey: ["stats"], queryFn: getStats, staleTime: 30_000 });
 
-  // Server-side filter for entities (?q= / ?entity_type=)
+  // Server-side filter for entities (?q= / ?entity_type= / ?provisional=)
   const serverQ = tab === "entities" && q.trim() && !looksLikeResolveRef(q) ? q.trim() : undefined;
   const entities = useQuery({
-    queryKey: ["entities", serverQ ?? "", entityType],
-    queryFn: () => getEntities(serverQ, entityType || undefined),
+    queryKey: ["entities", serverQ ?? "", entityType, provisionalFilter],
+    queryFn: () =>
+      getEntities(serverQ, entityType || undefined, {
+        provisional:
+          provisionalFilter === "provisional"
+            ? true
+            : provisionalFilter === "resolved"
+              ? false
+              : undefined,
+      }),
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
-    queryKey: ["observations", q, obsType, spanFilter, docFilter],
+    queryKey: ["observations", q, obsType, spanFilter, docFilter, provisionalFilter],
     queryFn: () =>
       getObservations({
         q: q.trim() || undefined,
@@ -325,6 +358,13 @@ export function DataExplorer() {
               : docFilter === "without"
                 ? false
                 : undefined,
+        // On observations tab, provisional filter maps to subject_provisional
+        subject_provisional:
+          provisionalFilter === "provisional"
+            ? true
+            : provisionalFilter === "resolved"
+              ? false
+              : undefined,
       }),
     enabled: tab === "observations",
   });
@@ -492,63 +532,161 @@ export function DataExplorer() {
       </div>
 
       {tab === "entities" && (
-        <div
-          style={{
-            display: "flex",
-            gap: 6,
-            marginBottom: 12,
-            flexWrap: "wrap",
-            alignItems: "center",
-            padding: 10,
-            background: "#f6f8fa",
-            border: "1px solid #d0d7de",
-            borderRadius: 8,
-          }}
-        >
-          <b style={{ fontSize: 12 }}>entity_type</b>
-          <button
-            type="button"
-            onClick={() => setEntityType("")}
+        <>
+          <div
             style={{
-              fontWeight: entityType === "" ? 700 : 400,
-              border: entityType === "" ? "1px solid #0969da" : "1px solid #d0d7de",
-              borderRadius: 6,
-              padding: "2px 8px",
-              background: entityType === "" ? "#ddf4ff" : "white",
-              cursor: "pointer",
-              fontSize: 11,
+              display: "flex",
+              gap: 6,
+              marginBottom: 8,
+              flexWrap: "wrap",
+              alignItems: "center",
+              padding: 10,
+              background: "#f6f8fa",
+              border: "1px solid #d0d7de",
+              borderRadius: 8,
             }}
           >
-            All
-          </button>
-          {Object.entries(stats.data?.entity_type_counts || {})
-            .sort((a, b) => b[1] - a[1])
-            .map(([t, n]) => {
-              const active = entityType === t;
+            <b style={{ fontSize: 12 }}>entity_type</b>
+            <button
+              type="button"
+              onClick={() => setEntityType("")}
+              style={{
+                fontWeight: entityType === "" ? 700 : 400,
+                border: entityType === "" ? "1px solid #0969da" : "1px solid #d0d7de",
+                borderRadius: 6,
+                padding: "2px 8px",
+                background: entityType === "" ? "#ddf4ff" : "white",
+                cursor: "pointer",
+                fontSize: 11,
+              }}
+            >
+              All
+            </button>
+            {Object.entries(stats.data?.entity_type_counts || {})
+              .sort((a, b) => b[1] - a[1])
+              .map(([t, n]) => {
+                const active = entityType === t;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setEntityType(active ? "" : t)}
+                    style={{
+                      fontWeight: active ? 700 : 400,
+                      border: active ? "1px solid #0969da" : "1px solid #d0d7de",
+                      borderRadius: 6,
+                      padding: "2px 8px",
+                      background: active ? "#ddf4ff" : "white",
+                      cursor: "pointer",
+                      fontSize: 11,
+                    }}
+                  >
+                    {t} ({n})
+                  </button>
+                );
+              })}
+            <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/entities?entity_type=</span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 6,
+              marginBottom: 12,
+              flexWrap: "wrap",
+              alignItems: "center",
+              padding: 10,
+              background: "#fff8c5",
+              border: "1px solid #d4a72c",
+              borderRadius: 8,
+            }}
+            title="Staged unresolved mentions (engine 0.1.39+); promote via resolve_entities"
+          >
+            <b style={{ fontSize: 12 }}>provisional</b>
+            {(
+              [
+                ["", "All"],
+                ["provisional", `provisional (${stats.data?.entities_provisional ?? 0})`],
+                ["resolved", "resolved only"],
+              ] as [ProvisionalFilter, string][]
+            ).map(([key, label]) => {
+              const active = provisionalFilter === key;
               return (
                 <button
-                  key={t}
+                  key={key || "all"}
                   type="button"
-                  onClick={() => setEntityType(active ? "" : t)}
+                  onClick={() => setProvisionalFilter(key)}
                   style={{
                     fontWeight: active ? 700 : 400,
-                    border: active ? "1px solid #0969da" : "1px solid #d0d7de",
+                    border: active ? "1px solid #9a6700" : "1px solid #d0d7de",
                     borderRadius: 6,
                     padding: "2px 8px",
-                    background: active ? "#ddf4ff" : "white",
+                    background: active ? "#fff8c5" : "white",
                     cursor: "pointer",
                     fontSize: 11,
                   }}
                 >
-                  {t} ({n})
+                  {label}
                 </button>
               );
             })}
-          <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/entities?entity_type=</span>
-        </div>
+            <span style={{ fontSize: 11, color: "#8c959f" }}>
+              GET /api/entities?provisional=true|false
+            </span>
+          </div>
+        </>
       )}
 
       {tab === "observations" && (
+        <>
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 8,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#fff8c5",
+            border: "1px solid #d4a72c",
+            borderRadius: 8,
+          }}
+          title="Observations whose subject was staged provisional at import (0.1.42+)"
+        >
+          <b style={{ fontSize: 12 }}>subject provisional</b>
+          {(
+            [
+              ["", "All"],
+              [
+                "provisional",
+                `staged (${stats.data?.observations_subject_provisional ?? 0})`,
+              ],
+              ["resolved", "resolved only"],
+            ] as [ProvisionalFilter, string][]
+          ).map(([key, label]) => {
+            const active = provisionalFilter === key;
+            return (
+              <button
+                key={key || "all-obs-prov"}
+                type="button"
+                onClick={() => setProvisionalFilter(key)}
+                style={{
+                  fontWeight: active ? 700 : 400,
+                  border: active ? "1px solid #9a6700" : "1px solid #d0d7de",
+                  borderRadius: 6,
+                  padding: "2px 8px",
+                  background: active ? "#fff8c5" : "white",
+                  cursor: "pointer",
+                  fontSize: 11,
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>
+            GET /api/observations?subject_provisional=
+          </span>
+        </div>
         <div
           style={{
             display: "flex",
@@ -603,6 +741,7 @@ export function DataExplorer() {
             })}
           <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/observations?observation_type=</span>
         </div>
+        </>
       )}
 
       {tab === "observations" && (
@@ -981,6 +1120,23 @@ export function DataExplorer() {
                 <div style={{ marginBottom: 6 }}>
                   <b>{selected.canonical_name}</b>
                   {selected.entity_type ? ` · ${selected.entity_type}` : ""}
+                  {rowIsProvisionalEntity(selected) && (
+                    <span
+                      title="Staged unresolved mention (PROVISIONAL / metadata.provisional)"
+                      style={{
+                        marginLeft: 8,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#9a6700",
+                        background: "#fff8c5",
+                        borderRadius: 8,
+                        padding: "1px 6px",
+                        verticalAlign: "middle",
+                      }}
+                    >
+                      provisional
+                    </span>
+                  )}
                 </div>
                 <div style={{ color: "#57606a", marginBottom: 8 }}>{selected.entity_id}</div>
                 <b>external_ids</b>

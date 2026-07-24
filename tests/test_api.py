@@ -66,6 +66,20 @@ def test_entities_entity_type_filter(client):
     assert all(str(e.get("entity_type") or "").upper() in {"COMPANY", "PERSON"} for e in multi)
 
 
+def test_entities_provisional_filter_and_stats(client):
+    """Demo snapshot has no provisional entities; filter still returns 200."""
+    stats = client.get("/api/stats").json()
+    assert "entities_provisional" in stats
+    assert stats["entities_provisional"] == 0
+    assert "observations_subject_provisional" in stats
+    none_p = client.get("/api/entities?provisional=true&limit=500").json()
+    assert none_p == []
+    resolved = client.get("/api/entities?provisional=false&limit=500").json()
+    assert len(resolved) == stats["entities_total"]
+    obs_p = client.get("/api/observations?subject_provisional=true&limit=50").json()
+    assert obs_p == []
+
+
 def test_stats_endpoint(client):
     r = client.get("/api/stats")
     assert r.status_code == 200, r.text
