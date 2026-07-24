@@ -172,9 +172,14 @@ Hypothesis pickers on Discovery Map and Timeline write/read URL `?id=`
 Hypothesis Explorer detail links to Map/Timeline/Bottleneck Lab; Map and
 Timeline link back to Explorer (and each other) with the same `?id=`.
 
+## 35. Bottleneck Lab cluster → Explorer deep-link — **done (v0.1.37)**
+
+Cluster names open Explorer with `?status=` + `?id=`; map/timeline secondary
+links; entity_id searches Data Explorer entities tab.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
 - `subject_raw` staging field for unresolved entity mentions
-- Bottleneck Lab cluster name → Explorer `?id=` deep-link
+- self-audit: document Windows engine-only gate / Docker still PARTIAL
