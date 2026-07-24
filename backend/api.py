@@ -128,6 +128,7 @@ def stats():
     obs_with_document_id = 0
     obs_with_char_span = 0
     obs_with_char_span_auto = 0
+    obs_missing_char_span = 0  # has document_id but no span (0.1.27+)
     unique_event_ids: set = set()
     country_counts: dict = {}
     for o in s.observations:
@@ -142,12 +143,25 @@ def stats():
             c = (g.get("country") if isinstance(g, dict) else None) or ""
             if c:
                 country_counts[c] = country_counts.get(c, 0) + 1
-        if getattr(o, "document_id", None) or (o.metadata or {}).get("document_id"):
+        has_doc = bool(
+            getattr(o, "document_id", None) or (o.metadata or {}).get("document_id")
+        )
+        has_span = bool(
+            getattr(o, "char_span", None) or (o.metadata or {}).get("char_span")
+        )
+        if has_doc:
             obs_with_document_id += 1
-        if getattr(o, "char_span", None) or (o.metadata or {}).get("char_span"):
+            if not has_span:
+                obs_missing_char_span += 1
+        if has_span:
             obs_with_char_span += 1
             if (o.metadata or {}).get("char_span_auto"):
                 obs_with_char_span_auto += 1
+    n_obs = len(s.observations)
+    snap_docs = getattr(s, "documents", None) or []
+    docs_with_text = sum(
+        1 for d in snap_docs if (getattr(d, "text", None) or "").strip()
+    )
     with_ext = sum(1 for e in s.entities if e.external_ids)
     entities_with_country = sum(1 for e in s.entities if (e.country or "").strip())
     entity_country_counts: dict = {}
@@ -185,7 +199,11 @@ def stats():
         "observations_with_document_id": obs_with_document_id,
         "observations_with_char_span": obs_with_char_span,
         "observations_with_char_span_auto": obs_with_char_span_auto,
-        "documents_total": len(getattr(s, "documents", None) or []),
+        "observations_missing_char_span": obs_missing_char_span,
+        "char_span_ratio": (obs_with_char_span / n_obs) if n_obs else 0.0,
+        "document_link_ratio": (obs_with_document_id / n_obs) if n_obs else 0.0,
+        "documents_total": len(snap_docs),
+        "documents_with_text": docs_with_text,
         "document_ids_referenced": len({
             (getattr(o, "document_id", None) or (o.metadata or {}).get("document_id") or "").strip()
             for o in s.observations

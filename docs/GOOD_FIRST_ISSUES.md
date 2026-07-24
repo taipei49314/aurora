@@ -117,8 +117,13 @@ iron-air-retro gains scorecard.json; check_all runs mini + retro scorecards.
 `--require-char-spans` (document_id rows must have spans) and
 `--min-char-span-ratio R`. Soft fields always reported. check_all wired.
 
+## 24. Dashboard provenance quality panel — **done (v0.1.27)**
+
+Coverage bars for document_id link, char_span, documents-with-text; stats
+ratios for ratios and missing spans on document_id observations.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: Dashboard span coverage quality panel
+- Optional: Data Explorer filter preset for missing char_span on document_id

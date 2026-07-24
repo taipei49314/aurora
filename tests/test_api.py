@@ -248,6 +248,25 @@ def test_stats_char_span_auto_field(client):
     assert body["observations_with_char_span_auto"] >= 0
 
 
+def test_stats_provenance_quality_fields(client):
+    """0.1.27+: char_span_ratio, missing spans, documents_with_text."""
+    r = client.get("/api/stats")
+    assert r.status_code == 200
+    body = r.json()
+    for key in (
+        "char_span_ratio",
+        "document_link_ratio",
+        "observations_missing_char_span",
+        "documents_with_text",
+    ):
+        assert key in body, key
+    assert 0.0 <= float(body["char_span_ratio"]) <= 1.0
+    assert 0.0 <= float(body["document_link_ratio"]) <= 1.0
+    assert isinstance(body["observations_missing_char_span"], int)
+    assert isinstance(body["documents_with_text"], int)
+    assert body["documents_with_text"] >= 0
+
+
 def test_observations_has_char_span_and_auto_filters(client):
     """0.1.21+: filter observations by span presence / auto-align flag."""
     # Seed a package with one auto span and one without
