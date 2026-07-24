@@ -169,7 +169,18 @@ export function Dashboard() {
               <td style={{ padding: 6 }}>
                 <Badge status={h.status} />
               </td>
-              <td>{h.human_name ?? h.generated_name}</td>
+              <td>
+                <Link
+                  to={`/hypotheses?id=${encodeURIComponent(h.hypothesis_id)}`}
+                  title="Open in Hypothesis Explorer"
+                  style={{ color: "#0969da", textDecoration: "none", fontWeight: 600 }}
+                >
+                  {h.human_name ?? h.generated_name}
+                  <span style={{ marginLeft: 4, fontSize: 11, fontWeight: 600 }} aria-hidden>
+                    ↗
+                  </span>
+                </Link>
+              </td>
               <td style={{ textAlign: "right", fontWeight: 700 }}>{h.overall_score.toFixed(1)}</td>
               <td style={{ textAlign: "right" }}>{h.hype_risk_score.toFixed(0)}</td>
               <td style={{ textAlign: "right" }}>{h.contradiction_score.toFixed(0)}</td>

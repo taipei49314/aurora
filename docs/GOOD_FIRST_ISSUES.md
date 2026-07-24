@@ -142,9 +142,19 @@ detail links `document_id` into documents tab; Dashboard document_id bar deep-li
 Observations table `document_id` cell → documents tab; Dashboard coverage
 StatCards link into Data Explorer tabs (entities/sources/observations/documents).
 
+## 29. Engine-only test path on Windows — **done (v0.1.32)**
+
+`requirements-engine-test.txt` + `scripts/check_engine.py` so contributors without
+MSVC/greenlet can still run demo + non-SQL tests.
+
+## 30. Hypothesis table → Explorer deep-link — **done (v0.1.32)**
+
+Dashboard hypothesis name links to `/hypotheses?id=`; Explorer opens that card,
+scrolls into view, and keeps expand/collapse in the shareable URL.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Hypothesis table row → Hypothesis Explorer deep-link
 - `subject_raw` staging field for unresolved entity mentions
+- Status count chips on Dashboard → Hypothesis Explorer `?status=` filter

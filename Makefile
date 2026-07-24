@@ -4,11 +4,13 @@
 PY ?= python
 PYTHONPATH := backend
 
-.PHONY: help install test lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case check-all
+.PHONY: help install install-engine-test test test-engine lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case check-all check-engine
 
 help:
-	@echo "make install    - install python deps (fastapi, pytest, hypothesis)"
+	@echo "make install    - install python deps (fastapi, pytest, hypothesis, sqlalchemy)"
+	@echo "make install-engine-test - pytest/hypothesis/httpx only (no greenlet/MSVC)"
 	@echo "make test        - run the full test suite"
+	@echo "make test-engine / check-engine - engine gate without API/persistence tests"
 	@echo "make demo        - generate corpus, run discovery, print classified hypotheses"
 	@echo "make generate    - (re)generate the Northstar corpus + ground truth"
 	@echo "make backtest    - run a historical discovery backtest"
@@ -27,8 +29,14 @@ help:
 install:
 	$(PY) -m pip install -r backend/requirements.txt
 
+install-engine-test:
+	$(PY) -m pip install -r backend/requirements-engine-test.txt
+
 test:
 	PYTHONPATH=$(PYTHONPATH) $(PY) -m pytest
+
+test-engine check-engine:
+	$(PY) scripts/check_engine.py
 
 lint:
 	$(PY) -m compileall -q backend/aurora

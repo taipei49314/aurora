@@ -6,6 +6,28 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.32] — 2026-07-24
+
+### Added
+
+- `backend/requirements-engine-test.txt` — pytest/hypothesis/httpx **without** SQLAlchemy/greenlet
+- `scripts/check_engine.py` — demo + version-sync + engine pytest (ignores API/persistence)
+- `make install-engine-test` / `make test-engine` / `make check-engine`
+- `scripts/check_all.py --engine-only` delegates to the engine gate
+- Dashboard hypothesis table **name** → Hypothesis Explorer deep-link
+  (`/hypotheses?id=<hypothesis_id>`)
+- Hypothesis Explorer: URL open state (`id` / `hypothesis_id` / `h`), scroll-into-view,
+  highlight open card; expand/collapse updates the shareable URL
+
+### Fixed
+
+- `pyproject.toml` package version lagging engine (was 0.1.18; now tracks engine)
+
+### Changed
+
+- Engine / feature → **0.1.32**
+- README documents Windows-without-MSVC install path; badge aligned
+
 ## [0.1.31] — 2026-07-24
 
 ### Added

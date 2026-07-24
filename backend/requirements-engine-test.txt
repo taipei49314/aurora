@@ -1,0 +1,9 @@
+# Engine + adapter tests without SQLAlchemy (no greenlet / MSVC on Windows).
+# Core discovery engine remains stdlib-only; these are test helpers only.
+#
+#   python -m pip install -r backend/requirements-engine-test.txt
+#   PYTHONPATH=backend python scripts/check_all.py --engine-only
+#
+pytest>=8.0
+hypothesis>=6.100
+httpx>=0.27
