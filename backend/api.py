@@ -173,13 +173,11 @@ def stats():
     )
     with_ext = sum(1 for e in s.entities if e.external_ids)
     entities_with_country = sum(1 for e in s.entities if (e.country or "").strip())
-    entities_provisional = sum(
-        1
-        for e in s.entities
-        if e.entity_type == "PROVISIONAL" or (e.metadata or {}).get("provisional")
-    )
+    from aurora.provisional import is_provisional_entity, observation_subject_provisional
+
+    entities_provisional = sum(1 for e in s.entities if is_provisional_entity(e))
     obs_subject_provisional = sum(
-        1 for o in s.observations if (o.metadata or {}).get("subject_provisional")
+        1 for o in s.observations if observation_subject_provisional(o)
     )
     entity_country_counts: dict = {}
     entity_type_counts: dict = {}
@@ -257,10 +255,14 @@ def resolve_entity(body: ResolveBody):
     if eid is None:
         raise HTTPException(404, f"cannot resolve {body.ref!r}")
     ent = next(e for e in REPO.snapshot.entities if e.entity_id == eid)
+    from aurora.provisional import is_provisional_entity
+
     return {
         "ref": body.ref,
         "entity_id": eid,
         "canonical_name": ent.canonical_name,
+        "entity_type": ent.entity_type,
+        "provisional": is_provisional_entity(ent),
         "aliases": list(ent.aliases or []),
         "external_ids": list(ent.external_ids or []),
     }
@@ -271,8 +273,14 @@ def entities(
     limit: int = 200,
     q: Optional[str] = None,
     entity_type: Optional[str] = None,
+    provisional: Optional[bool] = None,
 ):
-    """List entities; optional ``q`` and ``entity_type`` (comma list) filters."""
+    """List entities; optional ``q``, ``entity_type`` (comma list), ``provisional`` filters.
+
+    ``provisional`` (0.1.42+): true/false — type PROVISIONAL or metadata.provisional.
+    """
+    from aurora.provisional import is_provisional_entity
+
     rows = [to_dict(e) for e in REPO.snapshot.entities]
     if entity_type:
         types = {t.strip().upper() for t in entity_type.split(",") if t.strip()}
@@ -280,6 +288,8 @@ def entities(
             r for r in rows
             if str(r.get("entity_type") or "").upper() in types
         ]
+    if provisional is not None:
+        rows = [r for r in rows if is_provisional_entity(r) is provisional]
     if q:
         needle = q.strip().lower()
         filtered = []
@@ -434,6 +444,8 @@ def observations(
     char_span_auto: Optional[bool] = None,
     has_document_id: Optional[bool] = None,
     missing_char_span: Optional[bool] = None,
+    subject_provisional: Optional[bool] = None,
+    provisional_mention: Optional[bool] = None,
     q: Optional[str] = None,
 ):
     """List observations.
@@ -445,8 +457,15 @@ def observations(
     - ``char_span_auto``: true/false — auto-aligned spans only / exclude them
     - ``has_document_id``: true/false — rows with / without document_id (0.1.28+)
     - ``missing_char_span``: true — document_id present but no char_span (0.1.28+)
+    - ``subject_provisional``: true/false — subject was staged provisional (0.1.42+)
+    - ``provisional_mention``: true/false — subject or object staged provisional (0.1.42+)
     - ``q``: case-insensitive substring over the serialized row
     """
+    from aurora.provisional import (
+        observation_has_provisional_mention,
+        observation_subject_provisional,
+    )
+
     rows = [to_dict(o) for o in REPO.snapshot.observations]
     if observation_type:
         types = {t.strip() for t in observation_type.split(",") if t.strip()}
@@ -456,6 +475,13 @@ def observations(
         rows = [
             r for r in rows
             if str(r.get("document_id") or (r.get("metadata") or {}).get("document_id") or "").strip() == did
+        ]
+    if subject_provisional is not None:
+        rows = [r for r in rows if observation_subject_provisional(r) is subject_provisional]
+    if provisional_mention is not None:
+        rows = [
+            r for r in rows
+            if observation_has_provisional_mention(r) is provisional_mention
         ]
     if has_document_id is not None:
         rows = [r for r in rows if _obs_has_document_id(r) is has_document_id]

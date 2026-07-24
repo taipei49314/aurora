@@ -350,6 +350,13 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
     },
   ];
 
+  const nEntities = Number(stats.entities_total ?? stats.counts?.entities ?? 0);
+  const nProvisional = Number(stats.entities_provisional ?? 0);
+  const nObsProv = Number(stats.observations_subject_provisional ?? 0);
+  // Lower is better for provisional residual on a curated corpus
+  const provisionalResolvedRatio =
+    nEntities > 0 ? Math.max(0, 1 - nProvisional / nEntities) : 1;
+
   return (
     <div
       style={{
@@ -363,13 +370,30 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
         <b style={{ fontSize: 13 }}>Provenance quality</b>
         <span style={{ fontSize: 11, color: "#8c959f" }}>
-          documents · char_span · GET /api/stats
+          documents · char_span · provisional · GET /api/stats
         </span>
       </div>
       <div style={{ display: "grid", gap: 10 }}>
         {rows.map((r) => (
           <CoverageBar key={r.label} {...r} />
         ))}
+        <CoverageBar
+          label="entities resolved (not provisional)"
+          ratio={provisionalResolvedRatio}
+          detail={`${nProvisional} provisional · ${nEntities || "—"} entities · ${nObsProv} obs subject-staged`}
+          good={1}
+          warn={0.95}
+          to={
+            nProvisional > 0
+              ? "/data?tab=entities&provisional=true"
+              : "/data?tab=entities&provisional=false"
+          }
+          title={
+            nProvisional > 0
+              ? "Open provisional entities in Data Explorer (0.1.42+)"
+              : "No provisional entities"
+          }
+        />
       </div>
       <p style={{ margin: "10px 0 0", fontSize: 11, color: "#57606a" }}>
         Improve span coverage with adapter <code>ensure_documents</code> and progressive
@@ -384,6 +408,22 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
         </Link>{" "}
         (<code>/data?tab=observations&amp;span=missing_on_doc</code>
         {missingSpan > 0 ? ` · ${missingSpan} rows` : ""}).
+        {nProvisional > 0 && (
+          <>
+            {" "}
+            ·{" "}
+            <Link
+              to="/data?tab=entities&provisional=true"
+              style={{ color: "#9a6700", fontWeight: 600 }}
+              title="Staged unresolved entities"
+            >
+              {nProvisional} provisional
+            </Link>
+            {" "}
+            (promote via <code>resolve_entities --promote</code> or lint{" "}
+            <code>--no-provisional</code>).
+          </>
+        )}
       </p>
     </div>
   );

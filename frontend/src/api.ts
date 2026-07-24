@@ -76,6 +76,8 @@ export interface CorpusStats {
   entities_with_country?: number;
   entity_country_counts?: Record<string, number>;
   entity_type_counts?: Record<string, number>;
+  entities_provisional?: number;
+  observations_subject_provisional?: number;
   unique_event_ids?: number;
   reliability_tier_counts: Record<string, number>;
   observation_type_counts: Record<string, number>;
@@ -86,10 +88,16 @@ export interface CorpusStats {
 export const getStats = () => j<CorpusStats>(`/api/stats`);
 export const getRuns = () => j<RunSummary[]>(`/api/research-runs`);
 export const getHypotheses = (runId: string) => j<Hypothesis[]>(`/api/research-runs/${runId}/hypotheses`);
-export const getEntities = (q?: string, entityType?: string) => {
+export const getEntities = (
+  q?: string,
+  entityType?: string,
+  opts?: { provisional?: boolean },
+) => {
   const params = new URLSearchParams({ limit: "500" });
   if (q) params.set("q", q);
   if (entityType) params.set("entity_type", entityType);
+  if (opts?.provisional === true) params.set("provisional", "true");
+  if (opts?.provisional === false) params.set("provisional", "false");
   return j<any[]>(`/api/entities?${params.toString()}`);
 };
 export const getObservations = (opts?: {
@@ -99,6 +107,8 @@ export const getObservations = (opts?: {
   char_span_auto?: boolean;
   has_document_id?: boolean;
   missing_char_span?: boolean;
+  subject_provisional?: boolean;
+  provisional_mention?: boolean;
   q?: string;
 }) => {
   const params = new URLSearchParams({ limit: "800" });
@@ -112,6 +122,10 @@ export const getObservations = (opts?: {
   if (opts?.has_document_id === false) params.set("has_document_id", "false");
   if (opts?.missing_char_span === true) params.set("missing_char_span", "true");
   if (opts?.missing_char_span === false) params.set("missing_char_span", "false");
+  if (opts?.subject_provisional === true) params.set("subject_provisional", "true");
+  if (opts?.subject_provisional === false) params.set("subject_provisional", "false");
+  if (opts?.provisional_mention === true) params.set("provisional_mention", "true");
+  if (opts?.provisional_mention === false) params.set("provisional_mention", "false");
   if (opts?.q) params.set("q", opts.q);
   return j<any[]>(`/api/observations?${params.toString()}`);
 };

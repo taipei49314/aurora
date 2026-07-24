@@ -197,9 +197,14 @@ unknown names; ambiguous / pure-ext failures still error; stats + tests.
 Scorecard `require_no_provisional` on all cases; check_all / check_engine wire
 `--no-provisional` for curated/example packages.
 
+## 40. Provisional visibility (API + Explorer + Dashboard) — **done (v0.1.42)**
+
+`?provisional=` entity filter, observation subject_provisional filter, Dashboard
+provenance bar, Explorer chips/badge; shared `aurora.provisional` helpers.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: Data Explorer provisional entity_type chip / filter
+- Optional: adapter emit subject_raw by default; blocking for large entity graphs
 - Keep Docker PARTIAL honest until compose is verified on a Docker host
