@@ -54,3 +54,11 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.36).
 - **Commit:** `41acea1`
 - **Next suggestion:** Bottleneck Lab cluster → Explorer `?id=`; or `subject_raw`; human: PatentsView / Actions PAT.
+
+## 2026-07-24 cycle-7
+
+- **Planned:** Bottleneck Lab cluster name → Explorer `?id=` deep-link.
+- **Shipped (v0.1.37):** Cluster → Explorer `?status=&id=`; map/timeline secondary; entity_id → Data Explorer; docs #35.
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.37).
+- **Commit:** (this cycle)
+- **Next suggestion:** self-audit Windows engine-only note; or `subject_raw`; human: PatentsView / Actions PAT.
