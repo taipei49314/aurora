@@ -28,5 +28,5 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
   - Hypothesis Explorer All / per-status chips; URL `?status=` / `?s=`; composes with `?id=`
   - Docs: CHANGELOG, GOOD_FIRST_ISSUES #31, evolution-loop, README badge
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.33).
-- **Commit:** (pending this cycle)
+- **Commit:** `94cf45c`
 - **Next suggestion:** Table Status badge dual deep-link; or `subject_raw` staging; human: PatentsView dump / Actions PAT.
