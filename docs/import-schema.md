@@ -118,7 +118,7 @@ Resolution order: unique external id → compact ext ref → name/alias → exte
 
 **Provisional policy:** only *unknown* display names are staged. Ambiguous names and pure external-id misses still error. Staged entities get `metadata.provisional=true` and observation `metadata.subject_provisional` / `object_provisional`.
 
-**Lint / promote (0.1.40+):**
+**Lint / promote (0.1.40+) / curated gates (0.1.41+):**
 
 ```bash
 # soft stats always include provisional_entities
@@ -132,6 +132,17 @@ PYTHONPATH=backend python scripts/resolve_entities.py pkg.json --list-provisiona
 PYTHONPATH=backend python scripts/resolve_entities.py pkg.json \
   --promote "Mystery Corp" --to-type COMPANY --clear-stage-flag -o promoted.json
 ```
+
+Case `scorecard.json` gates:
+
+| Gate | Meaning |
+|------|---------|
+| `require_no_provisional` | Fail if any provisional entity after import |
+| `max_provisional_entities` | Soft cap (integer) when staging is intentional |
+
+Shipped curated cases set `require_no_provisional: true`. `check_all` and
+`check_engine` pass `--no-provisional` on example/case lints.
+
 
 ---
 

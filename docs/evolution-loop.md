@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.40)
+## Shipped (through 0.1.41)
 
 | Ver | Highlights |
 |-----|------------|
@@ -48,12 +48,13 @@
 | 0.1.38 | First-class `subject_raw` / `object_raw` mention staging |
 | 0.1.39 | Opt-in provisional entities (`PROVISIONAL`, non-clusterable) |
 | 0.1.40 | lint `--no-provisional` + resolve `--list-provisional` / `--promote` |
+| 0.1.41 | Scorecard + check_all/engine forbid provisional on curated cases |
 
 ## Next
 
 1. Real PatentsView dump (human data)
 2. Enable Actions with workflow-scoped PAT (human)
-3. Optional: wire `--no-provisional` into check_all for curated cases
+3. Optional: Data Explorer provisional entity_type chip / filter
 4. Keep Docker PARTIAL honest until verified on a Docker host
 
 ## Out of scope

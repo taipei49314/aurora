@@ -59,6 +59,17 @@ def main() -> int:
             [py, "scripts/validate_package.py", "examples/real_mini_package.json", "--strict"],
         ),
         (
+            "lint-example-no-provisional",
+            [
+                py,
+                "scripts/lint_package.py",
+                "examples/real_mini_package.json",
+                "--strict",
+                "--require-documents",
+                "--no-provisional",
+            ],
+        ),
+        (
             "adapters-doctor",
             [py, "-m", "adapters", "doctor"],
         ),

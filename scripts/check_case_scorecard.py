@@ -27,6 +27,7 @@ def main(argv=None) -> int:
     sys.path.insert(0, str(ROOT / "backend"))
     from aurora import import_package
 
+    # Preserve staging flags so provisional entities from stage_unresolved are visible (0.1.41+)
     pkg = {
         "entities": package.get("entities", []),
         "sources": package.get("sources", []),
@@ -34,6 +35,11 @@ def main(argv=None) -> int:
     }
     if package.get("documents"):
         pkg["documents"] = package["documents"]
+    for flag in ("license", "stage_unresolved", "stage_unresolved_subjects", "provisional_entity_type"):
+        if flag in package:
+            pkg[flag] = package[flag]
+    if isinstance(package.get("package"), dict):
+        pkg["package"] = dict(package["package"])
     snap = import_package(pkg)
     n_err = len(snap.import_errors or [])
     obs_types = {o.observation_type for o in snap.observations}
@@ -45,6 +51,12 @@ def main(argv=None) -> int:
         1 for o in snap.observations if getattr(o, "char_span", None) is not None
     )
     span_ratio = (n_spans / n_obs) if n_obs else 0.0
+    provisional = [
+        e
+        for e in snap.entities
+        if e.entity_type == "PROVISIONAL" or (e.metadata or {}).get("provisional")
+    ]
+    n_provisional = len(provisional)
 
     # Orphan document_ids: referenced by obs but missing from documents[]
     present = {
@@ -85,12 +97,26 @@ def main(argv=None) -> int:
         failures.append(
             f"char_span_ratio={span_ratio:.3f} < min_char_span_ratio {min_ratio}"
         )
+    # Provisional entity policy (engine 0.1.41+): curated cases should be fully resolved
+    if gates.get("require_no_provisional") and n_provisional:
+        names = sorted({e.canonical_name for e in provisional if e.canonical_name})
+        sample = ", ".join(names[:5])
+        more = f" (+{len(names) - 5} more)" if len(names) > 5 else ""
+        failures.append(
+            f"provisional_entities={n_provisional} but require_no_provisional: {sample}{more}"
+        )
+    max_prov = gates.get("max_provisional_entities")
+    if max_prov is not None and n_provisional > int(max_prov):
+        failures.append(
+            f"provisional_entities={n_provisional} > max_provisional_entities {max_prov}"
+        )
 
     print(
         f"case={scorecard.get('case_id')} errors={n_err} "
         f"sources={raw} independent={indep} documents={n_docs} "
         f"spans={n_spans}/{n_obs} ({span_ratio:.0%}) "
-        f"orphan_doc_ids={len(orphans)} obs_types={sorted(obs_types)}"
+        f"orphan_doc_ids={len(orphans)} provisional={n_provisional} "
+        f"obs_types={sorted(obs_types)}"
     )
     if failures:
         for f in failures:
