@@ -3,7 +3,7 @@
 **Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Engine](https://img.shields.io/badge/engine-0.1.31-blue.svg)](CHANGELOG.md)
+[![Engine](https://img.shields.io/badge/engine-0.1.32-blue.svg)](CHANGELOG.md)
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](backend/requirements.txt)
 
@@ -38,8 +38,11 @@ The engine clusters cross-source structure, compares to a known taxonomy, hunts
 git clone https://github.com/taipei49314/aurora.git
 cd aurora
 
-# optional: API + tests
+# optional: API + tests (needs SQLAlchemy; on Windows may require MSVC for greenlet)
 python -m pip install -r backend/requirements.txt
+
+# Windows without C++ Build Tools — engine tests only (recommended default):
+python -m pip install -r backend/requirements-engine-test.txt
 
 # Windows PowerShell
 $env:PYTHONPATH = "backend"
@@ -47,8 +50,10 @@ $env:PYTHONPATH = "backend"
 # export PYTHONPATH=backend
 
 python backend/aurora/cli.py          # demo: generate corpus → classify
-python -m pytest tests/ -q            # full suite
-python scripts/check_all.py           # pre-push: tests + cases + resolve smoke
+python scripts/check_engine.py        # engine gate (skips API/SQL tests)
+python -m pytest tests/ -q            # full suite (needs full requirements)
+python scripts/check_all.py --engine-only   # same as check_engine
+python scripts/check_all.py           # full pre-push: tests + cases + resolve smoke
 ```
 
 With Make (if available):
@@ -140,7 +145,7 @@ tests/            pytest (unit / integration / e2e)
 
 ## Version
 
-- Engine: **0.1.31** — see [CHANGELOG.md](CHANGELOG.md)
+- Engine: **0.1.32** — see [CHANGELOG.md](CHANGELOG.md)
 - License: **MIT** — see [LICENSE](LICENSE)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security: [SECURITY.md](SECURITY.md)

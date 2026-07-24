@@ -40,12 +40,22 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--quick", action="store_true", help="pytest only")
     ap.add_argument(
+        "--engine-only",
+        action="store_true",
+        help="delegate to scripts/check_engine.py (no SQLAlchemy/greenlet)",
+    )
+    ap.add_argument(
         "--python",
         default=sys.executable,
         help="Python interpreter (default: current)",
     )
     args = ap.parse_args(argv)
     py = args.python
+
+    if args.engine_only:
+        # Avoid importing SQLAlchemy-backed tests on machines without MSVC/greenlet.
+        r = subprocess.run([py, str(ROOT / "scripts" / "check_engine.py")], cwd=str(ROOT))
+        return int(r.returncode)
 
     # basetemp under repo avoids Windows pytest-of-* temp cleanup PermissionError
     basetemp = ROOT / ".tmp" / "pytest"

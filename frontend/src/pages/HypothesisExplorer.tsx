@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useCurrentRun } from "../useRun";
 import { STATUS_COLORS, Hypothesis } from "../api";
 
@@ -77,24 +78,95 @@ function Detail({ h }: { h: Hypothesis }) {
   );
 }
 
+/** Read open hypothesis id from URL (`id`, `hypothesis_id`, or short `h`). */
+function parseOpenId(params: URLSearchParams): string | null {
+  return params.get("id") || params.get("hypothesis_id") || params.get("h") || null;
+}
+
 export function HypothesisExplorer() {
   const { hyps } = useCurrentRun();
-  const [open, setOpen] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openId = parseOpenId(searchParams);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const scrolledFor = useRef<string | null>(null);
+
+  const setOpen = (id: string | null) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        // Normalize to a single canonical param.
+        next.delete("hypothesis_id");
+        next.delete("h");
+        if (id) next.set("id", id);
+        else next.delete("id");
+        return next;
+      },
+      { replace: true },
+    );
+  };
+
+  // Scroll the deep-linked card into view once per id (Dashboard → Explorer).
+  useEffect(() => {
+    if (!openId || !hyps.data) return;
+    if (scrolledFor.current === openId) return;
+    const el = cardRefs.current[openId];
+    if (!el) return;
+    scrolledFor.current = openId;
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [openId, hyps.data]);
+
   if (!hyps.data) return <p>Loading…</p>;
+
+  const known = openId && hyps.data.some((h) => h.hypothesis_id === openId);
+
   return (
     <div>
       <h2>Hypothesis Explorer</h2>
-      {hyps.data.map((h) => (
-        <div key={h.hypothesis_id} style={{ border: "1px solid #d0d7de", borderRadius: 8, padding: 12, marginBottom: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
-            onClick={() => setOpen(open === h.hypothesis_id ? null : h.hypothesis_id)}>
-            <span style={{ background: STATUS_COLORS[h.status] ?? "#57606a", color: "white", padding: "2px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600 }}>{h.status}</span>
-            <span style={{ fontWeight: 600, flex: 1 }}>{h.human_name ?? h.generated_name}</span>
-            <span style={{ fontSize: 20, fontWeight: 700 }}>{h.overall_score.toFixed(0)}</span>
+      {openId && !known && (
+        <p style={{ fontSize: 12, color: "#9a6700", marginBottom: 10 }}>
+          No hypothesis matches <code>?id={openId}</code> for this run.
+        </p>
+      )}
+      {hyps.data.map((h) => {
+        const isOpen = openId === h.hypothesis_id;
+        return (
+          <div
+            key={h.hypothesis_id}
+            ref={(el) => {
+              cardRefs.current[h.hypothesis_id] = el;
+            }}
+            style={{
+              border: isOpen ? "1px solid #0969da" : "1px solid #d0d7de",
+              borderRadius: 8,
+              padding: 12,
+              marginBottom: 10,
+              background: isOpen ? "#f6f8fa" : undefined,
+            }}
+          >
+            <div
+              style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+              onClick={() => setOpen(isOpen ? null : h.hypothesis_id)}
+              title={isOpen ? "Collapse detail" : "Expand detail (URL updates for sharing)"}
+            >
+              <span
+                style={{
+                  background: STATUS_COLORS[h.status] ?? "#57606a",
+                  color: "white",
+                  padding: "2px 8px",
+                  borderRadius: 12,
+                  fontSize: 11,
+                  fontWeight: 600,
+                }}
+              >
+                {h.status}
+              </span>
+              <span style={{ fontWeight: 600, flex: 1 }}>{h.human_name ?? h.generated_name}</span>
+              <span style={{ fontSize: 20, fontWeight: 700 }}>{h.overall_score.toFixed(0)}</span>
+            </div>
+            {isOpen && <Detail h={h} />}
           </div>
-          {open === h.hypothesis_id && <Detail h={h} />}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
