@@ -72,3 +72,17 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.37).
 - **Commit:** `0853314`
 - **Next suggestion:** self-audit Windows engine-only note; or `subject_raw`; human: PatentsView / Actions PAT.
+
+## 2026-07-24 cycle-8 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (data contract + import behavior + tests, not UX-only).
+- **Planned:** First-class `subject_raw` / `object_raw` mention staging (GOOD_FIRST_ISSUES / evolution-loop).
+- **Shipped (v0.1.38):**
+  - `Observation.subject_raw` / `object_raw`; import derive + metadata fallback; subject_raw-only resolve
+  - Unresolved errors carry raw_value + subject_raw in message
+  - API stats (`observations_with_subject_raw`, `observations_subject_raw_differs`); export round-trip
+  - Data Explorer column + detail; JSON Schema + import-schema gap closed
+  - self-audit: Windows engine-only gate documented under known limitations
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.38; includes `tests/test_subject_raw.py`).
+- **Commit:** `0f05a58`
+- **Next suggestion:** provisional entities for unresolved mentions (explicit type policy); human: PatentsView real dump / Actions PAT.
