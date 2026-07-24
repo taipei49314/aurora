@@ -173,6 +173,14 @@ def stats():
     )
     with_ext = sum(1 for e in s.entities if e.external_ids)
     entities_with_country = sum(1 for e in s.entities if (e.country or "").strip())
+    entities_provisional = sum(
+        1
+        for e in s.entities
+        if e.entity_type == "PROVISIONAL" or (e.metadata or {}).get("provisional")
+    )
+    obs_subject_provisional = sum(
+        1 for o in s.observations if (o.metadata or {}).get("subject_provisional")
+    )
     entity_country_counts: dict = {}
     entity_type_counts: dict = {}
     for e in s.entities:
@@ -192,6 +200,8 @@ def stats():
         "entities_with_external_ids": with_ext,
         "entities_total": len(s.entities),
         "entities_with_country": entities_with_country,
+        "entities_provisional": entities_provisional,
+        "observations_subject_provisional": obs_subject_provisional,
         "entity_country_counts": entity_country_counts,
         "entity_type_counts": entity_type_counts,
         "sources_total": len(s.sources),

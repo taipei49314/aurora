@@ -11,6 +11,8 @@ Entities that share an ``external_ids`` key are merged into the first entity
 that claimed that key (aliases + external_ids union). Observations may resolve
 subjects via name, ``ext:system:id``, or ``{name, external_ids}``. Surface-form
 ``subject_raw`` / ``object_raw`` are stored for provenance (engine 0.1.38+).
+Opt-in ``stage_unresolved`` creates provisional entities for unknown names
+(engine 0.1.39+; default type ``PROVISIONAL``, not industry-clusterable).
 """
 from __future__ import annotations
 
@@ -119,6 +121,85 @@ def _derive_mention_raw(ref: Any) -> str:
     if isinstance(ref, str):
         return ref.strip()
     return str(ref).strip()
+
+
+def _package_stage_unresolved(raw: dict) -> bool:
+    """Package-level opt-in for provisional entity staging (0.1.39+)."""
+    if raw.get("stage_unresolved") in (True, "true", "1", 1):
+        return True
+    if raw.get("stage_unresolved_subjects") in (True, "true", "1", 1):
+        return True
+    if isinstance(raw.get("package"), dict) and raw["package"].get("stage_unresolved") in (
+        True, "true", "1", 1,
+    ):
+        return True
+    return False
+
+
+def _package_provisional_type(raw: dict) -> str:
+    """Default entity_type for staged unresolved mentions (default PROVISIONAL)."""
+    t = raw.get("provisional_entity_type")
+    if not t and isinstance(raw.get("package"), dict):
+        t = raw["package"].get("provisional_entity_type")
+    t = (str(t).strip() if t not in (None, "") else "") or "PROVISIONAL"
+    return t
+
+
+def _row_stage_unresolved(row: dict, meta: dict, package_flag: bool) -> bool:
+    if package_flag:
+        return True
+    v = row.get("stage_unresolved")
+    if v in (None, ""):
+        v = meta.get("stage_unresolved")
+    return v in (True, "true", "1", 1)
+
+
+def _staging_display_name(name: Optional[str], mention_raw: str) -> Optional[str]:
+    """Human-readable name required to stage a provisional entity."""
+    display = (name or "").strip() or (mention_raw or "").strip()
+    if not display:
+        return None
+    # pure external refs are not usable as canonical names
+    as_ext = normalize_external_id(display)
+    if as_ext and (
+        display.lower().startswith("ext:")
+        or (display.count(":") == 1 and "://" not in display)
+    ):
+        # allow only when parse gave a separate name (already empty path)
+        if not (name or "").strip():
+            return None
+    return display
+
+
+def _stage_provisional_entity(
+    entities: dict,
+    resolver: EntityResolver,
+    *,
+    name: str,
+    entity_type: str,
+    created_at: str,
+    ext_ids: Optional[List] = None,
+) -> str:
+    """Create or reuse a provisional entity and register it with the resolver."""
+    eid = prefixed_id("ent", entity_type, normalize_text(name))
+    if eid in entities:
+        return eid
+    # Prefer an already-known entity with this name if resolve now hits
+    existing = resolver.resolve(name, external_ids=ext_ids or [])
+    if existing:
+        return existing
+    ext_list = [{"system": sys, "id": iid} for sys, iid in (ext_ids or [])]
+    ent = Entity(
+        entity_id=eid,
+        entity_type=entity_type,
+        canonical_name=name,
+        created_at=created_at,
+        external_ids=ext_list,
+        metadata={"provisional": True},
+    )
+    entities[eid] = ent
+    resolver.register(ent)
+    return eid
 
 
 def _extract_char_span(row: dict, meta: dict) -> Optional[list]:
@@ -254,6 +335,13 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         package_license = (raw["package"].get("license") or "").strip()
     if not package_license and isinstance(raw.get("meta"), dict):
         package_license = (raw["meta"].get("license") or "").strip()
+
+    # Opt-in provisional entity staging for unresolved mentions (0.1.39+)
+    stage_unresolved_pkg = _package_stage_unresolved(raw)
+    provisional_type_default = _package_provisional_type(raw)
+    if provisional_type_default not in ENTITY_TYPES:
+        # fall back rather than hard-fail the whole package
+        provisional_type_default = "PROVISIONAL"
 
     # --- 1. build entities (deterministic ids; merge on shared external_ids) ---
     entities: dict[str, Entity] = {}
@@ -484,15 +572,51 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             meta.pop("subject_raw", None)
 
         name_s, ext_s = parse_entity_ref(subject_ref)
-        subj = resolver.resolve(name_s, external_ids=list(ext_s) + list(subj_ext))
+        all_subj_ext = list(ext_s) + list(subj_ext)
+        subj = resolver.resolve(name_s, external_ids=all_subj_ext)
+        stage_this = _row_stage_unresolved(row, meta, stage_unresolved_pkg)
+        if "stage_unresolved" in meta:
+            meta.pop("stage_unresolved", None)
         if subj is None:
-            errors.append(RowError(
-                i, "subject", "ENTITY_RESOLUTION_AMBIGUOUS",
-                f"cannot resolve subject {subject_ref!r}"
-                + (f" (subject_raw={subject_raw!r})" if subject_raw else ""),
-                subject_raw or str(subject_ref),
-            ))
-            continue
+            # Ambiguous known names never invent a third entity
+            if resolver.name_is_ambiguous(name_s):
+                errors.append(RowError(
+                    i, "subject", "ENTITY_RESOLUTION_AMBIGUOUS",
+                    f"cannot resolve subject {subject_ref!r} (ambiguous name)"
+                    + (f" (subject_raw={subject_raw!r})" if subject_raw else ""),
+                    subject_raw or str(subject_ref),
+                ))
+                continue
+            display = _staging_display_name(name_s, subject_raw)
+            if stage_this and display:
+                subj_type = (
+                    row.get("subject_entity_type")
+                    or meta.pop("subject_entity_type", None)
+                    or provisional_type_default
+                )
+                subj_type = str(subj_type).strip() or provisional_type_default
+                if subj_type not in ENTITY_TYPES:
+                    errors.append(RowError(
+                        i, "subject_entity_type", "SCHEMA_VALIDATION_FAILED",
+                        f"unknown subject_entity_type {subj_type!r} for provisional staging",
+                        subj_type,
+                    ))
+                    continue
+                subj = _stage_provisional_entity(
+                    entities, resolver,
+                    name=display, entity_type=subj_type, created_at=created_at,
+                    ext_ids=all_subj_ext,
+                )
+                meta["subject_provisional"] = True
+            else:
+                errors.append(RowError(
+                    i, "subject", "ENTITY_RESOLUTION_AMBIGUOUS",
+                    f"cannot resolve subject {subject_ref!r}"
+                    + (f" (subject_raw={subject_raw!r})" if subject_raw else "")
+                    + ("" if stage_this else "; set stage_unresolved to stage provisional entity"),
+                    subject_raw or str(subject_ref),
+                ))
+                continue
 
         obj = None
         object_ref = row.get("object")
@@ -504,15 +628,47 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             if object_raw:
                 meta.pop("object_raw", None)
             name_o, ext_o = parse_entity_ref(object_ref)
-            obj = resolver.resolve(name_o, external_ids=list(ext_o) + list(obj_ext))
+            all_obj_ext = list(ext_o) + list(obj_ext)
+            obj = resolver.resolve(name_o, external_ids=all_obj_ext)
             if obj is None:
-                errors.append(RowError(
-                    i, "object", "ENTITY_RESOLUTION_AMBIGUOUS",
-                    f"cannot resolve object {object_ref!r}"
-                    + (f" (object_raw={object_raw!r})" if object_raw else ""),
-                    object_raw or str(object_ref),
-                ))
-                continue
+                if resolver.name_is_ambiguous(name_o):
+                    errors.append(RowError(
+                        i, "object", "ENTITY_RESOLUTION_AMBIGUOUS",
+                        f"cannot resolve object {object_ref!r} (ambiguous name)"
+                        + (f" (object_raw={object_raw!r})" if object_raw else ""),
+                        object_raw or str(object_ref),
+                    ))
+                    continue
+                display_o = _staging_display_name(name_o, object_raw)
+                if stage_this and display_o:
+                    obj_type = (
+                        row.get("object_entity_type")
+                        or meta.pop("object_entity_type", None)
+                        or provisional_type_default
+                    )
+                    obj_type = str(obj_type).strip() or provisional_type_default
+                    if obj_type not in ENTITY_TYPES:
+                        errors.append(RowError(
+                            i, "object_entity_type", "SCHEMA_VALIDATION_FAILED",
+                            f"unknown object_entity_type {obj_type!r} for provisional staging",
+                            obj_type,
+                        ))
+                        continue
+                    obj = _stage_provisional_entity(
+                        entities, resolver,
+                        name=display_o, entity_type=obj_type, created_at=created_at,
+                        ext_ids=all_obj_ext,
+                    )
+                    meta["object_provisional"] = True
+                else:
+                    errors.append(RowError(
+                        i, "object", "ENTITY_RESOLUTION_AMBIGUOUS",
+                        f"cannot resolve object {object_ref!r}"
+                        + (f" (object_raw={object_raw!r})" if object_raw else "")
+                        + ("" if stage_this else "; set stage_unresolved to stage provisional entity"),
+                        object_raw or str(object_ref),
+                    ))
+                    continue
 
         if not _valid_date(row.get("observed_at")):
             errors.append(RowError(i, "observed_at", "SOURCE_DATE_MISSING",

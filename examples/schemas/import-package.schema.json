@@ -11,6 +11,18 @@
       "type": "string",
       "description": "Package-level default redistribution license applied to sources missing license (0.1.14+)"
     },
+    "stage_unresolved": {
+      "type": "boolean",
+      "description": "Opt-in: stage provisional entities for unresolved subject/object names (0.1.39+). Alias: stage_unresolved_subjects."
+    },
+    "stage_unresolved_subjects": {
+      "type": "boolean",
+      "description": "Alias of stage_unresolved (0.1.39+)"
+    },
+    "provisional_entity_type": {
+      "type": "string",
+      "description": "Default entity_type for staged unresolved mentions (default PROVISIONAL; not industry-clusterable)"
+    },
     "entities": {
       "type": "array",
       "items": { "$ref": "#/$defs/entity" }
@@ -35,7 +47,7 @@
       "enum": [
         "COMPANY", "RESEARCH_INSTITUTE", "UNIVERSITY", "GOVERNMENT", "STANDARD_BODY",
         "PRODUCT", "TECHNOLOGY", "MATERIAL", "COMPONENT", "PROCESS", "FACILITY",
-        "APPLICATION", "MARKET", "PERSON"
+        "APPLICATION", "MARKET", "PERSON", "PROVISIONAL"
       ]
     },
     "sourceType": {
@@ -170,6 +182,18 @@
         "object_raw": {
           "type": "string",
           "description": "Surface-form object mention; staging / provenance (0.1.38+)"
+        },
+        "stage_unresolved": {
+          "type": "boolean",
+          "description": "Row-level opt-in to create provisional entities when subject/object does not resolve (0.1.39+)"
+        },
+        "subject_entity_type": {
+          "type": "string",
+          "description": "entity_type for staged subject provisional (default package provisional_entity_type / PROVISIONAL)"
+        },
+        "object_entity_type": {
+          "type": "string",
+          "description": "entity_type for staged object provisional"
         },
         "observed_at": {
           "type": ["string", "null"]

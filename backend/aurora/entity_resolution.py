@@ -105,13 +105,28 @@ class EntityResolver:
         self._name_to_ids: dict[str, set[str]] = defaultdict(set)
         self._ext_to_ids: dict[ExtKey, set[str]] = defaultdict(set)
         for e in sorted(entities, key=lambda x: x.entity_id):
-            self._name_to_ids[normalize_text(e.canonical_name)].add(e.entity_id)
-            for alias in e.aliases or []:
-                self._name_to_ids[normalize_text(alias)].add(e.entity_id)
-            for raw in e.external_ids or []:
-                key = normalize_external_id(raw)
-                if key:
-                    self._ext_to_ids[key].add(e.entity_id)
+            self._index_entity(e)
+
+    def _index_entity(self, e) -> None:
+        self._name_to_ids[normalize_text(e.canonical_name)].add(e.entity_id)
+        for alias in e.aliases or []:
+            self._name_to_ids[normalize_text(alias)].add(e.entity_id)
+        for raw in e.external_ids or []:
+            key = normalize_external_id(raw)
+            if key:
+                self._ext_to_ids[key].add(e.entity_id)
+
+    def register(self, entity) -> None:
+        """Index a newly staged entity (provisional import; engine 0.1.39+)."""
+        self.entities[entity.entity_id] = entity
+        self._index_entity(entity)
+
+    def name_is_ambiguous(self, name: Optional[str]) -> bool:
+        """True when the normalized name maps to more than one known entity."""
+        if not name or not str(name).strip():
+            return False
+        ids = self._name_to_ids.get(normalize_text(name)) or set()
+        return len(ids) > 1
 
     def external_id_collisions(self) -> list[dict]:
         """External ids that map to more than one entity."""
