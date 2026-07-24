@@ -187,9 +187,14 @@ resolve; export/stats/Data Explorer; unresolved still requires a resolvable enti
 Opt-in `stage_unresolved` creates `PROVISIONAL` (non-clusterable) entities from
 unknown names; ambiguous / pure-ext failures still error; stats + tests.
 
+## 38. lint --no-provisional + resolve promote — **done (v0.1.40)**
+
+`lint_package --no-provisional` hard policy; soft provisional stats; resolve CLI
+`--list-provisional` and `--promote NAME --to-type` package rewrite.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: lint rule `--no-provisional` / promote provisional entities in resolve CLI
+- Optional: wire `--no-provisional` into check_all for curated cases
 - Keep Docker PARTIAL honest until compose is verified on a Docker host
