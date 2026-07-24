@@ -126,3 +126,16 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.41).
 - **Commit:** `de919d7`
 - **Next suggestion:** Data Explorer provisional entity_type chip/filter; human: PatentsView dump / Actions PAT.
+
+## 2026-07-24 cycle-12 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (API data contract + multi-file visibility + tests; not a single chip).
+- **Planned:** Provisional visibility across API, Data Explorer, and Dashboard.
+- **Shipped (v0.1.42):**
+  - `backend/aurora/provisional.py` helpers
+  - API `?provisional=` entities; `?subject_provisional=` / `?provisional_mention=` observations; resolve adds entity_type/provisional
+  - Explorer chips + badge; Dashboard provenance resolved-vs-provisional bar + deep-links
+  - Tests: `tests/test_provisional_helpers.py` (+ API filter assertions)
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.42).
+- **Commit:** `ae62fcf`
+- **Next suggestion:** adapters default subject_raw; entity-graph blocking for scale; human: PatentsView dump / Actions PAT.
