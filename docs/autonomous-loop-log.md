@@ -113,3 +113,16 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.40).
 - **Commit:** `d4a2256`
 - **Next suggestion:** wire `--no-provisional` into check_all for curated cases; human: PatentsView dump / Actions PAT.
+
+## 2026-07-24 cycle-11 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (scorecard gate + CI wiring + tests).
+- **Planned:** Wire `--no-provisional` into check_all + scorecard honesty for curated cases.
+- **Shipped (v0.1.41):**
+  - Scorecard `require_no_provisional` / `max_provisional_entities`; all 5 cases set require_no_provisional
+  - check_all curated lints use `--no-provisional`; check_engine lints example with it
+  - scorecard import preserves stage_unresolved flags
+  - Tests: `tests/test_scorecard_provisional_gates.py`
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.41).
+- **Commit:** `de919d7`
+- **Next suggestion:** Data Explorer provisional entity_type chip/filter; human: PatentsView dump / Actions PAT.
