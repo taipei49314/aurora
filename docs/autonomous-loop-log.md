@@ -1,6 +1,16 @@
 # Autonomous progress loop log
 
-Cadence: every ~30 minutes (plan → execute → test → git push).
+## Policy (mode B — since 2026-07-24)
+
+- Cadence: about **every 2 hours** (not 30 minutes).
+- **No micro version spam.** Do not bump `ENGINE_VERSION` for one deep-link, docs-only, or loop-log-only work.
+- Version bump only for a **coherent pack**: engine/import/adapters/schema/tests or multi-file non-trivial feature, with tests.
+- Tiny leftovers: either batch into one pack, or commit **without** version bump.
+- Flow still: plan → execute → test → git push (no force-push).
+
+## Legacy note
+
+Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That cadence is **retired**.
 
 ## 2026-07-24 cycle-1
 
