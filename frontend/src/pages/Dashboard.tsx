@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { useCurrentRun } from "../useRun";
 import { STATUS_COLORS, Hypothesis, getStats } from "../api";
 
@@ -186,7 +187,7 @@ function tierLine(tiers?: Record<string, number>) {
     .join(" ");
 }
 
-/** Document / char_span coverage quality panel (engine 0.1.27+). */
+/** Document / char_span coverage quality panel (engine 0.1.27+; deep-links 0.1.29+). */
 function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats }) {
   const nObs = Number(stats.counts?.observations ?? 0);
   const withDoc = stats.observations_with_document_id ?? 0;
@@ -210,13 +211,23 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
         : 0;
   const textRatio = refs ? Math.min(1, docsText / Math.max(refs, 1)) : docsTotal ? 1 : 0;
 
-  const rows: { label: string; ratio: number; detail: string; good: number; warn: number }[] = [
+  const rows: {
+    label: string;
+    ratio: number;
+    detail: string;
+    good: number;
+    warn: number;
+    to?: string;
+    title?: string;
+  }[] = [
     {
       label: "document_id link",
       ratio: docLinkRatio,
       detail: `${withDoc}/${nObs || "—"} observations`,
       good: 0.8,
       warn: 0.4,
+      to: "/data?tab=observations",
+      title: "Open observations in Data Explorer",
     },
     {
       label: "char_span coverage",
@@ -224,6 +235,14 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
       detail: `${withSpan}/${nObs || "—"} obs · ${autoSpan} auto · ${missingSpan} missing on doc`,
       good: 0.7,
       warn: 0.35,
+      to:
+        missingSpan > 0
+          ? "/data?tab=observations&span=missing_on_doc"
+          : "/data?tab=observations&span=with",
+      title:
+        missingSpan > 0
+          ? "Open observations with document_id but no char_span"
+          : "Open observations with char_span",
     },
     {
       label: "documents with text",
@@ -231,6 +250,8 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
       detail: `${docsText} with text · ${docsTotal} full rows · ${refs} referenced`,
       good: 0.9,
       warn: 0.5,
+      to: "/data?tab=documents",
+      title: "Open documents tab in Data Explorer",
     },
   ];
 
@@ -258,8 +279,16 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
       <p style={{ margin: "10px 0 0", fontSize: 11, color: "#57606a" }}>
         Improve span coverage with adapter <code>ensure_documents</code> and progressive
         char_span align; lint with <code>--require-char-spans</code> /{" "}
-        <code>--min-char-span-ratio</code>. In Data Explorer, filter observations with{" "}
-        <b>missing on doc</b> (<code>?missing_char_span=true</code>).
+        <code>--min-char-span-ratio</code>. Drill into gaps via{" "}
+        <Link
+          to="/data?tab=observations&span=missing_on_doc"
+          style={{ color: "#cf222e", fontWeight: 600 }}
+          title="Observations with document_id but no char_span"
+        >
+          missing on doc
+        </Link>{" "}
+        (<code>/data?tab=observations&amp;span=missing_on_doc</code>
+        {missingSpan > 0 ? ` · ${missingSpan} rows` : ""}).
       </p>
     </div>
   );
@@ -271,24 +300,45 @@ function CoverageBar({
   detail,
   good,
   warn,
+  to,
+  title,
 }: {
   label: string;
   ratio: number;
   detail: string;
   good: number;
   warn: number;
+  to?: string;
+  title?: string;
 }) {
   const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
   const color =
     ratio >= good ? "#1a7f37" : ratio >= warn ? "#9a6700" : ratio > 0 ? "#cf222e" : "#8c959f";
   const bg =
     ratio >= good ? "#dafbe1" : ratio >= warn ? "#fff8c5" : ratio > 0 ? "#ffebe9" : "#eaeef2";
+  const labelNode = to ? (
+    <Link to={to} title={title || label} style={{ color: "inherit", textDecoration: "none" }}>
+      <b style={{ borderBottom: "1px dashed #0969da" }}>{label}</b>
+    </Link>
+  ) : (
+    <b>{label}</b>
+  );
+  const barInner = (
+    <div
+      style={{
+        width: `${pct}%`,
+        height: "100%",
+        background: color,
+        borderRadius: 4,
+        transition: "width 0.2s ease",
+      }}
+    />
+  );
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
         <span>
-          <b>{label}</b>{" "}
-          <span style={{ color: "#57606a" }}>{detail}</span>
+          {labelNode} <span style={{ color: "#57606a" }}>{detail}</span>
         </span>
         <span style={{ fontWeight: 700, color }}>{pct}%</span>
       </div>
@@ -299,17 +349,19 @@ function CoverageBar({
           background: "#eaeef2",
           overflow: "hidden",
         }}
-        title={`${label}: ${pct}%`}
+        title={title || `${label}: ${pct}%`}
       >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: "100%",
-            background: color,
-            borderRadius: 4,
-            transition: "width 0.2s ease",
-          }}
-        />
+        {to ? (
+          <Link
+            to={to}
+            title={title || `${label}: ${pct}%`}
+            style={{ display: "block", width: "100%", height: "100%", textDecoration: "none" }}
+          >
+            {barInner}
+          </Link>
+        ) : (
+          barInner
+        )}
       </div>
       <div
         style={{
