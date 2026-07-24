@@ -6,6 +6,18 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.35] — 2026-07-24
+
+### Added
+
+- Discovery Map and Timeline hypothesis pickers sync to shareable URL
+  (`?id=` / `hypothesis_id` / `h`); invalid ids fall back with a warning
+
+### Changed
+
+- Engine / feature → **0.1.35**
+- README engine badge version aligned
+
 ## [0.1.34] — 2026-07-24
 
 ### Added

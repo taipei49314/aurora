@@ -162,9 +162,14 @@ per-status chips with shareable URL (composes with `?id=`).
 Dashboard table Status badge and name open Explorer with
 `?status=<STATUS>&id=<hypothesis_id>` (filtered list + open card).
 
+## 33. DiscoveryMap / Timeline shareable `?id=` — **done (v0.1.35)**
+
+Hypothesis pickers on Discovery Map and Timeline write/read URL `?id=`
+(aliases `hypothesis_id`, `h`) so selections are bookmarkable.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
 - `subject_raw` staging field for unresolved entity mentions
-- DiscoveryMap / Timeline hypothesis picker → shareable `?id=` URL
+- Cross-page links: Explorer → Discovery Map / Timeline with same `?id=`

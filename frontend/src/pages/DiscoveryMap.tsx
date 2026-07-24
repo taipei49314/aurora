@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentRun } from "../useRun";
 import { getGraph } from "../api";
@@ -9,11 +9,31 @@ const ROLE_COLORS: Record<string, string> = {
   APPLICATION: "#db2777", END_CUSTOMER: "#57606a", STANDARD_OR_REGULATION: "#6b7280",
 };
 
+/** Shareable hypothesis id from URL (`id`, `hypothesis_id`, or short `h`). */
+function parseHypId(params: URLSearchParams): string | null {
+  return params.get("id") || params.get("hypothesis_id") || params.get("h") || null;
+}
+
 export function DiscoveryMap() {
   const { hyps } = useCurrentRun();
-  const [sel, setSel] = useState<string | null>(null);
-  const id = sel ?? hyps.data?.[0]?.hypothesis_id;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fromUrl = parseHypId(searchParams);
+  const known = fromUrl && hyps.data?.some((h) => h.hypothesis_id === fromUrl);
+  const id = (known ? fromUrl : null) ?? hyps.data?.[0]?.hypothesis_id ?? null;
   const graph = useQuery({ queryKey: ["graph", id], queryFn: () => getGraph(id!), enabled: !!id });
+
+  const setId = (nextId: string) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("hypothesis_id");
+        next.delete("h");
+        next.set("id", nextId);
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   if (!hyps.data) return <p>Loading…</p>;
   const nodes = graph.data?.nodes ?? [];
@@ -28,9 +48,28 @@ export function DiscoveryMap() {
   return (
     <div>
       <h2>Discovery Map</h2>
-      <select value={id} onChange={(e) => setSel(e.target.value)} style={{ marginBottom: 12 }}>
-        {hyps.data.map((h) => <option key={h.hypothesis_id} value={h.hypothesis_id}>{h.generated_name}</option>)}
+      {fromUrl && !known && (
+        <p style={{ fontSize: 12, color: "#9a6700", marginBottom: 8 }}>
+          No hypothesis matches <code>?id={fromUrl}</code> for this run — showing first hypothesis.
+        </p>
+      )}
+      <select
+        value={id ?? ""}
+        onChange={(e) => setId(e.target.value)}
+        style={{ marginBottom: 12 }}
+        title="Selection is stored in ?id= for sharing"
+      >
+        {hyps.data.map((h) => (
+          <option key={h.hypothesis_id} value={h.hypothesis_id}>
+            {h.generated_name}
+          </option>
+        ))}
       </select>
+      {id && (
+        <span style={{ marginLeft: 10, fontSize: 11, color: "#8c959f" }}>
+          <code>?id={id.slice(0, 12)}…</code>
+        </span>
+      )}
       <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
         <svg width={520} height={480} style={{ border: "1px solid #d0d7de", borderRadius: 8 }}>
           {edges.map((e: any, i: number) => {

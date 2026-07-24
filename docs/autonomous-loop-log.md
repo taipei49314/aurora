@@ -38,3 +38,11 @@ Cadence: every ~30 minutes (plan → execute → test → git push).
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.34).
 - **Commit:** `25fbb5f`
 - **Next suggestion:** DiscoveryMap/Timeline shareable `?id=`; or `subject_raw` staging; human: PatentsView dump / Actions PAT.
+
+## 2026-07-24 cycle-5
+
+- **Planned:** DiscoveryMap / Timeline hypothesis picker → shareable `?id=` URL.
+- **Shipped (v0.1.35):** Both pages read/write `?id=` (aliases); invalid id warning + fallback; docs #33.
+- **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.35).
+- **Commit:** (this cycle)
+- **Next suggestion:** Explorer → Map/Timeline cross-links with same `?id=`; or `subject_raw`; human: PatentsView / Actions PAT.
