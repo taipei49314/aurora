@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentRun } from "../useRun";
 import { getTimeline } from "../api";
@@ -56,6 +56,22 @@ export function Timeline() {
       {id && (
         <span style={{ marginLeft: 10, fontSize: 11, color: "#8c959f" }}>
           <code>?id={id.slice(0, 12)}…</code>
+          {" · "}
+          <Link
+            to={`/hypotheses?id=${encodeURIComponent(id)}`}
+            style={{ color: "#0969da", fontWeight: 600, textDecoration: "none" }}
+            title="Open this hypothesis in Hypothesis Explorer"
+          >
+            Explorer ↗
+          </Link>
+          {" · "}
+          <Link
+            to={`/map?id=${encodeURIComponent(id)}`}
+            style={{ color: "#0969da", fontWeight: 600, textDecoration: "none" }}
+            title="Open Discovery Map for this hypothesis"
+          >
+            Map ↗
+          </Link>
         </span>
       )}
       <div style={{ display: "flex", alignItems: "flex-end", gap: 12, height: 240, borderBottom: "1px solid #d0d7de", paddingBottom: 4 }}>
