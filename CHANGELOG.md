@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.29] — 2026-07-24
+
+### Added
+
+- Data Explorer **URL deep-links** for shareable filters:
+  - `?tab=observations|sources|documents|entities`
+  - `?span=with|auto|none|missing_on_doc` (also accepts `?missing_char_span=true`)
+  - `?tier=`, `?source_type=`, `?entity_type=`, `?obs_type=`, `?q=`
+- Dashboard **Provenance quality** panel links into Data Explorer
+  (missing-on-doc, observations, documents)
+
+### Changed
+
+- Engine / feature → **0.1.29**
+
 ## [0.1.28] — 2026-07-24
 
 ### Added

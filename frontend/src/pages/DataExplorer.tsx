@@ -1,5 +1,6 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import {
   getDocument,
   getDocuments,
@@ -12,6 +13,31 @@ import {
 
 type Tab = "entities" | "observations" | "sources" | "documents";
 type Tier = "A" | "B" | "C" | "D";
+type SpanFilter = "" | "with" | "auto" | "none" | "missing_on_doc";
+
+const TABS: Tab[] = ["entities", "observations", "sources", "documents"];
+const SPAN_FILTERS: SpanFilter[] = ["", "with", "auto", "none", "missing_on_doc"];
+const TIERS: Tier[] = ["A", "B", "C", "D"];
+
+function parseTab(v: string | null): Tab {
+  return TABS.includes(v as Tab) ? (v as Tab) : "entities";
+}
+
+/** Deep-link: ?span=missing_on_doc | ?missing_char_span=true | ?has_char_span= */
+function parseSpanFilter(params: URLSearchParams): SpanFilter {
+  if (params.get("missing_char_span") === "true") return "missing_on_doc";
+  const span = params.get("span");
+  if (span && SPAN_FILTERS.includes(span as SpanFilter)) return span as SpanFilter;
+  if (params.get("char_span_auto") === "true") return "auto";
+  if (params.get("has_char_span") === "true") return "with";
+  if (params.get("has_char_span") === "false") return "none";
+  return "";
+}
+
+function parseTier(v: string | null): "" | Tier {
+  const u = (v || "").toUpperCase();
+  return TIERS.includes(u as Tier) ? (u as Tier) : "";
+}
 
 const TIER_COLORS: Record<Tier, { bg: string; fg: string; label: string }> = {
   A: { bg: "#dafbe1", fg: "#1a7f37", label: "official / primary legal" },
@@ -141,16 +167,83 @@ function looksLikeResolveRef(s: string): boolean {
 }
 
 export function DataExplorer() {
-  const [tab, setTab] = useState<Tab>("entities");
-  const [q, setQ] = useState("");
-  const [tierFilter, setTierFilter] = useState<"" | Tier>("");
-  const [sourceType, setSourceType] = useState("");
-  const [entityType, setEntityType] = useState("");
-  const [obsType, setObsType] = useState("");
-  /** "" | "with" | "auto" | "none" | "missing_on_doc" — char_span filter (0.1.21+ / 0.1.28) */
-  const [spanFilter, setSpanFilter] = useState<
-    "" | "with" | "auto" | "none" | "missing_on_doc"
-  >("");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  /** Shareable filter state lives in the URL (Dashboard deep-links, 0.1.29+). */
+  const tab = parseTab(searchParams.get("tab"));
+  const spanFilter = parseSpanFilter(searchParams);
+  const tierFilter = parseTier(searchParams.get("tier"));
+  const sourceType = searchParams.get("source_type") || "";
+  const entityType = searchParams.get("entity_type") || "";
+  const obsType = searchParams.get("obs_type") || searchParams.get("observation_type") || "";
+  const q = searchParams.get("q") || "";
+
+  const patchParams = useCallback(
+    (patch: Record<string, string | null | undefined>) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [key, value] of Object.entries(patch)) {
+            if (value == null || value === "") next.delete(key);
+            else next.set(key, value);
+          }
+          // Canonicalize span aliases when span is set explicitly
+          if ("span" in patch) {
+            next.delete("missing_char_span");
+            next.delete("has_char_span");
+            next.delete("char_span_auto");
+          }
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const setTab = useCallback(
+    (t: Tab) => {
+      patchParams({ tab: t === "entities" ? null : t });
+    },
+    [patchParams],
+  );
+  const setSpanFilter = useCallback(
+    (s: SpanFilter) => {
+      patchParams({ span: s || null });
+    },
+    [patchParams],
+  );
+  const setTierFilter = useCallback(
+    (t: "" | Tier) => {
+      patchParams({ tier: t || null });
+    },
+    [patchParams],
+  );
+  const setSourceType = useCallback(
+    (t: string) => {
+      patchParams({ source_type: t || null });
+    },
+    [patchParams],
+  );
+  const setEntityType = useCallback(
+    (t: string) => {
+      patchParams({ entity_type: t || null });
+    },
+    [patchParams],
+  );
+  const setObsType = useCallback(
+    (t: string) => {
+      patchParams({ obs_type: t || null, observation_type: null });
+    },
+    [patchParams],
+  );
+  const setQ = useCallback(
+    (value: string) => {
+      patchParams({ q: value || null });
+    },
+    [patchParams],
+  );
+
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
@@ -248,8 +341,10 @@ export function DataExplorer() {
       // Prefer full entity row from list when available
       const full = (entities.data ?? []).find((e: any) => e.entity_id === hit.entity_id);
       setSelected(full ?? hit);
-      setTab("entities");
-      setQ(hit.canonical_name || target);
+      patchParams({
+        tab: null, // entities is default
+        q: hit.canonical_name || target || null,
+      });
       setResolveRef(target);
       setResolveStatus(`OK → ${hit.canonical_name} (${hit.entity_id.slice(0, 12)}…)`);
     } catch (e: any) {
@@ -544,7 +639,9 @@ export function DataExplorer() {
             );
           })}
           <span style={{ fontSize: 11, color: "#8c959f" }}>
-            GET /api/observations?missing_char_span=&amp;has_char_span=
+            deep-link{" "}
+            <code>?tab=observations&amp;span=missing_on_doc</code> · API{" "}
+            <code>?missing_char_span=</code>
           </span>
         </div>
       )}
@@ -825,10 +922,13 @@ export function DataExplorer() {
               <DocumentDetail
                 doc={selected}
                 onOpenObservation={(obs) => {
-                  setTab("observations");
                   setSelected(obs);
-                  setObsType("");
-                  setQ(obs.document_id || "");
+                  patchParams({
+                    tab: "observations",
+                    obs_type: null,
+                    observation_type: null,
+                    q: obs.document_id || null,
+                  });
                 }}
               />
             )}

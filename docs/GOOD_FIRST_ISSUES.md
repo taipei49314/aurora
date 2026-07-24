@@ -127,7 +127,14 @@ ratios for ratios and missing spans on document_id observations.
 Chip + API ?missing_char_span=true for observations with document_id but no
 char_span; also ?has_document_id=.
 
+## 26. Dashboard → Data Explorer deep-links — **done (v0.1.29)**
+
+Data Explorer filter state in URL (`tab`, `span`, `tier`, types, `q`);
+Provenance quality panel links to missing-on-doc / observations / documents.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
+- Data Explorer chip for has_document_id (+ Dashboard document_id bar link)
+- Observation detail open-document deep-link (`?tab=documents&q=…`)
