@@ -226,8 +226,8 @@ function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats
       detail: `${withDoc}/${nObs || "—"} observations`,
       good: 0.8,
       warn: 0.4,
-      to: "/data?tab=observations",
-      title: "Open observations in Data Explorer",
+      to: "/data?tab=observations&has_document_id=true",
+      title: "Open observations that have a document_id",
     },
     {
       label: "char_span coverage",
