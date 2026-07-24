@@ -9,7 +9,8 @@ never doubles the evidence (spec §34.3).
 
 Entities that share an ``external_ids`` key are merged into the first entity
 that claimed that key (aliases + external_ids union). Observations may resolve
-subjects via name, ``ext:system:id``, or ``{name, external_ids}``.
+subjects via name, ``ext:system:id``, or ``{name, external_ids}``. Surface-form
+``subject_raw`` / ``object_raw`` are stored for provenance (engine 0.1.38+).
 """
 from __future__ import annotations
 
@@ -78,6 +79,46 @@ def _extract_license(row: dict, meta: dict, default: str = "") -> str:
 def _extract_document_id(row: dict, meta: dict) -> str:
     """First-class document_id with metadata fallback (engine 0.1.15+)."""
     return (row.get("document_id") or meta.get("document_id") or "").strip()
+
+
+def _extract_mention_raw(row: dict, meta: dict, *, field: str, ref: Any) -> str:
+    """First-class subject_raw / object_raw with metadata + derivation (0.1.38+).
+
+    Prefer explicit top-level / metadata; otherwise derive a stable surface form
+    from the subject/object ref (name string, structured name, or compact ext ref).
+    """
+    key = f"{field}_raw"
+    explicit = row.get(key)
+    if explicit in (None, ""):
+        explicit = meta.get(key)
+    if explicit not in (None, ""):
+        return str(explicit).strip()
+    return _derive_mention_raw(ref)
+
+
+def _derive_mention_raw(ref: Any) -> str:
+    """Surface form for a subject/object ref when no explicit *_raw is given."""
+    if ref is None or ref == "":
+        return ""
+    if isinstance(ref, dict):
+        name = ref.get("name") or ref.get("canonical_name") or ref.get("subject")
+        if name not in (None, ""):
+            return str(name).strip()
+        # compact first external id for pure-id structured refs
+        ext = normalize_external_ids(
+            ref.get("external_ids")
+            or ([ref["external_id"]] if ref.get("external_id") else None)
+        )
+        one = normalize_external_id(ref)
+        if one and one not in ext:
+            ext.append(one)
+        if ext:
+            sys, iid = ext[0]
+            return f"ext:{sys}:{iid}"
+        return ""
+    if isinstance(ref, str):
+        return ref.strip()
+    return str(ref).strip()
 
 
 def _extract_char_span(row: dict, meta: dict) -> Optional[list]:
@@ -398,10 +439,14 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
     # --- 3. build observations ---
     observations: dict[str, Observation] = {}
     for i, row in enumerate(raw.get("observations", [])):
-        # subject may be dict — required check tolerates that
-        if row.get("subject") in (None, ""):
+        meta = dict(row.get("metadata", {}))
+        # subject may be dict; subject_raw alone is accepted as staging fallback (0.1.38+)
+        subject_ref = row.get("subject")
+        if subject_ref in (None, ""):
+            subject_ref = row.get("subject_raw") or meta.get("subject_raw") or ""
+        if subject_ref in (None, ""):
             errors.append(RowError(i, "subject", "SCHEMA_VALIDATION_FAILED",
-                                   "missing required observation fields", str(row)))
+                                   "missing required observation fields (subject or subject_raw)", str(row)))
             continue
         missing = set()
         if not row.get("source_ref"):
@@ -422,7 +467,6 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                                    f"observation references unknown source {row['source_ref']}", str(row["source_ref"])))
             continue
 
-        meta = dict(row.get("metadata", {}))
         # optional observation-level external hints
         subj_ext = normalize_external_ids(
             row.get("subject_external_ids")
@@ -435,20 +479,39 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             or ([meta["object_external_id"]] if meta.get("object_external_id") else None)
         )
 
-        name_s, ext_s = parse_entity_ref(row["subject"])
+        subject_raw = _extract_mention_raw(row, meta, field="subject", ref=subject_ref)
+        if subject_raw:
+            meta.pop("subject_raw", None)
+
+        name_s, ext_s = parse_entity_ref(subject_ref)
         subj = resolver.resolve(name_s, external_ids=list(ext_s) + list(subj_ext))
         if subj is None:
-            errors.append(RowError(i, "subject", "ENTITY_RESOLUTION_AMBIGUOUS",
-                                   f"cannot resolve subject {row['subject']!r}", str(row["subject"])))
+            errors.append(RowError(
+                i, "subject", "ENTITY_RESOLUTION_AMBIGUOUS",
+                f"cannot resolve subject {subject_ref!r}"
+                + (f" (subject_raw={subject_raw!r})" if subject_raw else ""),
+                subject_raw or str(subject_ref),
+            ))
             continue
 
         obj = None
-        if row.get("object") not in (None, ""):
-            name_o, ext_o = parse_entity_ref(row["object"])
+        object_ref = row.get("object")
+        if object_ref in (None, ""):
+            object_ref = row.get("object_raw") or meta.get("object_raw") or None
+        object_raw = ""
+        if object_ref not in (None, ""):
+            object_raw = _extract_mention_raw(row, meta, field="object", ref=object_ref)
+            if object_raw:
+                meta.pop("object_raw", None)
+            name_o, ext_o = parse_entity_ref(object_ref)
             obj = resolver.resolve(name_o, external_ids=list(ext_o) + list(obj_ext))
             if obj is None:
-                errors.append(RowError(i, "object", "ENTITY_RESOLUTION_AMBIGUOUS",
-                                       f"cannot resolve object {row['object']!r}", str(row["object"])))
+                errors.append(RowError(
+                    i, "object", "ENTITY_RESOLUTION_AMBIGUOUS",
+                    f"cannot resolve object {object_ref!r}"
+                    + (f" (object_raw={object_raw!r})" if object_raw else ""),
+                    object_raw or str(object_ref),
+                ))
                 continue
 
         if not _valid_date(row.get("observed_at")):
@@ -495,7 +558,8 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 numeric_value=row.get("numeric_value"), unit=row.get("unit"),
                 text_excerpt=row.get("text_excerpt", ""), confidence=float(row.get("confidence", 0.7)),
                 event_id=event_id, geo=geo, document_id=document_id,
-                char_span=char_span, metadata=meta,
+                char_span=char_span, subject_raw=subject_raw, object_raw=object_raw,
+                metadata=meta,
             )
 
     # Optional documents[] for full-text / path provenance (engine 0.1.15+)
