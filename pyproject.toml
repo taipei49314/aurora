@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aurora-discovery"
-version = "0.1.34"
+version = "0.1.35"
 description = "Local-first unknown-industry discovery engine (deterministic, no LLM at runtime)"
 readme = "README.md"
 license = { text = "MIT" }
