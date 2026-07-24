@@ -6,6 +6,18 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.27] — 2026-07-24
+
+### Added
+
+- Dashboard **Provenance quality** panel (document link / char_span / text bars)
+- Stats: `char_span_ratio`, `document_link_ratio`, `observations_missing_char_span`,
+  `documents_with_text`
+
+### Changed
+
+- Engine / feature → **0.1.27**
+
 ## [0.1.26] — 2026-07-24
 
 ### Added

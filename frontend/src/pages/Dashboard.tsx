@@ -116,6 +116,8 @@ export function Dashboard() {
         </div>
       )}
 
+      {st && <ProvenanceQualityPanel stats={st} />}
+
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", margin: "12px 0 20px" }}>
         {Object.entries(c).map(([s, n]) => (
           <div key={s} style={{ border: "1px solid #d0d7de", borderRadius: 8, padding: "8px 12px" }}>
@@ -182,4 +184,146 @@ function tierLine(tiers?: Record<string, number>) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, v]) => `${k}:${v}`)
     .join(" ");
+}
+
+/** Document / char_span coverage quality panel (engine 0.1.27+). */
+function ProvenanceQualityPanel({ stats }: { stats: import("../api").CorpusStats }) {
+  const nObs = Number(stats.counts?.observations ?? 0);
+  const withDoc = stats.observations_with_document_id ?? 0;
+  const withSpan = stats.observations_with_char_span ?? 0;
+  const autoSpan = stats.observations_with_char_span_auto ?? 0;
+  const missingSpan = stats.observations_missing_char_span ?? Math.max(0, withDoc - withSpan);
+  const docsTotal = stats.documents_total ?? 0;
+  const docsText = stats.documents_with_text ?? docsTotal;
+  const refs = stats.document_ids_referenced ?? 0;
+  const spanRatio =
+    typeof stats.char_span_ratio === "number"
+      ? stats.char_span_ratio
+      : nObs
+        ? withSpan / nObs
+        : 0;
+  const docLinkRatio =
+    typeof stats.document_link_ratio === "number"
+      ? stats.document_link_ratio
+      : nObs
+        ? withDoc / nObs
+        : 0;
+  const textRatio = refs ? Math.min(1, docsText / Math.max(refs, 1)) : docsTotal ? 1 : 0;
+
+  const rows: { label: string; ratio: number; detail: string; good: number; warn: number }[] = [
+    {
+      label: "document_id link",
+      ratio: docLinkRatio,
+      detail: `${withDoc}/${nObs || "—"} observations`,
+      good: 0.8,
+      warn: 0.4,
+    },
+    {
+      label: "char_span coverage",
+      ratio: spanRatio,
+      detail: `${withSpan}/${nObs || "—"} obs · ${autoSpan} auto · ${missingSpan} missing on doc`,
+      good: 0.7,
+      warn: 0.35,
+    },
+    {
+      label: "documents with text",
+      ratio: textRatio,
+      detail: `${docsText} with text · ${docsTotal} full rows · ${refs} referenced`,
+      good: 0.9,
+      warn: 0.5,
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        border: "1px solid #d0d7de",
+        borderRadius: 8,
+        padding: "12px 14px",
+        margin: "0 0 16px",
+        background: "#ffffff",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+        <b style={{ fontSize: 13 }}>Provenance quality</b>
+        <span style={{ fontSize: 11, color: "#8c959f" }}>
+          documents · char_span · GET /api/stats
+        </span>
+      </div>
+      <div style={{ display: "grid", gap: 10 }}>
+        {rows.map((r) => (
+          <CoverageBar key={r.label} {...r} />
+        ))}
+      </div>
+      <p style={{ margin: "10px 0 0", fontSize: 11, color: "#57606a" }}>
+        Improve span coverage with adapter <code>ensure_documents</code> and progressive
+        char_span align; lint with <code>--require-char-spans</code> /{" "}
+        <code>--min-char-span-ratio</code>.
+      </p>
+    </div>
+  );
+}
+
+function CoverageBar({
+  label,
+  ratio,
+  detail,
+  good,
+  warn,
+}: {
+  label: string;
+  ratio: number;
+  detail: string;
+  good: number;
+  warn: number;
+}) {
+  const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+  const color =
+    ratio >= good ? "#1a7f37" : ratio >= warn ? "#9a6700" : ratio > 0 ? "#cf222e" : "#8c959f";
+  const bg =
+    ratio >= good ? "#dafbe1" : ratio >= warn ? "#fff8c5" : ratio > 0 ? "#ffebe9" : "#eaeef2";
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+        <span>
+          <b>{label}</b>{" "}
+          <span style={{ color: "#57606a" }}>{detail}</span>
+        </span>
+        <span style={{ fontWeight: 700, color }}>{pct}%</span>
+      </div>
+      <div
+        style={{
+          height: 8,
+          borderRadius: 4,
+          background: "#eaeef2",
+          overflow: "hidden",
+        }}
+        title={`${label}: ${pct}%`}
+      >
+        <div
+          style={{
+            width: `${pct}%`,
+            height: "100%",
+            background: color,
+            borderRadius: 4,
+            transition: "width 0.2s ease",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "inline-block",
+          marginTop: 4,
+          fontSize: 10,
+          fontWeight: 600,
+          color,
+          background: bg,
+          borderRadius: 8,
+          padding: "0 6px",
+        }}
+      >
+        {ratio >= good ? "good" : ratio >= warn ? "fair" : ratio > 0 ? "low" : "empty"}
+      </div>
+    </div>
+  );
 }

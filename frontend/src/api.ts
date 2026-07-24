@@ -66,7 +66,11 @@ export interface CorpusStats {
   observations_with_document_id?: number;
   observations_with_char_span?: number;
   observations_with_char_span_auto?: number;
+  observations_missing_char_span?: number;
+  char_span_ratio?: number;
+  document_link_ratio?: number;
   documents_total?: number;
+  documents_with_text?: number;
   document_ids_referenced?: number;
   observation_country_counts?: Record<string, number>;
   entities_with_country?: number;
