@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.29)
+## Shipped (through 0.1.30)
 
 | Ver | Highlights |
 |-----|------------|
@@ -37,13 +37,14 @@
 | 0.1.27 | Dashboard provenance quality panel + span ratio stats |
 | 0.1.28 | Data Explorer missing-on-doc span filter + API |
 | 0.1.29 | Dashboard quality deep-links + Data Explorer URL filters |
+| 0.1.30 | has_document_id chips + observation→document deep-link |
 
 ## Next
 
 1. Real PatentsView dump (human data)
 2. Enable Actions with workflow-scoped PAT (human)
-3. Optional: Data Explorer `has_document_id` chip + deep-link from document_id bar
-4. Optional: Observation detail → document deep-link (`?tab=documents&q=…`)
+3. Optional: table cell document_id click → documents tab
+4. Optional: Dashboard documents StatCard deep-link
 
 ## Out of scope
 

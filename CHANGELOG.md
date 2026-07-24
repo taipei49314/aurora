@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.30] — 2026-07-24
+
+### Added
+
+- Data Explorer **document_id** chips: All / with doc / no doc
+  (`?has_document_id=true|false`, alias `?has_doc=`)
+- Observation detail: clickable `document_id` + **open document →** deep-link
+  (`/data?tab=documents&q=…`)
+- Dashboard document_id coverage bar → `?has_document_id=true`
+
+### Changed
+
+- Engine / feature → **0.1.30**
+
 ## [0.1.29] — 2026-07-24
 
 ### Added

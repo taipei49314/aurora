@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   getDocument,
   getDocuments,
@@ -14,6 +14,8 @@ import {
 type Tab = "entities" | "observations" | "sources" | "documents";
 type Tier = "A" | "B" | "C" | "D";
 type SpanFilter = "" | "with" | "auto" | "none" | "missing_on_doc";
+/** document_id presence filter (API has_document_id, 0.1.30+) */
+type DocFilter = "" | "with" | "without";
 
 const TABS: Tab[] = ["entities", "observations", "sources", "documents"];
 const SPAN_FILTERS: SpanFilter[] = ["", "with", "auto", "none", "missing_on_doc"];
@@ -31,6 +33,14 @@ function parseSpanFilter(params: URLSearchParams): SpanFilter {
   if (params.get("char_span_auto") === "true") return "auto";
   if (params.get("has_char_span") === "true") return "with";
   if (params.get("has_char_span") === "false") return "none";
+  return "";
+}
+
+/** Deep-link: ?has_document_id=true|false or ?has_doc=true|false */
+function parseDocFilter(params: URLSearchParams): DocFilter {
+  const raw = params.get("has_document_id") ?? params.get("has_doc");
+  if (raw === "true") return "with";
+  if (raw === "false") return "without";
   return "";
 }
 
@@ -172,6 +182,7 @@ export function DataExplorer() {
   /** Shareable filter state lives in the URL (Dashboard deep-links, 0.1.29+). */
   const tab = parseTab(searchParams.get("tab"));
   const spanFilter = parseSpanFilter(searchParams);
+  const docFilter = parseDocFilter(searchParams);
   const tierFilter = parseTier(searchParams.get("tier"));
   const sourceType = searchParams.get("source_type") || "";
   const entityType = searchParams.get("entity_type") || "";
@@ -193,6 +204,10 @@ export function DataExplorer() {
             next.delete("has_char_span");
             next.delete("char_span_auto");
           }
+          // Canonicalize document_id presence aliases
+          if ("has_document_id" in patch) {
+            next.delete("has_doc");
+          }
           return next;
         },
         { replace: true },
@@ -209,7 +224,19 @@ export function DataExplorer() {
   );
   const setSpanFilter = useCallback(
     (s: SpanFilter) => {
-      patchParams({ span: s || null });
+      // missing_on_doc already implies document_id; drop redundant has_document_id
+      if (s === "missing_on_doc") {
+        patchParams({ span: s, has_document_id: null, has_doc: null });
+      } else {
+        patchParams({ span: s || null });
+      }
+    },
+    [patchParams],
+  );
+  const setDocFilter = useCallback(
+    (d: DocFilter) => {
+      const val = d === "with" ? "true" : d === "without" ? "false" : null;
+      patchParams({ has_document_id: val, has_doc: null });
     },
     [patchParams],
   );
@@ -258,7 +285,7 @@ export function DataExplorer() {
     enabled: tab === "entities" || !!selected,
   });
   const observations = useQuery({
-    queryKey: ["observations", q, obsType, spanFilter],
+    queryKey: ["observations", q, obsType, spanFilter, docFilter],
     queryFn: () =>
       getObservations({
         q: q.trim() || undefined,
@@ -271,6 +298,15 @@ export function DataExplorer() {
               : undefined,
         char_span_auto: spanFilter === "auto" ? true : undefined,
         missing_char_span: spanFilter === "missing_on_doc" ? true : undefined,
+        // missing_on_doc already requires document_id server-side
+        has_document_id:
+          spanFilter === "missing_on_doc"
+            ? undefined
+            : docFilter === "with"
+              ? true
+              : docFilter === "without"
+                ? false
+                : undefined,
       }),
     enabled: tab === "observations",
   });
@@ -430,7 +466,7 @@ export function DataExplorer() {
           {filtered.length} rows
           {q ||
           (tab === "sources" && (tierFilter || sourceType)) ||
-          (tab === "observations" && (obsType || spanFilter)) ||
+          (tab === "observations" && (obsType || spanFilter || docFilter)) ||
           (tab === "entities" && entityType)
             ? " (filtered)"
             : ""}
@@ -548,6 +584,78 @@ export function DataExplorer() {
               );
             })}
           <span style={{ fontSize: 11, color: "#8c959f" }}>GET /api/observations?observation_type=</span>
+        </div>
+      )}
+
+      {tab === "observations" && (
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            marginBottom: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: 10,
+            background: "#f6f8fa",
+            border: "1px solid #d0d7de",
+            borderRadius: 8,
+          }}
+        >
+          <b style={{ fontSize: 12 }}>document_id</b>
+          {(
+            [
+              { id: "" as const, label: "All", n: undefined as number | undefined },
+              {
+                id: "with" as const,
+                label: "with doc",
+                n: stats.data?.observations_with_document_id,
+              },
+              {
+                id: "without" as const,
+                label: "no doc",
+                n:
+                  typeof stats.data?.counts?.observations === "number" &&
+                  typeof stats.data?.observations_with_document_id === "number"
+                    ? Math.max(
+                        0,
+                        (stats.data.counts.observations as number) -
+                          (stats.data.observations_with_document_id as number),
+                      )
+                    : undefined,
+              },
+            ] as const
+          ).map(({ id, label, n }) => {
+            const active = docFilter === id;
+            return (
+              <button
+                key={label}
+                type="button"
+                title={
+                  id === "with"
+                    ? "Observations with document_id (0.1.28+ API / 0.1.30 chip)"
+                    : id === "without"
+                      ? "Observations without document_id"
+                      : "All observations"
+                }
+                onClick={() => setDocFilter(active && id !== "" ? "" : id)}
+                style={{
+                  fontWeight: active ? 700 : 400,
+                  border: active ? "1px solid #0969da" : "1px solid #d0d7de",
+                  borderRadius: 6,
+                  padding: "2px 8px",
+                  background: active ? "#ddf4ff" : "white",
+                  cursor: "pointer",
+                  fontSize: 11,
+                }}
+              >
+                {label}
+                {typeof n === "number" ? ` (${n})` : ""}
+              </button>
+            );
+          })}
+          <span style={{ fontSize: 11, color: "#8c959f" }}>
+            deep-link <code>?has_document_id=true</code>
+          </span>
         </div>
       )}
 
@@ -1114,6 +1222,9 @@ function ObservationDetail({ obs }: { obs: any }) {
     enabled: !!docId,
     retry: false,
   });
+  const docsHref = docId
+    ? `/data?tab=documents&q=${encodeURIComponent(docId)}`
+    : "/data?tab=documents";
 
   return (
     <div>
@@ -1126,7 +1237,18 @@ function ObservationDetail({ obs }: { obs: any }) {
         <b>observed_at</b> {obs.observed_at || "—"} · <b>event_id</b> {obs.event_id || "—"}
       </div>
       <div style={{ marginBottom: 6 }}>
-        <b>document_id</b> <code>{docId || "—"}</code>
+        <b>document_id</b>{" "}
+        {docId ? (
+          <Link
+            to={docsHref}
+            title="Open documents tab filtered to this id (0.1.30+)"
+            style={{ color: "#0969da", fontFamily: "ui-monospace, monospace", fontSize: 12 }}
+          >
+            {docId}
+          </Link>
+        ) : (
+          <code>—</code>
+        )}
         {span != null && (
           <>
             {" "}
@@ -1185,7 +1307,13 @@ function ObservationDetail({ obs }: { obs: any }) {
                 </span>
               ) : null}
             </b>
-            <span style={{ fontSize: 10, color: "#8c959f" }}>GET /api/documents/…</span>
+            <Link
+              to={docsHref}
+              style={{ fontSize: 10, color: "#0969da" }}
+              title="Open in documents tab"
+            >
+              open document →
+            </Link>
           </div>
           {doc.isLoading && <span style={{ color: "#57606a" }}>Loading document…</span>}
           {doc.isError && (

@@ -132,9 +132,14 @@ char_span; also ?has_document_id=.
 Data Explorer filter state in URL (`tab`, `span`, `tier`, types, `q`);
 Provenance quality panel links to missing-on-doc / observations / documents.
 
+## 27. has_document_id chips + open document — **done (v0.1.30)**
+
+Observations chips All / with doc / no doc (`?has_document_id=`); observation
+detail links `document_id` into documents tab; Dashboard document_id bar deep-link.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Data Explorer chip for has_document_id (+ Dashboard document_id bar link)
-- Observation detail open-document deep-link (`?tab=documents&q=…`)
+- Table-row document_id click → documents tab
+- Dashboard documents StatCard deep-link
