@@ -147,8 +147,10 @@ export function DataExplorer() {
   const [sourceType, setSourceType] = useState("");
   const [entityType, setEntityType] = useState("");
   const [obsType, setObsType] = useState("");
-  /** "" | "with" | "auto" | "none" — char_span filter (0.1.21+) */
-  const [spanFilter, setSpanFilter] = useState<"" | "with" | "auto" | "none">("");
+  /** "" | "with" | "auto" | "none" | "missing_on_doc" — char_span filter (0.1.21+ / 0.1.28) */
+  const [spanFilter, setSpanFilter] = useState<
+    "" | "with" | "auto" | "none" | "missing_on_doc"
+  >("");
   const [resolveRef, setResolveRef] = useState("");
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
@@ -175,6 +177,7 @@ export function DataExplorer() {
               ? false
               : undefined,
         char_span_auto: spanFilter === "auto" ? true : undefined,
+        missing_char_span: spanFilter === "missing_on_doc" ? true : undefined,
       }),
     enabled: tab === "observations",
   });
@@ -482,6 +485,11 @@ export function DataExplorer() {
                 n: stats.data?.observations_with_char_span_auto,
               },
               {
+                id: "missing_on_doc" as const,
+                label: "missing on doc",
+                n: stats.data?.observations_missing_char_span,
+              },
+              {
                 id: "none" as const,
                 label: "no span",
                 n:
@@ -497,6 +505,12 @@ export function DataExplorer() {
             ] as const
           ).map(({ id, label, n }) => {
             const active = spanFilter === id;
+            const accent =
+              id === "auto"
+                ? { border: "#9a6700", bg: "#fff8c5", color: "#9a6700" }
+                : id === "missing_on_doc"
+                  ? { border: "#cf222e", bg: "#ffebe9", color: "#cf222e" }
+                  : { border: "#0969da", bg: "#ddf4ff", color: undefined as string | undefined };
             return (
               <button
                 key={label}
@@ -506,26 +520,20 @@ export function DataExplorer() {
                     ? "Auto-aligned from text_excerpt (engine 0.1.20+)"
                     : id === "with"
                       ? "Observations with any char_span"
-                      : id === "none"
-                        ? "Observations without char_span"
-                        : "All observations"
+                      : id === "missing_on_doc"
+                        ? "Has document_id but no char_span — provenance gap (0.1.28+)"
+                        : id === "none"
+                          ? "Observations without char_span"
+                          : "All observations"
                 }
                 onClick={() => setSpanFilter(active && id !== "" ? "" : id)}
                 style={{
                   fontWeight: active ? 700 : 400,
-                  border: active
-                    ? id === "auto"
-                      ? "1px solid #9a6700"
-                      : "1px solid #0969da"
-                    : "1px solid #d0d7de",
+                  border: active ? `1px solid ${accent.border}` : "1px solid #d0d7de",
                   borderRadius: 6,
                   padding: "2px 8px",
-                  background: active
-                    ? id === "auto"
-                      ? "#fff8c5"
-                      : "#ddf4ff"
-                    : "white",
-                  color: active && id === "auto" ? "#9a6700" : undefined,
+                  background: active ? accent.bg : "white",
+                  color: active ? accent.color : undefined,
                   cursor: "pointer",
                   fontSize: 11,
                 }}
@@ -536,7 +544,7 @@ export function DataExplorer() {
             );
           })}
           <span style={{ fontSize: 11, color: "#8c959f" }}>
-            GET /api/observations?has_char_span=&amp;char_span_auto=
+            GET /api/observations?missing_char_span=&amp;has_char_span=
           </span>
         </div>
       )}

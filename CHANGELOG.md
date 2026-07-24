@@ -6,6 +6,19 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.28] — 2026-07-24
+
+### Added
+
+- `GET /api/observations?missing_char_span=` (document_id without span)
+- `GET /api/observations?has_document_id=`
+- Data Explorer chip **missing on doc** (provenance gap preset)
+- Dashboard tip links to the filter
+
+### Changed
+
+- Engine / feature → **0.1.28**
+
 ## [0.1.27] — 2026-07-24
 
 ### Added
