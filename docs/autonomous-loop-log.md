@@ -190,3 +190,29 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
   outer loop.
 - **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
   host; human: PatentsView real dump / Actions PAT.
+
+## 2026-07-26 cycle-15 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (run-manifest diagnostics +
+  clustering-scale auditability + tests).
+- **Planned:** The documented Next items were all human-blocked, so extend the
+  previous sparse-blocking diagnostics with accepted-block entity coverage
+  without requiring Docker, workflow credentials, or an external corpus.
+- **Shipped (v0.1.45):**
+  - Feature-space candidate diagnostics now report covered, uncovered, and
+    covered-ratio entity counts. Entities present only in skipped oversized
+    blocks are visible in the run manifest.
+  - Complete and sparse paths retain identical candidate-pair and clustering
+    semantics; regression assertions cover 100% complete-path coverage and
+    sparse-path uncovered entities.
+  - Docs: CHANGELOG, clustering model, self-audit, GOOD_FIRST_ISSUES, and
+    evolution-loop updated.
+- **Tests:** targeted clustering/manifest tests — 19 passed. The required
+  .venv\Scripts\python.exe scripts/check_engine.py first hit 16 setup errors
+  because the prior .tmp\pytest-engine was inaccessible to this sandbox
+  identity; after preserving that directory as .tmp.blocked-old and rebuilding
+  .tmp, the same command completed with ENGINE CHECK ALL OK (engine 0.1.45).
+- **Commit:** not attempted by instruction; workspace changes left for the
+  outer loop.
+- **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
+  host; human: PatentsView real dump / Actions PAT.

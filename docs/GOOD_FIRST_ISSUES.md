@@ -214,6 +214,13 @@ Research Run manifests record the realized complete/sparse candidate path,
 block counts, skipped oversized blocks, and candidate-pair ratio so large-graph
 results remain auditable. Complete and sparse paths are regression-tested.
 
+## 43. Feature-space block coverage — **done (v0.1.45)**
+
+Research Run manifests also report how many clusterable entities enter at least
+one accepted sparse block, how many are uncovered by skipped oversized blocks,
+and the resulting coverage ratio. This makes sparse-block exclusions visible
+without changing candidate-pair or clustering semantics.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)

@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.45] — 2026-07-26
+
+### Added
+
+- Research Run feature-space blocking diagnostics now report entity coverage:
+  entities in accepted blocks, entities excluded by skipped oversized blocks,
+  and the covered-entity ratio
+- Regression tests cover complete-path 100% coverage and sparse-path uncovered
+  entities
+
+### Changed
+
+- Engine / feature → **0.1.45**
+- README engine badge version aligned
+
 ## [0.1.44] — 2026-07-26
 
 ### Added

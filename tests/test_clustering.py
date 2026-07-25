@@ -92,6 +92,9 @@ def test_large_entity_graph_uses_sparse_blocks():
         "complete_pair_count": 719400,
         "candidate_pair_count": 3,
         "candidate_pair_ratio": 0.00000417,
+        "covered_entity_count": 1200,
+        "uncovered_entity_count": 0,
+        "covered_entity_ratio": 1.0,
     }
     assert clustering.feature_space_clusters([], [], cfg, vectors=vectors) == []
     clusters = clustering.feature_space_clusters(entities, [], cfg, vectors=vectors)
@@ -125,6 +128,9 @@ def test_sparse_blocking_diagnostics_count_skipped_high_frequency_blocks():
     assert diagnostics["max_observed_block_size"] == 3
     assert diagnostics["candidate_pair_count"] == 0
     assert diagnostics["complete_pair_count"] == 499500
+    assert diagnostics["covered_entity_count"] == 997
+    assert diagnostics["uncovered_entity_count"] == 3
+    assert diagnostics["covered_entity_ratio"] == 0.997
 
 
 def test_complete_candidate_diagnostics_report_full_pair_set():
@@ -142,3 +148,6 @@ def test_complete_candidate_diagnostics_report_full_pair_set():
     assert diagnostics["candidate_pair_count"] == 3
     assert diagnostics["complete_pair_count"] == 3
     assert diagnostics["candidate_pair_ratio"] == 1.0
+    assert diagnostics["covered_entity_count"] == 3
+    assert diagnostics["uncovered_entity_count"] == 0
+    assert diagnostics["covered_entity_ratio"] == 1.0

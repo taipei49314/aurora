@@ -67,7 +67,8 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
   similarity uses the complete pair set below 1,000 clusterable entities, then
   switches to deterministic sparse blocking with oversized high-frequency
   blocks skipped; thresholds and realized candidate diagnostics are recorded in
-  each Research Run manifest (engine 0.1.44).
+  each Research Run manifest (engine 0.1.45), including accepted-block entity
+  coverage and uncovered-entity counts.
 - **Bottleneck substitutability** — FIXED 2026-07-23: an alternative now has to
   serve the same downstream via the same dependency type, so the co-listed
   component no longer counts and the shared supplier reads 0.0 (was 0.5).

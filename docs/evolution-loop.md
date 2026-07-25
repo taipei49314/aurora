@@ -7,7 +7,7 @@
 - Autonomous git: commit/push/tag on meaningful slices.
 - Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
 
-## Shipped (through 0.1.44)
+## Shipped (through 0.1.45)
 
 | Ver | Highlights |
 |-----|------------|
@@ -52,6 +52,7 @@
 | 0.1.42 | Provisional visibility: API filters + Explorer chips + Dashboard |
 | 0.1.43 | Adapter default raw mentions + deterministic entity-graph blocking |
 | 0.1.44 | Per-run feature-space blocking diagnostics in research manifests |
+| 0.1.45 | Per-run blocking diagnostics add accepted-block entity coverage |
 
 ## Next
 

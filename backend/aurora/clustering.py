@@ -90,6 +90,9 @@ def feature_space_candidate_pairs(
                 "complete_pair_count": complete_pair_count,
                 "candidate_pair_count": len(pairs),
                 "candidate_pair_ratio": 1.0 if complete_pair_count else 0.0,
+                "covered_entity_count": len(ordered_ids),
+                "uncovered_entity_count": 0,
+                "covered_entity_ratio": 1.0 if ordered_ids else 0.0,
             })
         return pairs
 
@@ -103,6 +106,7 @@ def feature_space_candidate_pairs(
     accepted_block_count = 0
     skipped_oversized_block_count = 0
     max_observed_block_size = 0
+    covered_entity_ids: set[str] = set()
     for term in sorted(postings):
         members = postings[term]
         max_observed_block_size = max(max_observed_block_size, len(members))
@@ -110,10 +114,13 @@ def feature_space_candidate_pairs(
             skipped_oversized_block_count += 1
             continue
         accepted_block_count += 1
+        covered_entity_ids.update(members)
         for i, a in enumerate(members):
             for b in members[i + 1:]:
                 pairs.add((a, b))
     result = sorted(pairs)
+    covered_entity_count = len(covered_entity_ids)
+    uncovered_entity_count = len(ordered_ids) - covered_entity_count
     if diagnostics is not None:
         diagnostics.clear()
         diagnostics.update({
@@ -130,6 +137,11 @@ def feature_space_candidate_pairs(
             "candidate_pair_ratio": round(
                 len(result) / complete_pair_count, 8
             ) if complete_pair_count else 0.0,
+            "covered_entity_count": covered_entity_count,
+            "uncovered_entity_count": uncovered_entity_count,
+            "covered_entity_ratio": round(
+                covered_entity_count / len(ordered_ids), 8
+            ) if ordered_ids else 0.0,
         })
     return result
 
