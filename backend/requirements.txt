@@ -2,6 +2,7 @@
 fastapi>=0.110
 uvicorn[standard]>=0.29
 pydantic>=2.6
+python-multipart>=0.0.9   # FastAPI form-data endpoints; importing the app fails without it
 
 # --- persistence (optional store; core runs without it) ---
 sqlalchemy>=2.0        # SQLite persistence layer (aurora.store_sql)
