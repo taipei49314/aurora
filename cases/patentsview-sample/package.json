@@ -9,7 +9,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -21,7 +21,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -38,7 +38,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -55,7 +55,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -72,7 +72,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -84,7 +84,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -101,7 +101,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     }
   ],
@@ -131,7 +131,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "family_id": "fam-ironair-2018",
         "classification_codes": [
           "H01M12/06",
@@ -168,7 +168,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "family_id": "fam-oxa-2019",
         "classification_codes": [
           "H01M4/86",
@@ -205,7 +205,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "family_id": "fam-ironair-2018",
         "classification_codes": [
           "H01M4/86",
@@ -242,7 +242,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "family_id": "fam-ferro-elyte-2021",
         "classification_codes": [
           "H01M10/26",
@@ -268,7 +268,7 @@
       "document_id": "pat-10476080",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -278,6 +278,8 @@
         ],
         "char_span_auto": true
       },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         231
@@ -295,7 +297,7 @@
       "document_id": "pat-10476080",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -303,7 +305,9 @@
         "inventors": [
           "A. Researcher"
         ]
-      }
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-10476080",
@@ -317,7 +321,7 @@
       "document_id": "pat-10476080",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -325,7 +329,9 @@
         "inventors": [
           "A. Researcher"
         ]
-      }
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "porous iron electrode"
     },
     {
       "source_ref": "pat-10930940",
@@ -339,13 +345,15 @@
       "document_id": "pat-10930940",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "OxaCell Systems",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         214
@@ -363,12 +371,14 @@
       "document_id": "pat-10930940",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "OxaCell Systems",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-11271215",
@@ -382,13 +392,15 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         221
@@ -406,12 +418,14 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ]
-      }
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-11271215",
@@ -425,12 +439,19 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
-        ]
-      }
+        ],
+        "char_span_auto": true
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "porous iron electrode",
+      "char_span": [
+        0,
+        32
+      ]
     },
     {
       "source_ref": "pat-11271215",
@@ -444,12 +465,14 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ]
-      }
+      },
+      "subject_raw": "porous iron electrode",
+      "object_raw": "food-grade iron powder"
     },
     {
       "source_ref": "pat-11271215",
@@ -463,13 +486,15 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         221
@@ -487,12 +512,14 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ]
-      }
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-11271215",
@@ -506,12 +533,19 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
-        ]
-      }
+        ],
+        "char_span_auto": true
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "porous iron electrode",
+      "char_span": [
+        0,
+        32
+      ]
     },
     {
       "source_ref": "pat-11271215",
@@ -525,12 +559,14 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ]
-      }
+      },
+      "subject_raw": "porous iron electrode",
+      "object_raw": "food-grade iron powder"
     },
     {
       "source_ref": "pat-11575128",
@@ -544,13 +580,15 @@
       "document_id": "pat-11575128",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         213
@@ -568,12 +606,14 @@
       "document_id": "pat-11575128",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation"
     }
   ],
   "documents": [

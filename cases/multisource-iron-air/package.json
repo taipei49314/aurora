@@ -10,7 +10,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -22,7 +22,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -34,7 +34,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -51,7 +51,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -63,7 +63,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -88,7 +88,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "domains": [
           "ferrogrid.example"
         ]
@@ -112,7 +112,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -137,7 +137,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "domains": [
           "longhaul.example"
         ]
@@ -161,7 +161,7 @@
       ],
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -178,7 +178,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -203,7 +203,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -228,7 +228,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "domains": [
           "oxacell.example"
         ]
@@ -248,7 +248,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -260,7 +260,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "filings-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -272,7 +272,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     }
   ],
@@ -291,7 +291,7 @@
       "excerpt": "Pilot plant capacity expansion for multi-day grid firming modules; utility interest cited.",
       "metadata": {
         "extractor_id": "filings-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "filing_id",
@@ -327,7 +327,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
@@ -350,7 +350,7 @@
       "excerpt": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes for multi-day grid firming modules.",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "article_id",
@@ -375,7 +375,7 @@
       "excerpt": "Architecture study of oxygen electrodes for multi-day iron-air duty cycles and grid dispatch.",
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2",
+        "extractor_version": "0.1.3",
         "source_format": "openalex-works-v1",
         "external_ids": [
           {
@@ -403,7 +403,7 @@
       "excerpt": "Board approved USD 120 million capex for Arizona pilot plant capacity expansion for iron-air multi-day storage modules.",
       "metadata": {
         "extractor_id": "filings-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "filing_id",
@@ -429,7 +429,7 @@
       "excerpt": "FerroGrid Power signed a multi-year supplier agreement with PureChitin Bio for food-grade iron powder feedstock used in porous iron electrodes for multi-day grid firming modules.",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "article_id",
@@ -452,7 +452,7 @@
       "excerpt": "OxaCell Systems announced strategic investment to expand oxygen electrode manufacturing for multi-day iron-air customers.",
       "metadata": {
         "extractor_id": "filings-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "filing_id",
@@ -486,7 +486,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
@@ -519,7 +519,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -542,7 +542,7 @@
       "excerpt": "Laboratory review of reversible iron oxidation and porous electrode limits for multi-day grid storage concepts.",
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2",
+        "extractor_version": "0.1.3",
         "source_format": "openalex-works-v1",
         "external_ids": [
           {
@@ -570,7 +570,7 @@
       "excerpt": "LongHaul Energy is piloting hundred-hour depth-discharge iron-air modules for regional utility grid firming and dispatchable firming contracts using reversible iron oxidation.",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "article_id",
@@ -593,7 +593,7 @@
       "excerpt": "Support hundred-hour depth-discharge iron-air pilots with regional utility grid firming contracts.",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "job_id",
@@ -627,7 +627,7 @@
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
@@ -650,7 +650,7 @@
       "excerpt": "Expand oxygen electrode manufacturing for multi-day iron-air storage customers.",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "job_id",
@@ -674,7 +674,7 @@
       "excerpt": "Hiring electrochemical engineers for porous iron electrode and long-duration grid-dispatch stack scale-up in Arizona. Skills: electrochemistry, alkaline systems, pilot manufacturing.",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "job_id",
@@ -700,10 +700,15 @@
       "document_id": "news-regional-reprint-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "is_reprint_of": "reuter-ferro-supply-2024",
+        "char_span_auto": true,
         "reliability_tier": "D"
-      }
+      },
+      "char_span": [
+        25,
+        101
+      ]
     },
     {
       "source_ref": "src_fe0917cbe1439be5",
@@ -718,7 +723,7 @@
       "document_id": "job-oxa-2024-mfg",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-05-10",
         "reliability_tier": "B"
       }
@@ -757,7 +762,7 @@
       "document_id": "news-reuter-ferro-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "reliability_tier": "C"
       }
     },
@@ -774,13 +779,18 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        32
+      ]
     },
     {
       "source_ref": "src_e33259975b8fde0e",
@@ -795,7 +805,7 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
@@ -816,7 +826,7 @@
       "document_id": "job-longhaul-2024-apps",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-04-01",
         "reliability_tier": "B"
       }
@@ -834,7 +844,7 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
@@ -855,7 +865,7 @@
       "document_id": "pat-10476080",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -884,7 +894,7 @@
       "document_id": "pat-11575128",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
@@ -910,7 +920,7 @@
       "document_id": "pat-11575128",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
@@ -931,7 +941,7 @@
       "document_id": "job-ferro-2024-chem",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01",
         "reliability_tier": "B"
@@ -997,7 +1007,7 @@
       "document_id": "pat-10476080",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -1021,7 +1031,7 @@
       "document_id": "job-oxa-2024-mfg",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-05-10",
         "char_span_auto": true,
         "reliability_tier": "B"
@@ -1092,7 +1102,7 @@
       "document_id": "news-reuter-ferro-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "reliability_tier": "C"
       }
     },
@@ -1109,7 +1119,7 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
@@ -1135,7 +1145,7 @@
       "document_id": "job-longhaul-2024-apps",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-04-01",
         "char_span_auto": true,
         "reliability_tier": "B"
@@ -1158,7 +1168,7 @@
       "document_id": "pat-10476080",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M12/06",
           "H01M4/86"
@@ -1182,7 +1192,7 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
@@ -1203,7 +1213,7 @@
       "document_id": "news-gridtech-longhaul-2023",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "char_span_auto": true,
         "reliability_tier": "C"
       },
@@ -1225,7 +1235,7 @@
       "document_id": "news-gridtech-longhaul-2023",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "char_span_auto": true,
         "reliability_tier": "C"
       },
@@ -1247,7 +1257,7 @@
       "document_id": "job-ferro-2024-chem",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01",
         "char_span_auto": true,
@@ -1271,9 +1281,14 @@
       "document_id": "news-reuter-ferro-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
+        "char_span_auto": true,
         "reliability_tier": "C"
-      }
+      },
+      "char_span": [
+        25,
+        101
+      ]
     },
     {
       "source_ref": "src_e33259975b8fde0e",
@@ -1288,7 +1303,7 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
@@ -1341,7 +1356,7 @@
       "document_id": "pat-10930940",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
@@ -1362,7 +1377,7 @@
       "document_id": "pat-10930940",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
@@ -1388,7 +1403,7 @@
       "document_id": "news-gridtech-longhaul-2023",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "char_span_auto": true,
         "reliability_tier": "C"
       },
@@ -1410,13 +1425,18 @@
       "document_id": "pat-11271215",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "classification_codes": [
           "H01M4/86",
           "H01M4/02"
         ],
+        "char_span_auto": true,
         "reliability_tier": "A"
-      }
+      },
+      "char_span": [
+        0,
+        32
+      ]
     }
   ],
   "documents": [

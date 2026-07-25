@@ -22,7 +22,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -39,7 +39,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -60,7 +60,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     },
     {
@@ -77,7 +77,7 @@
       ],
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2"
+        "extractor_version": "0.1.3"
       }
     }
   ],
@@ -96,7 +96,7 @@
       "license": "openalex-unknown",
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2",
+        "extractor_version": "0.1.3",
         "source_format": "openalex-works-v1",
         "external_ids": [
           {
@@ -124,7 +124,7 @@
       "license": "openalex-unknown",
       "metadata": {
         "extractor_id": "openalex-offline",
-        "extractor_version": "0.1.2",
+        "extractor_version": "0.1.3",
         "source_format": "openalex-works-v1",
         "external_ids": [
           {
@@ -158,6 +158,7 @@
         ],
         "char_span_auto": true
       },
+      "subject_raw": "Grid Storage Research Lab",
       "char_span": [
         0,
         111
@@ -182,6 +183,7 @@
         ],
         "char_span_auto": true
       },
+      "subject_raw": "European Electrochemistry Institute",
       "char_span": [
         0,
         93
@@ -206,6 +208,7 @@
         ],
         "char_span_auto": true
       },
+      "subject_raw": "Grid Storage Research Lab",
       "char_span": [
         0,
         93
