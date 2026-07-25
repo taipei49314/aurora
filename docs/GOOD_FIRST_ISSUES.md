@@ -223,6 +223,8 @@ without changing candidate-pair or clustering semantics.
 
 ## Suggested next issues
 
+- Docker static readiness audit is done in **v0.1.46**; runtime verification
+  still needs a Docker host and should keep requirement 37 PARTIAL until then.
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
 - Keep Docker PARTIAL honest until compose is verified on a Docker host

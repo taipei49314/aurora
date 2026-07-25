@@ -6,6 +6,25 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.46] — 2026-07-26
+
+### Added
+
+- Offline Docker readiness audit for the Compose service contract and both
+  Dockerfiles (`scripts/docker_audit.py` / `make docker-audit`)
+- Engine-gate tests cover the bundled contract, deliberate config drift, and
+  the audit's explicit runtime-verification warning
+
+### Changed
+
+- Engine / feature → **0.1.46**
+- README engine badge and quick-start version aligned
+
+### Honesty
+
+- A passing static audit does not verify image builds or container startup;
+  Docker remains PARTIAL until checked on a Docker host
+
 ## [0.1.45] — 2026-07-26
 
 ### Added

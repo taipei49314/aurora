@@ -216,3 +216,30 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
   outer loop.
 - **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
   host; human: PatentsView real dump / Actions PAT.
+
+## 2026-07-26 cycle-16 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (deployment contract audit +
+  tests + developer entry point; runtime status remains honest).
+- **Planned:** The documented Next items were all human-blocked, so make the
+  Docker PARTIAL state more actionable without claiming a Docker host
+  verification.
+- **Shipped (v0.1.46):**
+  - Added pure-standard-library `scripts/docker_audit.py`, which checks the
+    Compose service contract, build contexts, mounts, ports, environment path,
+    dependency, and both Dockerfile startup contracts.
+  - Added `make docker-audit` and engine-gate tests for a passing bundled stack,
+    deliberate context/port drift, and the explicit runtime-verification
+    warning.
+  - Docs: Docker readiness guide, CHANGELOG, README, self-audit,
+    GOOD_FIRST_ISSUES, evolution-loop, and version metadata updated.
+- **Tests:** targeted Docker/clustering/error tests — 18 passed; static audit —
+  26 checks passed. The required `.venv\Scripts\python.exe
+  scripts/check_engine.py` first hit 16 setup errors because the prior
+  `.tmp\pytest-engine` was inaccessible (`WinError 5`); after preserving the
+  old `.tmp` tree as `.tmp.blocked-old-0.1.46-root` and rebuilding `.tmp`, the
+  same command completed with `ENGINE CHECK ALL OK` (engine 0.1.46).
+- **Commit:** not attempted by instruction; workspace changes left for the
+  outer loop.
+- **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
+  host; human: PatentsView real dump / Actions PAT.

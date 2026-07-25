@@ -3,7 +3,7 @@
 **Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Engine](https://img.shields.io/badge/engine-0.1.45-blue.svg)](CHANGELOG.md)
+[![Engine](https://img.shields.io/badge/engine-0.1.46-blue.svg)](CHANGELOG.md)
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](backend/requirements.txt)
 
@@ -63,6 +63,7 @@ make demo
 make test
 make check-all    # recommended before release push
 make backtest
+make docker-audit # static Docker/Compose contract check; does not start Docker
 make api          # FastAPI :8000
 make frontend     # Vite :5173
 ```
@@ -127,6 +128,8 @@ Docs: [architecture](docs/architecture.md) · [scoring](docs/scoring-model.md) �
 - **PatentsView sample dump** is a **format-compatible fixture** by default; replace
   `dump.json` with a real export without code changes.
 - See [docs/self-audit.md](docs/self-audit.md) for PASS / PARTIAL items (e.g. Docker not verified on all machines).
+- `python scripts/docker_audit.py` checks the Docker/Compose contract offline;
+  it does not replace starting the stack on a Docker host.
 
 ## Layout
 
@@ -145,7 +148,7 @@ tests/            pytest (unit / integration / e2e)
 
 ## Version
 
-- Engine: **0.1.45** — see [CHANGELOG.md](CHANGELOG.md)
+- Engine: **0.1.46** — see [CHANGELOG.md](CHANGELOG.md)
 - License: **MIT** — see [LICENSE](LICENSE)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security: [SECURITY.md](SECURITY.md)

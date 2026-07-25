@@ -4,7 +4,7 @@
 PY ?= python
 PYTHONPATH := backend
 
-.PHONY: help install install-engine-test test test-engine lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case check-all check-engine
+.PHONY: help install install-engine-test test test-engine lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case check-all check-engine docker-audit
 
 help:
 	@echo "make install    - install python deps (fastapi, pytest, hypothesis, sqlalchemy)"
@@ -23,6 +23,7 @@ help:
 	@echo "make patentsview-sample - PatentsView-compatible dump case (Loop 4A)"
 	@echo "make multisource-case - patents+jobs+news with LEI external_ids"
 	@echo "make check-all   - pytest + cases + resolve smoke (pre-push gate)"
+	@echo "make docker-audit - static Docker/Compose readiness audit (no Docker required)"
 	@echo "make api         - run the FastAPI backend on :8000"
 	@echo "make frontend    - run the Vite dev server on :5173 (needs npm install)"
 
@@ -82,6 +83,9 @@ multisource-case:
 
 check-all:
 	$(PY) scripts/check_all.py
+
+docker-audit:
+	$(PY) scripts/docker_audit.py
 
 api:
 	PYTHONPATH=$(PYTHONPATH) $(PY) -m uvicorn api:app --app-dir backend --port 8000
