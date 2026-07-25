@@ -122,7 +122,10 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
 
     # --- features + clustering ---
     vectors = clustering.entity_vectors(entities, observations)
-    fs_clusters = clustering.feature_space_clusters(entities, observations, cfg.clustering, vectors)
+    candidate_diagnostics: dict = {}
+    fs_clusters = clustering.feature_space_clusters(
+        entities, observations, cfg.clustering, vectors, candidate_diagnostics,
+    )
     graph_comm = clustering.graph_clusters(entities, observations, cfg.clustering)
     agreement = clustering.pairwise_agreement(fs_clusters, graph_comm)
     stability = clustering.stability_scores(entities, observations, cfg.clustering)
@@ -230,10 +233,12 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
     for h in hypotheses:
         h.created_from_run = run_id
 
+    algorithm_config = cfg.manifest()["clustering"]
+    algorithm_config["feature_space_candidate_diagnostics"] = candidate_diagnostics
     run = ResearchRun(
         run_id=run_id, snapshot_id=snapshot.snapshot_id, cutoff_date=cutoff_date,
         engine_version=cfg.engine_version, feature_version=cfg.feature_version,
-        taxonomy_version=cfg.taxonomy_version, algorithm_config=cfg.manifest()["clustering"],
+        taxonomy_version=cfg.taxonomy_version, algorithm_config=algorithm_config,
         scoring_config=cfg.manifest()["scoring"], created_at=datetime.now(timezone.utc).isoformat(),
         status="COMPLETE", input_manifest_hash=snapshot.input_manifest_hash(),
         result_manifest_hash=result_hash, hypotheses=hypotheses,

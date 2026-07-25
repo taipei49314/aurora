@@ -58,6 +58,7 @@ class _UF:
 
 def feature_space_candidate_pairs(
     ids, vectors: dict[str, dict[str, float]], cfg: ClusterConfig,
+    diagnostics: dict | None = None,
 ) -> list[tuple[str, str]]:
     """Return deterministic cosine candidates for the similarity graph.
 
@@ -68,12 +69,29 @@ def feature_space_candidate_pairs(
     discriminative signal and would recreate the quadratic candidate set.
     """
     ordered_ids = sorted(ids)
+    complete_pair_count = len(ordered_ids) * (len(ordered_ids) - 1) // 2
     if len(ordered_ids) < cfg.entity_blocking_min_entities:
-        return [
+        pairs = [
             (a, b)
             for i, a in enumerate(ordered_ids)
             for b in ordered_ids[i + 1:]
         ]
+        if diagnostics is not None:
+            diagnostics.clear()
+            diagnostics.update({
+                "mode": "complete",
+                "entity_count": len(ordered_ids),
+                "blocking_min_entities": int(cfg.entity_blocking_min_entities),
+                "max_block_size": max(2, int(cfg.entity_blocking_max_block_size)),
+                "block_count": 0,
+                "accepted_block_count": 0,
+                "skipped_oversized_block_count": 0,
+                "max_observed_block_size": 0,
+                "complete_pair_count": complete_pair_count,
+                "candidate_pair_count": len(pairs),
+                "candidate_pair_ratio": 1.0 if complete_pair_count else 0.0,
+            })
+        return pairs
 
     postings: dict[str, list[str]] = defaultdict(list)
     for entity_id in ordered_ids:
@@ -82,23 +100,49 @@ def feature_space_candidate_pairs(
 
     pairs: set[tuple[str, str]] = set()
     max_block_size = max(2, int(cfg.entity_blocking_max_block_size))
+    accepted_block_count = 0
+    skipped_oversized_block_count = 0
+    max_observed_block_size = 0
     for term in sorted(postings):
         members = postings[term]
+        max_observed_block_size = max(max_observed_block_size, len(members))
         if len(members) > max_block_size:
+            skipped_oversized_block_count += 1
             continue
+        accepted_block_count += 1
         for i, a in enumerate(members):
             for b in members[i + 1:]:
                 pairs.add((a, b))
-    return sorted(pairs)
+    result = sorted(pairs)
+    if diagnostics is not None:
+        diagnostics.clear()
+        diagnostics.update({
+            "mode": "sparse_blocking",
+            "entity_count": len(ordered_ids),
+            "blocking_min_entities": int(cfg.entity_blocking_min_entities),
+            "max_block_size": max_block_size,
+            "block_count": len(postings),
+            "accepted_block_count": accepted_block_count,
+            "skipped_oversized_block_count": skipped_oversized_block_count,
+            "max_observed_block_size": max_observed_block_size,
+            "complete_pair_count": complete_pair_count,
+            "candidate_pair_count": len(result),
+            "candidate_pair_ratio": round(
+                len(result) / complete_pair_count, 8
+            ) if complete_pair_count else 0.0,
+        })
+    return result
 
 
-def feature_space_clusters(entities, observations, cfg: ClusterConfig, vectors=None):
+def feature_space_clusters(
+    entities, observations, cfg: ClusterConfig, vectors=None, diagnostics=None,
+):
     """Single-linkage clustering via a cosine-similarity threshold graph."""
     ents = [e for e in entities if e.entity_type in CLUSTERABLE_TYPES]
     ids = [e.entity_id for e in ents]
     vecs = vectors if vectors is not None else entity_vectors(entities, observations)
     uf = _UF(ids)
-    for a, b in feature_space_candidate_pairs(ids, vecs, cfg):
+    for a, b in feature_space_candidate_pairs(ids, vecs, cfg, diagnostics=diagnostics):
         if cosine(vecs.get(a, {}), vecs.get(b, {})) >= cfg.similarity_threshold:
             uf.union(a, b)
     groups: dict[str, list[str]] = defaultdict(list)

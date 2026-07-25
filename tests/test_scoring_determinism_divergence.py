@@ -60,6 +60,14 @@ def test_determinism_full_scale_smoke(snapshot, taxonomy):
     assert a.result_manifest_hash == b.result_manifest_hash
 
 
+def test_run_manifest_records_feature_space_candidate_diagnostics(run):
+    diagnostics = run.algorithm_config["feature_space_candidate_diagnostics"]
+    assert diagnostics["mode"] == "complete"
+    assert diagnostics["entity_count"] == 191
+    assert diagnostics["candidate_pair_count"] == diagnostics["complete_pair_count"]
+    assert diagnostics["candidate_pair_ratio"] == 1.0
+
+
 def test_divergence_on_cutoff_change(snapshot, taxonomy):
     a = run_pipeline(snapshot, taxonomy, DEFAULT_CONFIG, cutoff_date="2020-12-31")
     b = run_pipeline(snapshot, taxonomy, DEFAULT_CONFIG, cutoff_date=None)

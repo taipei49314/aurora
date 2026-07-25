@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.44] — 2026-07-26
+
+### Added
+
+- Research Run clustering manifests now record actual feature-space candidate
+  diagnostics: complete vs sparse mode, indexed/oversized block counts,
+  candidate-pair counts, and the retained-pair ratio
+- Regression tests cover complete pairs, sparse blocking, skipped high-frequency
+  blocks, and manifest data
+
+### Changed
+
+- Engine / feature → **0.1.44**
+- README engine badge version aligned
+
 ## [0.1.43] — 2026-07-26
 
 ### Added

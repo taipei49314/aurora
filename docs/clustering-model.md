@@ -34,10 +34,14 @@ backtest track-matching by entity Jaccard) surfaces split, merge, drift and
 disappearance over time.
 
 ## Scale / performance
-As of engine 0.1.43, feature-space entity similarity uses the complete pair set
+As of engine 0.1.44, feature-space entity similarity uses the complete pair set
 below 1,000 clusterable entities. At larger scale it uses deterministic sparse
-inverted-index blocks and skips oversized high-frequency blocks; these settings
-are recorded in each Research Run manifest.
+inverted-index blocks and skips oversized high-frequency blocks. Each Research
+Run records both the configured thresholds and the realized
+`feature_space_candidate_diagnostics` under `algorithm_config`: mode, block
+counts, skipped oversized blocks, complete/candidate pair counts, and the
+retained-pair ratio. This makes an aggressive blocking result visible without
+reconstructing the candidate graph.
 Source near-duplicate detection uses **MinHash-LSH** (`dedup.py`, 48 hashes /
 12 bands of 4), so it stays near-linear at 3120 sources instead of O(sources²).
 The entity pairwise cosine remains the dominant cost for the current 199-entity

@@ -39,7 +39,7 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
 | 21 | Temporal cutoff + leakage prevention (§19) | **PASS** | `leakage.py` | `test_leakage_backtest.py` (4 tests) |
 | 22 | Historical backtest + lead time (§20) | **PASS** | `backtest.py` | `make backtest`; `test_leakage_backtest.py` |
 | 23 | First-divergence analysis (§21) | **PASS** | `divergence.py` | `test_scoring_determinism_divergence.py` (3 tests) |
-| 24 | Immutable Research Run w/ manifests (§22) | **PASS** | `store.py`, `pipeline.py` | `test_determinism_50_runs` (result hash stable) |
+| 24 | Immutable Research Run w/ manifests (§22) | **PASS** | `store.py`, `pipeline.py` | `test_determinism_50_runs`; per-run feature-space candidate diagnostics |
 | 25 | Classification into all required statuses (§3) | **PASS** | `classify.py` | `test_scenarios.py`, `test_quality_groundtruth.py` |
 | 26 | Synthetic Northstar corpus w/ archetypes (§23) | **PASS** | `datasets/northstar/generate.py` | 199 entities / 3120 obs (meets 180/3000); all 8 archetype families + reprints/contradictions/missing-dates/aliases + 64-company background noise |
 | 27 | Ground-truth isolation from runtime (§23,§5.10) | **PASS** | `tests/ground_truth/` | `test_errors_isolation.py::test_engine_source_never_reads_ground_truth` |
@@ -66,7 +66,8 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
   near-linear at 3120 sources (import+dedup+ER ≈ 1.0 s). Feature-space entity
   similarity uses the complete pair set below 1,000 clusterable entities, then
   switches to deterministic sparse blocking with oversized high-frequency
-  blocks skipped; the settings are recorded in each Research Run manifest.
+  blocks skipped; thresholds and realized candidate diagnostics are recorded in
+  each Research Run manifest (engine 0.1.44).
 - **Bottleneck substitutability** — FIXED 2026-07-23: an alternative now has to
   serve the same downstream via the same dependency type, so the co-listed
   component no longer counts and the shared supplier reads 0.0 (was 0.5).

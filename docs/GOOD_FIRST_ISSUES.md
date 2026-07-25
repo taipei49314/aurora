@@ -208,6 +208,12 @@ Offline adapters now emit default `subject_raw` / `object_raw` provenance, and
 large feature-space entity graphs use deterministic sparse blocking beyond the
 1,000-entity scale boundary. Both paths are covered by engine-gate tests.
 
+## 42. Feature-space blocking diagnostics — **done (v0.1.44)**
+
+Research Run manifests record the realized complete/sparse candidate path,
+block counts, skipped oversized blocks, and candidate-pair ratio so large-graph
+results remain auditable. Complete and sparse paths are regression-tested.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)

@@ -162,3 +162,31 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
   read-only, so Git cannot create `.git/index.lock`; no push attempted.
 - **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
   host; human: PatentsView real dump / Actions PAT.
+
+## 2026-07-26 cycle-14 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (run-manifest provenance +
+  clustering diagnostics + tests).
+- **Planned:** Make v0.1.43's large-graph sparse blocking auditable without
+  requiring a Docker host or external corpus.
+- **Shipped (v0.1.44):**
+  - Feature-space candidate generation reports deterministic complete/sparse
+    mode, block counts, skipped oversized blocks, complete/candidate pair counts,
+    and retained-pair ratio
+  - `ResearchRun.algorithm_config.feature_space_candidate_diagnostics` records
+    the realized path for each run
+  - Tests cover the normal complete path, sparse path, high-frequency block
+    skipping, and Northstar manifest diagnostics
+  - Docs: CHANGELOG, clustering model, self-audit, GOOD_FIRST_ISSUES, and
+    evolution-loop updated
+- **Tests:** targeted pack tests — 19 passed; the same engine pytest suite with
+  a fresh workspace basetemp — 220 passed; validate-example,
+  lint-example-no-provisional, and adapters doctor — all passed. The required
+  `.venv\Scripts\python.exe scripts/check_engine.py` reached demo and
+  version-sync, then its pytest step hit 16 setup errors because the existing
+  `.tmp\pytest-engine` is owned by another sandbox identity (`WinError 5`);
+  it did not emit `ENGINE CHECK ALL OK`.
+- **Commit:** not attempted by instruction; workspace changes left for the
+  outer loop.
+- **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
+  host; human: PatentsView real dump / Actions PAT.
