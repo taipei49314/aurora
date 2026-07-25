@@ -5,7 +5,8 @@
 - **Mode A (active):** short-interval **scheduler (~20m)** continues development + push without user typing.
 - Session can still request intensive work while chat is open.
 - Autonomous git: commit/push/tag on meaningful slices.
-- Never push `.github/workflows/*` without `workflow` OAuth scope (use `docs/ci-github-actions.yml`).
+- Pushing `.github/workflows/*` requires a `workflow`-scoped OAuth token. The account
+  token now has it and CI is live; `docs/ci-github-actions.yml` is kept as the reference copy.
 
 ## Shipped (through 0.1.46)
 
@@ -58,8 +59,16 @@
 ## Next
 
 1. Real PatentsView dump (human data)
-2. Enable Actions with workflow-scoped PAT (human)
-3. Keep Docker PARTIAL honest until verified on a Docker host
+2. Keep Docker PARTIAL honest until verified on a Docker host
+
+## Done
+
+- **GitHub Actions CI enabled** (2026-07-26). `.github/workflows/ci.yml` runs
+  `scripts/check_all.py` plus an engine-version sanity check on every push and PR
+  to `master`/`main`. The account token now carries the `workflow` scope, so this
+  is no longer human-blocked.
+  The first run caught a real defect: `python-multipart` was never declared in
+  `backend/requirements.txt`, so a clean install could not import the FastAPI app.
 
 ## Out of scope
 
