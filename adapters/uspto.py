@@ -38,7 +38,7 @@ from typing import Any, Dict, List, Optional
 from .package_util import Package, ensure_documents, strip_package
 
 ADAPTER_ID = "uspto-offline"
-ADAPTER_VERSION = "0.1.1"
+ADAPTER_VERSION = "0.1.2"
 
 
 def _date(value: Optional[str]) -> Optional[str]:

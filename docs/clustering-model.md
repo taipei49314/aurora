@@ -34,9 +34,13 @@ backtest track-matching by entity Jaccard) surfaces split, merge, drift and
 disappearance over time.
 
 ## Scale / performance
+As of engine 0.1.43, feature-space entity similarity uses the complete pair set
+below 1,000 clusterable entities. At larger scale it uses deterministic sparse
+inverted-index blocks and skips oversized high-frequency blocks; these settings
+are recorded in each Research Run manifest.
 Source near-duplicate detection uses **MinHash-LSH** (`dedup.py`, 48 hashes /
 12 bands of 4), so it stays near-linear at 3120 sources instead of O(sources²).
-The entity pairwise cosine is O(entities²) = 199² and, with the 8× stability
-bootstrap, dominates the ~1.6 s pipeline at full scale — acceptable here, and a
-candidate for entity blocking beyond ~1k entities. Thresholds are unchanged by
-these optimizations.
+The entity pairwise cosine remains the dominant cost for the current 199-entity
+corpus, but the large-graph block path avoids an unconditional O(entities²)
+candidate pass. Similarity thresholds and union-find semantics are unchanged
+for the normal corpus.

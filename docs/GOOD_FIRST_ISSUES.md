@@ -202,9 +202,14 @@ Scorecard `require_no_provisional` on all cases; check_all / check_engine wire
 `?provisional=` entity filter, observation subject_provisional filter, Dashboard
 provenance bar, Explorer chips/badge; shared `aurora.provisional` helpers.
 
+## 41. Adapter raw mentions + entity blocking — **done (v0.1.43)**
+
+Offline adapters now emit default `subject_raw` / `object_raw` provenance, and
+large feature-space entity graphs use deterministic sparse blocking beyond the
+1,000-entity scale boundary. Both paths are covered by engine-gate tests.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
 - Enable GitHub Actions with a `workflow`-scoped PAT (human)
-- Optional: adapter emit subject_raw by default; blocking for large entity graphs
 - Keep Docker PARTIAL honest until compose is verified on a Docker host

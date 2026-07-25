@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest as _pytest
 pytestmark = _pytest.mark.unit
+from types import SimpleNamespace
 
 from aurora import DEFAULT_CONFIG
 from aurora import clustering
@@ -56,3 +57,28 @@ def test_higher_threshold_splits_more(snapshot):
                                              ClusterConfig(similarity_threshold=0.40))
     # tighter threshold -> at least as many (usually more) smaller clusters
     assert len(high) >= len(low) - 1
+
+
+def test_large_entity_graph_uses_sparse_blocks():
+    entities = [
+        SimpleNamespace(entity_id=f"e{i:04d}", entity_type="COMPANY")
+        for i in range(1200)
+    ]
+    vectors = {
+        entity.entity_id: ({"shared-capability": 1.0} if i < 3 else {f"unique-{i}": 1.0})
+        for i, entity in enumerate(entities)
+    }
+    cfg = ClusterConfig(
+        similarity_threshold=0.9,
+        min_cluster_size=3,
+        entity_blocking_min_entities=1000,
+        entity_blocking_max_block_size=128,
+    )
+
+    candidates = clustering.feature_space_candidate_pairs(
+        [e.entity_id for e in entities], vectors, cfg,
+    )
+    assert candidates == [("e0000", "e0001"), ("e0000", "e0002"), ("e0001", "e0002")]
+    assert clustering.feature_space_clusters([], [], cfg, vectors=vectors) == []
+    clusters = clustering.feature_space_clusters(entities, [], cfg, vectors=vectors)
+    assert clusters == [["e0000", "e0001", "e0002"]]

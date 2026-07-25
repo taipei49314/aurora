@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from .package_util import Package, ensure_documents
 
 ADAPTER_ID = "openalex-offline"
-ADAPTER_VERSION = "0.1.2"
+ADAPTER_VERSION = "0.1.3"
 
 
 def _date(value: Optional[str]) -> Optional[str]:

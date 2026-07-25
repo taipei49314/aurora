@@ -13,6 +13,57 @@ _MIN_PREFIX_LEN = 12
 _MIN_PREFIX_WORDS = 3
 
 
+def _mention_text(ref: Any) -> str:
+    """Return the stable surface form used by the import contract."""
+    if ref in (None, ""):
+        return ""
+    if isinstance(ref, dict):
+        name = ref.get("name") or ref.get("canonical_name") or ref.get("subject")
+        if name not in (None, ""):
+            return str(name).strip()
+        external_ids = ref.get("external_ids") or []
+        if isinstance(external_ids, list) and external_ids:
+            first = external_ids[0]
+            if isinstance(first, dict) and first.get("system") and first.get("id"):
+                return f"ext:{first['system']}:{first['id']}"
+        return ""
+    return str(ref).strip()
+
+
+def ensure_observation_raw_mentions(pkg: Package) -> Package:
+    """Materialize default ``*_raw`` fields on adapter observations.
+
+    The first-class raw fields are provenance, not a second resolution path:
+    an explicit top-level value wins, followed by the legacy metadata value,
+    followed by the supplied subject/object reference.  This keeps adapter
+    output useful before it reaches the engine while preserving caller data.
+    """
+    out = dict(pkg)
+    observations = []
+    for observation in out.get("observations") or []:
+        if not isinstance(observation, dict):
+            observations.append(observation)
+            continue
+        row = dict(observation)
+        metadata = dict(row.get("metadata") or {})
+        for field in ("subject", "object"):
+            raw_field = f"{field}_raw"
+            raw = row.get(raw_field)
+            if raw in (None, ""):
+                raw = metadata.pop(raw_field, None)
+            if raw in (None, ""):
+                raw = _mention_text(row.get(field))
+            if raw not in (None, ""):
+                row[raw_field] = str(raw).strip()
+        if metadata:
+            row["metadata"] = metadata
+        elif "metadata" in row:
+            row["metadata"] = {}
+        observations.append(row)
+    out["observations"] = observations
+    return out
+
+
 def align_char_span(document_text: str, text_excerpt: str) -> Optional[List[int]]:
     """Locate *text_excerpt* in *document_text*; return ``[start, end]`` or None.
 
@@ -329,7 +380,8 @@ def ensure_documents(pkg: Package, **kwargs: Any) -> Package:
     build_kwargs = {}
     if "only_referenced" in kwargs:
         build_kwargs["only_referenced"] = kwargs.pop("only_referenced")
-    out = build_documents_from_sources(pkg, **build_kwargs)
+    out = ensure_observation_raw_mentions(pkg)
+    out = build_documents_from_sources(out, **build_kwargs)
     return align_observation_char_spans(out, append_unmatched=append_unmatched)
 
 

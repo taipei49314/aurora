@@ -260,8 +260,8 @@ Suggested `independence_group` prefixes (adapters should set these, not leave em
 | Field | Type | Default | Engine use |
 |-------|------|---------|------------|
 | `object` | string \| null | null | Other entity name for relational edges |
-| `subject_raw` | string | derived | **First-class** (engine 0.1.38+); surface-form mention as written in the source (alias, trade print, compact ext ref). Explicit top-level / metadata wins; otherwise derived from `subject`. Stored on `Observation.subject_raw`; export round-trips it. Does **not** invent entities — unresolved names still error |
-| `object_raw` | string | derived | **First-class** (engine 0.1.38+); same staging rules for the object mention |
+| `subject_raw` | string | derived | **First-class** (engine 0.1.38+); surface-form mention as written in the source (alias, trade print, compact ext ref). Explicit top-level / metadata wins; otherwise derived from `subject`. Offline adapters materialize this default (0.1.43+). Stored on `Observation.subject_raw`; export round-trips it. Does **not** invent entities — unresolved names still error |
+| `object_raw` | string | derived | **First-class** (engine 0.1.38+); same staging rules for the object mention; offline adapters materialize it when `object` is present (0.1.43+) |
 | `observed_at` | string \| null | null | Temporal signals, leakage, fade |
 | `event_id` | string | `""` | **First-class** (engine 0.1.11+); real-world event. Metadata fallback; inherits `Source.event_id` when empty |
 | `geo` | object | `{}` | **First-class** (engine 0.1.13+); location/jurisdiction. Inherits `Source.geo` when empty. Accepts `location` / `country` / `jurisdiction` aliases |

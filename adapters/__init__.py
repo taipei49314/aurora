@@ -11,6 +11,7 @@ from .openalex import convert_openalex
 from .package_util import (
     align_char_span,
     align_observation_char_spans,
+    ensure_observation_raw_mentions,
     ensure_documents,
     merge_packages,
     strip_package,
@@ -27,8 +28,9 @@ __all__ = [
     "convert_filings",
     "align_char_span",
     "align_observation_char_spans",
+    "ensure_observation_raw_mentions",
     "ensure_documents",
     "merge_packages",
     "strip_package",
 ]
-__version__ = "0.1.8"
+__version__ = "0.1.9"

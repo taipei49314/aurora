@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 
-ENGINE_VERSION = "0.1.42"
-FEATURE_VERSION = "0.1.42"
+ENGINE_VERSION = "0.1.43"
+FEATURE_VERSION = "0.1.43"
 TAXONOMY_VERSION = "2024.1"
 
 
@@ -71,6 +71,9 @@ class ClusterConfig:
     # feature-space agglomerative clustering
     similarity_threshold: float = 0.18   # cosine sim to link two entities
     min_cluster_size: int = 3
+    # large entity sets use sparse feature blocks instead of all-pairs cosine
+    entity_blocking_min_entities: int = 1000
+    entity_blocking_max_block_size: int = 128
     # graph community detection (label propagation)
     label_propagation_max_iter: int = 100
     edge_min_weight: float = 0.12

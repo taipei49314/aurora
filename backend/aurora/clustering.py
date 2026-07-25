@@ -56,18 +56,51 @@ class _UF:
             self.p[hi] = lo
 
 
+def feature_space_candidate_pairs(
+    ids, vectors: dict[str, dict[str, float]], cfg: ClusterConfig,
+) -> list[tuple[str, str]]:
+    """Return deterministic cosine candidates for the similarity graph.
+
+    At the Northstar scale, the complete pair set is cheap and preserves the
+    historical path. Once the entity count crosses the configured boundary,
+    an inverted index over sparse vector dimensions provides blocking. A very
+    high-frequency dimension is deliberately ignored: it carries little
+    discriminative signal and would recreate the quadratic candidate set.
+    """
+    ordered_ids = sorted(ids)
+    if len(ordered_ids) < cfg.entity_blocking_min_entities:
+        return [
+            (a, b)
+            for i, a in enumerate(ordered_ids)
+            for b in ordered_ids[i + 1:]
+        ]
+
+    postings: dict[str, list[str]] = defaultdict(list)
+    for entity_id in ordered_ids:
+        for term in sorted(vectors.get(entity_id, {})):
+            postings[term].append(entity_id)
+
+    pairs: set[tuple[str, str]] = set()
+    max_block_size = max(2, int(cfg.entity_blocking_max_block_size))
+    for term in sorted(postings):
+        members = postings[term]
+        if len(members) > max_block_size:
+            continue
+        for i, a in enumerate(members):
+            for b in members[i + 1:]:
+                pairs.add((a, b))
+    return sorted(pairs)
+
+
 def feature_space_clusters(entities, observations, cfg: ClusterConfig, vectors=None):
     """Single-linkage clustering via a cosine-similarity threshold graph."""
     ents = [e for e in entities if e.entity_type in CLUSTERABLE_TYPES]
     ids = [e.entity_id for e in ents]
     vecs = vectors if vectors is not None else entity_vectors(entities, observations)
     uf = _UF(ids)
-    ids_sorted = sorted(ids)
-    for i in range(len(ids_sorted)):
-        for j in range(i + 1, len(ids_sorted)):
-            a, b = ids_sorted[i], ids_sorted[j]
-            if cosine(vecs.get(a, {}), vecs.get(b, {})) >= cfg.similarity_threshold:
-                uf.union(a, b)
+    for a, b in feature_space_candidate_pairs(ids, vecs, cfg):
+        if cosine(vecs.get(a, {}), vecs.get(b, {})) >= cfg.similarity_threshold:
+            uf.union(a, b)
     groups: dict[str, list[str]] = defaultdict(list)
     for i in ids:
         groups[uf.find(i)].append(i)

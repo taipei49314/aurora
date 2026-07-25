@@ -63,9 +63,10 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
   pytest, validate-example, adapters doctor. API/persistence tests still need a
   full env with SQLAlchemy.
 - **Source dedup near-dup** now uses **MinHash-LSH** (`dedup.py`), so it stays
-  near-linear at 3120 sources (import+dedup+ER ≈ 1.0 s). The entity pairwise
-  cosine remains O(entities²) = 199² (~1.6 s incl. 8× stability bootstrap);
-  fine at this scale, would want blocking beyond ~1k entities.
+  near-linear at 3120 sources (import+dedup+ER ≈ 1.0 s). Feature-space entity
+  similarity uses the complete pair set below 1,000 clusterable entities, then
+  switches to deterministic sparse blocking with oversized high-frequency
+  blocks skipped; the settings are recorded in each Research Run manifest.
 - **Bottleneck substitutability** — FIXED 2026-07-23: an alternative now has to
   serve the same downstream via the same dependency type, so the co-listed
   component no longer counts and the shared supplier reads 0.0 (was 0.5).

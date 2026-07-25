@@ -6,6 +6,23 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.43] — 2026-07-26
+
+### Added
+
+- Offline adapters now materialize default `subject_raw` / `object_raw`
+  provenance fields; explicit fields and metadata fallbacks remain authoritative
+- Large feature-space entity graphs use deterministic sparse blocking beyond
+  1,000 clusterable entities, with block settings recorded in run manifests
+- Tests for all six adapters and the large-graph candidate path
+
+### Changed
+
+- Engine / feature → **0.1.43**
+- Adapter package → **0.1.9** (extractors: USPTO/PatentsView/jobs/news/filings
+  **0.1.2**, OpenAlex **0.1.3**)
+- README engine badge version aligned
+
 ## [0.1.42] — 2026-07-24
 
 ### Added

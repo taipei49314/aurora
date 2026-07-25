@@ -139,3 +139,26 @@ Cycles 1–7 on 2026-07-24 used 30-minute micro releases (0.1.32–0.1.37). That
 - **Tests:** `python scripts/check_engine.py` — ALL OK (engine 0.1.42).
 - **Commit:** `ae62fcf`
 - **Next suggestion:** adapters default subject_raw; entity-graph blocking for scale; human: PatentsView dump / Actions PAT.
+
+## 2026-07-26 cycle-13 (mode B)
+
+- **Mode B:** coherent pack; version bump **yes** (adapter provenance contract +
+  large-graph clustering path + tests).
+- **Planned:** Continue Next item 3: adapters default `subject_raw` and
+  entity-graph blocking for scale.
+- **Shipped (v0.1.43):**
+  - All six offline adapters materialize default `subject_raw` / `object_raw`
+    fields through the shared package helper; explicit values and metadata
+    fallbacks remain authoritative
+  - Feature-space clustering switches from complete pairs to deterministic
+    sparse inverted-index blocks at 1,000 clusterable entities; oversized
+    high-frequency blocks are skipped and settings are recorded in manifests
+  - Adapter versions bumped to package 0.1.9 (extractors 0.1.2 / OpenAlex 0.1.3)
+  - Docs: changelog, import schema, clustering scale note, self-audit, and
+    GOOD_FIRST_ISSUES updated
+- **Tests:** `.venv\Scripts\python.exe scripts/check_engine.py` — `ENGINE CHECK ALL OK`
+  (engine 0.1.43; 217 engine tests green).
+- **Commit:** blocked before creation: this environment exposes `.git` as
+  read-only, so Git cannot create `.git/index.lock`; no push attempted.
+- **Next suggestion:** keep Docker PARTIAL honest until verified on a Docker
+  host; human: PatentsView real dump / Actions PAT.
