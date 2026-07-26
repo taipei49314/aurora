@@ -1,11 +1,55 @@
 """Import pipeline, deduplication, source independence, re-import idempotency."""
 from __future__ import annotations
 
+import copy
+
 import pytest as _pytest
 pytestmark = _pytest.mark.unit
 
 from aurora import import_package
 from aurora.dedup import resolve_independence, jaccard
+
+
+def _manifest_fixture() -> dict:
+    return {
+        "entities": [{"entity_type": "COMPANY", "canonical_name": "Acme"}],
+        "sources": [{
+            "ref": "s1", "source_type": "NEWS", "publisher": "Wire",
+            "title": "Acme activity", "published_at": "2024-01-01",
+            "excerpt": "Acme hired engineers.",
+        }],
+        "observations": [{
+            "source_ref": "s1", "observation_type": "HIRING_ACTIVITY",
+            "subject": "Acme", "observed_at": "2024-01-01",
+            "numeric_value": 12, "confidence": 0.8,
+            "text_excerpt": "hired engineers",
+        }],
+    }
+
+
+def test_input_manifest_hash_covers_observation_content_and_is_deterministic():
+    package = _manifest_fixture()
+    baseline = import_package(package, created_at="2024-01-02T00:00:00+00:00")
+    identical = import_package(copy.deepcopy(package), created_at="2024-01-02T00:00:00+00:00")
+
+    assert baseline.input_manifest_hash().startswith("v2:")
+    assert baseline.input_manifest_hash() == identical.input_manifest_hash()
+
+    confidence_changed = copy.deepcopy(package)
+    confidence_changed["observations"][0]["confidence"] = 0.01
+    confidence_snapshot = import_package(
+        confidence_changed, created_at="2024-01-02T00:00:00+00:00"
+    )
+    assert baseline.input_manifest_hash() != confidence_snapshot.input_manifest_hash()
+    assert baseline.observations[0].observation_id == confidence_snapshot.observations[0].observation_id
+
+    numeric_value_changed = copy.deepcopy(package)
+    numeric_value_changed["observations"][0]["numeric_value"] = 13
+    numeric_snapshot = import_package(
+        numeric_value_changed, created_at="2024-01-02T00:00:00+00:00"
+    )
+    assert baseline.input_manifest_hash() != numeric_snapshot.input_manifest_hash()
+    assert baseline.observations[0].observation_id == numeric_snapshot.observations[0].observation_id
 
 
 def test_import_produces_entities_sources_observations(snapshot):

@@ -7,11 +7,40 @@ intended production store and is tracked as PARTIAL in the self-audit.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, is_dataclass
 from pathlib import Path
 
 from .ids import content_hash
 from .models import Source, Entity, Observation, Document, to_dict
+
+
+_MANIFEST_HASH_VERSION = "v2"
+_MANIFEST_SEPARATOR = "\x1e"
+
+
+def _manifest_record(value) -> dict:
+    """Return one complete, JSON-ready input record without changing it."""
+    if is_dataclass(value):
+        return asdict(value)
+    if isinstance(value, dict):
+        return dict(value)
+    raise TypeError(f"unsupported manifest record: {type(value)!r}")
+
+
+def _manifest_records(values, id_key: str) -> list[dict]:
+    records = [_manifest_record(value) for value in values]
+    return sorted(records, key=lambda record: str(record.get(id_key, "")))
+
+
+def _manifest_part(kind: str, records: list[dict]) -> str:
+    payload = json.dumps(
+        records,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    return f"{kind}{_MANIFEST_SEPARATOR}{payload}"
 
 
 @dataclass
@@ -27,20 +56,21 @@ class Snapshot:
     documents: list = field(default_factory=list)  # Document rows (engine 0.1.15+)
 
     def input_manifest_hash(self) -> str:
+        """Hash the complete normalized input manifest, not only its IDs.
+
+        Each collection is encoded as a separately labelled JSON part. Object
+        keys are sorted and rows are sorted by their stable ID; ``content_hash``
+        adds a unit separator between parts. The visible version prefix makes
+        hashes from this algorithm explicitly incomparable with pre-v2 hashes.
+        """
         parts = [
-            sorted(e.entity_id for e in self.entities),
-            sorted(s.source_id for s in self.sources),
-            sorted(o.observation_id for o in self.observations),
+            _manifest_part(_MANIFEST_HASH_VERSION, []),
+            _manifest_part("entities", _manifest_records(self.entities, "entity_id")),
+            _manifest_part("sources", _manifest_records(self.sources, "source_id")),
+            _manifest_part("observations", _manifest_records(self.observations, "observation_id")),
+            _manifest_part("documents", _manifest_records(self.documents or [], "document_id")),
         ]
-        docs = self.documents or []
-        if docs:
-            parts.append(
-                sorted(
-                    (d.document_id if hasattr(d, "document_id") else d.get("document_id", ""))
-                    for d in docs
-                )
-            )
-        return content_hash(*parts)
+        return f"{_MANIFEST_HASH_VERSION}:{content_hash(*parts)}"
 
 
 def make_snapshot(

@@ -226,6 +226,10 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
     mark("hypotheses")
 
     hypotheses.sort(key=lambda h: (-h.overall_score, h.hypothesis_id))
+    # Keep this compact result signature unchanged. Hashing stored input values
+    # is safe (Python float repr is cross-platform stable); hashing the complete
+    # ResearchRun would also hash computed values, where numerical drift could
+    # make otherwise equivalent results differ across platforms.
     result_hash = content_hash([
         [h.hypothesis_id, h.status, h.overall_score, h.entity_ids] for h in hypotheses
     ])
