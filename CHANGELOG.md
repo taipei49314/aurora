@@ -6,6 +6,35 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [0.1.47] — 2026-08-07
+
+### Added
+
+- Frontier Atlas mothership adapter: turn a research run into a contract-shaped,
+  hashed run report with findings that state observations only (no implications)
+- Predictions register only for `INDUSTRY_CANDIDATE` clusters against an empirical
+  backtest retention baseline; unusable small-sample baselines skip prediction
+
+### Changed
+
+- `input_manifest_hash` now digests the full normalized input collections (v2
+  prefix), not only entity/source/observation/document IDs — so confidence /
+  numeric / unit / metadata edits change the hash
+- Curated sample cases regenerated for adapter `subject_raw` defaults
+- Engine / feature → **0.1.47**
+- README engine badge and Version section aligned
+- FastAPI OpenAPI `version` field follows `ENGINE_VERSION`
+
+### Fixed
+
+- Declare `python-multipart` in `backend/requirements.txt` (required for form
+  upload endpoints; first CI run caught the gap)
+
+### Honesty
+
+- Atlas findings never claim industries are forming or advise investment
+- Retention baselines below the minimum sample size are reported unusable
+
 ## [0.1.46] — 2026-07-26
 
 ### Added
