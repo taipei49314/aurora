@@ -29,6 +29,8 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 - Declare `python-multipart` in `backend/requirements.txt` (required for form
   upload endpoints; first CI run caught the gap)
+- Hypothesis cosine property strategies use ASCII keys + no deadline so the
+  engine gate stays stable under Windows load (assertion unchanged)
 
 ### Honesty
 

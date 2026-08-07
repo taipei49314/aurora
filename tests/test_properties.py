@@ -4,24 +4,35 @@ from __future__ import annotations
 import pytest as _pytest
 pytestmark = _pytest.mark.unit
 
-from hypothesis import given, strategies as st
+from hypothesis import given, settings, strategies as st
 
 from aurora.features import cosine
 from aurora.dedup import jaccard
 from aurora.scoring import assemble, saturating
 from aurora.config import ScoringConfig
 
-_vec = st.dictionaries(st.text(min_size=1, max_size=5), st.floats(min_value=-10, max_value=10,
-                                                                  allow_nan=False, allow_infinity=False),
-                       max_size=8)
+# ASCII keys keep generation cheap under load; the property is about cosine
+# bounds on finite float vectors, not Unicode key handling.
+_keys = st.text(
+    alphabet=st.characters(min_codepoint=ord("a"), max_codepoint=ord("z")),
+    min_size=1,
+    max_size=5,
+)
+_vec = st.dictionaries(
+    _keys,
+    st.floats(min_value=-10, max_value=10, allow_nan=False, allow_infinity=False),
+    max_size=8,
+)
 
 
+@settings(deadline=None)
 @given(_vec, _vec)
 def test_cosine_bounded(a, b):
     c = cosine(a, b)
     assert -1.0001 <= c <= 1.0001
 
 
+@settings(deadline=None)
 @given(_vec)
 def test_cosine_self_is_one_or_zero(a):
     c = cosine(a, a)
