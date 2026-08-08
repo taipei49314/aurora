@@ -8,7 +8,7 @@
 - Pushing `.github/workflows/*` requires a `workflow`-scoped OAuth token. The account
   token now has it and CI is live; `docs/ci-github-actions.yml` is kept as the reference copy.
 
-## Shipped (through 0.1.46)
+## Shipped (through 0.1.47)
 
 | Ver | Highlights |
 |-----|------------|
@@ -55,6 +55,7 @@
 | 0.1.44 | Per-run feature-space blocking diagnostics in research manifests |
 | 0.1.45 | Per-run blocking diagnostics add accepted-block entity coverage |
 | 0.1.46 | Offline Docker/Compose readiness audit; runtime status remains PARTIAL |
+| 0.1.47 | Manifest hash v2 (full input digest); Frontier Atlas mothership submit |
 
 ## Next
 

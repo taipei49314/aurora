@@ -23,13 +23,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from aurora import import_package, Taxonomy, run_pipeline, DEFAULT_CONFIG
+from aurora.config import ENGINE_VERSION
 from aurora.models import to_dict
 from aurora.errors import AuroraError
 from aurora.backtest import run_backtest
 from aurora import divergence
 import generate
 
-app = FastAPI(title="AURORA", version="0.1.0")
+app = FastAPI(title="AURORA", version=ENGINE_VERSION)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 TAXONOMY_PATH = ROOT / "datasets" / "taxonomy" / "taxonomy.json"

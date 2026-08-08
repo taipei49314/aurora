@@ -25,7 +25,7 @@ def hypothesis(**kw):
 def research_run(hypotheses, *, cutoff=None, manifest=None):
     return SimpleNamespace(
         run_id="run_test", snapshot_id="snap_test", cutoff_date=cutoff,
-        engine_version="0.1.46", feature_version="1", taxonomy_version="1",
+        engine_version="0.1.47", feature_version="1", taxonomy_version="1",
         created_at="2026-07-27T04:00:00+00:00", result_manifest_hash="deadbeef",
         hypotheses=hypotheses,
         leakage_manifest=manifest if manifest is not None else {
@@ -178,7 +178,7 @@ def test_prediction_is_registered_once_a_baseline_exists(monkeypatch):
     assert len(pushed["predictions"]) == 1, "only candidates get a prediction"
     rule = registered[0]["resolution_rule"]
     assert f"Jaccard >= {atlas.CLUSTER_MATCH_JACCARD}" in rule
-    assert "engine=0.1.46" in rule, "the rule must pin the engine config to be re-runnable"
+    assert "engine=0.1.47" in rule, "the rule must pin the engine config to be re-runnable"
     assert "correct" in rule and "incorrect" in rule and "ambiguous" in rule
     assert registered[0]["null_model"] == baseline["statement"]
     assert registered[0]["horizon_days"] == 180
