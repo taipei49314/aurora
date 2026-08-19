@@ -6,6 +6,15 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/) for the engine package
 (`backend/aurora`, `ENGINE_VERSION`).
 
+## [Unreleased]
+
+### Added
+
+- `--brain <vault>` on the demo CLI: write the same contract-shaped `FINDING`
+  report Atlas would receive, then call `mdbrain ingest --module aurora`.
+  Opens an episodic proposal only. Does not import md-brain. A failed ingest
+  does not fail the research run. Override the binary with `--brain-bin`.
+
 ## [0.1.47] — 2026-08-07
 
 ### Added
