@@ -14,6 +14,9 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
   report Atlas would receive, then call `mdbrain ingest --module aurora`.
   Opens an episodic proposal only. Does not import md-brain. A failed ingest
   does not fail the research run. Override the binary with `--brain-bin`.
+- `--atlas [URL]` on the demo CLI submits that same report to Frontier Atlas.
+  Findings land as observations. The demo does not invent a retention baseline,
+  so predictions are skipped. A failed submit does not fail the research run.
 
 ## [0.1.47] — 2026-08-07
 

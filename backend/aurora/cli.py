@@ -43,7 +43,53 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="where to write the *.fleet.md report (default: ./reports)",
     )
+    ap.add_argument(
+        "--atlas",
+        nargs="?",
+        const="http://127.0.0.1:8000",
+        default=None,
+        metavar="URL",
+        help="after the run, submit the FINDING report to Frontier Atlas (default http://127.0.0.1:8000)",
+    )
+    ap.add_argument(
+        "--atlas-workspace",
+        default="Fleet",
+        help="Atlas workspace name (default Fleet)",
+    )
     return ap
+
+
+def push_to_atlas(run, snapshot, args) -> None:
+    """Submit observations to Atlas. A failed push never fails the research run.
+
+    The demo CLI does not invent a retention baseline. Findings still land;
+    predictions are skipped until a measured backtest is supplied separately.
+    """
+    from aurora import atlas
+
+    try:
+        pushed = atlas.push_run(
+            run,
+            snapshot,
+            base_url=args.atlas,
+            workspace=args.atlas_workspace,
+            inputs=" ".join(sys.argv[1:]),
+        )
+    except atlas.AtlasError as exc:
+        print(f"\n[atlas] submit failed: {exc}", file=sys.stderr)
+        print("The research run itself completed; retry later.", file=sys.stderr)
+        return
+    print(
+        f"\n[atlas] submitted {pushed['findings']} findings"
+        f" (run {str(pushed.get('module_run_id') or '')[:8]}, "
+        f"hash {str(pushed.get('report_hash') or '')[:12]})."
+    )
+    skipped = pushed.get("predictions_skipped_reason")
+    if skipped:
+        print(f"[atlas] predictions skipped: {skipped}")
+    else:
+        print(f"[atlas] registered {len(pushed.get('predictions') or [])} prediction(s).")
+    print("Atlas claims stay unreviewed until a human accepts them.")
 
 
 def push_to_brain(run, snapshot, args) -> None:
@@ -103,6 +149,8 @@ def main(argv=None):
             print(f"[bottleneck] {h.generated_name[:30]:<32} -> "
                   f"{top['entity_id']} score={top['bottleneck_score']} "
                   f"(centrality={top['centrality']}, substitutability={top['substitutability']})")
+    if args.atlas:
+        push_to_atlas(run, snap, args)
     if args.brain:
         push_to_brain(run, snap, args)
     return run
