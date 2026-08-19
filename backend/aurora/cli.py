@@ -22,12 +22,56 @@ def load_package(scale: float):
     return package
 
 
-def main(argv=None):
+def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description="AURORA discovery demo")
     ap.add_argument("--scale", type=float, default=1.0)
     ap.add_argument("--cutoff", default=None, help="cutoff date YYYY-MM-DD for a historical run")
     ap.add_argument("--taxonomy", default=str(ROOT / "datasets" / "taxonomy" / "taxonomy.json"))
-    args = ap.parse_args(argv)
+    ap.add_argument(
+        "--brain",
+        metavar="VAULT",
+        default=None,
+        help="after the run, send the FINDING report into an md-brain Vault as an episodic proposal",
+    )
+    ap.add_argument(
+        "--brain-bin",
+        default=None,
+        help="mdbrain binary (default: mdbrain on PATH)",
+    )
+    ap.add_argument(
+        "--brain-report-dir",
+        default=None,
+        help="where to write the *.fleet.md report (default: ./reports)",
+    )
+    return ap
+
+
+def push_to_brain(run, snapshot, args) -> None:
+    """Send experience to md-brain. A failed ingest never fails the research run."""
+    from aurora import brain
+
+    try:
+        pushed = brain.ingest_run(
+            run,
+            snapshot,
+            vault=args.brain,
+            mdbrain_bin=args.brain_bin,
+            report_dir=args.brain_report_dir,
+            inputs=" ".join(sys.argv[1:]),
+        )
+    except brain.BrainError as exc:
+        print(f"\n[brain] Vault ingest failed: {exc}", file=sys.stderr)
+        print("The research run itself completed; retry with mdbrain ingest.", file=sys.stderr)
+        return
+    print(
+        f"\n[brain] opened proposal {pushed['proposal_id']}"
+        f" ({pushed.get('status') or 'proposed'}, {pushed.get('target_path') or '—'})."
+    )
+    print("This is an experience draft, not an Atlas claim; approve it before memory/episodic/.")
+
+
+def main(argv=None):
+    args = build_parser().parse_args(argv)
 
     package = load_package(args.scale)
     snap = import_package(package)
@@ -59,6 +103,8 @@ def main(argv=None):
             print(f"[bottleneck] {h.generated_name[:30]:<32} -> "
                   f"{top['entity_id']} score={top['bottleneck_score']} "
                   f"(centrality={top['centrality']}, substitutability={top['substitutability']})")
+    if args.brain:
+        push_to_brain(run, snap, args)
     return run
 
 

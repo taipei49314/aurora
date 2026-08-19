@@ -50,6 +50,8 @@ $env:PYTHONPATH = "backend"
 # export PYTHONPATH=backend
 
 python backend/aurora/cli.py          # demo: generate corpus → classify
+# optional: send the same FINDING report into an md-brain Vault (proposal only)
+python backend/aurora/cli.py --brain C:\vaults\nelson
 python scripts/check_engine.py        # engine gate (skips API/SQL tests)
 python -m pytest tests/ -q            # full suite (needs full requirements)
 python scripts/check_all.py --engine-only   # same as check_engine
@@ -76,6 +78,23 @@ INDUSTRY_CANDIDATE              73.8     7      5  0.00  analog-inference-comput
 HYPE_CLUSTER                    27.9    89      0  0.00  quantum-mining-superposition-hash
 INSUFFICIENT_EVIDENCE           25.0    73     55  0.00  volumetric-display-free-space-optics
 ```
+
+## Feeding md-brain (experience, not claims)
+
+Frontier Atlas keeps claims. [md-brain](https://github.com/taipei49314/md-brain)
+keeps identity and experience. After a run, `--brain <vault>` writes the same
+contract-shaped `FINDING` report the mothership adapter would submit, then calls
+the `mdbrain` CLI (`ingest --module aurora`). That opens an episodic **proposal**.
+Nothing is written into `memory/` until a person approves it.
+
+```powershell
+$env:PYTHONPATH = "backend"
+python backend/aurora/cli.py --brain C:\vaults\nelson
+```
+
+A failed ingest never fails the research run. This tool does not import md-brain;
+the engine stays stdlib-only. Override the binary with `--brain-bin` if `mdbrain`
+is not on `PATH`. Without `--brain`, AURORA does not touch a Vault.
 
 ## Bring your own data (import package)
 
