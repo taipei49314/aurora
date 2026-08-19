@@ -52,6 +52,7 @@ $env:PYTHONPATH = "backend"
 python backend/aurora/cli.py          # demo: generate corpus → classify
 # optional: send the same FINDING report into an md-brain Vault (proposal only)
 python backend/aurora/cli.py --brain C:\vaults\nelson
+python backend/aurora/cli.py --atlas  # findings only; no invented baseline
 python scripts/check_engine.py        # engine gate (skips API/SQL tests)
 python -m pytest tests/ -q            # full suite (needs full requirements)
 python scripts/check_all.py --engine-only   # same as check_engine
@@ -95,6 +96,12 @@ python backend/aurora/cli.py --brain C:\vaults\nelson
 A failed ingest never fails the research run. This tool does not import md-brain;
 the engine stays stdlib-only. Override the binary with `--brain-bin` if `mdbrain`
 is not on `PATH`. Without `--brain`, AURORA does not touch a Vault.
+
+`--atlas [URL]` is the claim-ledger sibling (default `http://127.0.0.1:8000`).
+It submits the same FINDING report. The demo CLI does **not** invent a retention
+baseline, so predictions are skipped until a measured backtest is supplied.
+A failed submit never fails the research run. Without `--atlas`, AURORA does
+not contact the mothership.
 
 ## Bring your own data (import package)
 

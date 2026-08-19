@@ -5,8 +5,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from aurora import brain
-from aurora.cli import build_parser, push_to_brain
+from aurora import atlas, brain
+from aurora.cli import build_parser, push_to_atlas, push_to_brain
 
 
 def hypothesis(**kw):
@@ -172,3 +172,49 @@ def test_push_failure_does_not_raise(tmp_path, capsys):
     err = capsys.readouterr().err
     assert "[brain]" in err
     assert "Vault ingest failed" in err
+
+
+@pytest.mark.unit
+def test_parser_exposes_atlas_flags():
+    bare = build_parser().parse_args(["--atlas"])
+    assert bare.atlas == "http://127.0.0.1:8000"
+    assert bare.atlas_workspace == "Fleet"
+    named = build_parser().parse_args(["--atlas", "http://x", "--atlas-workspace", "Lab"])
+    assert named.atlas == "http://x"
+    assert named.atlas_workspace == "Lab"
+    both = build_parser().parse_args(["--atlas", "--brain", r"C:\vaults\nelson"])
+    assert both.atlas == "http://127.0.0.1:8000"
+    assert both.brain == r"C:\vaults\nelson"
+
+
+@pytest.mark.unit
+def test_atlas_push_failure_does_not_raise(monkeypatch, capsys):
+    def boom(*_a, **_k):
+        raise atlas.AtlasError("down")
+
+    monkeypatch.setattr(atlas, "push_run", boom)
+    args = SimpleNamespace(atlas="http://x", atlas_workspace="Fleet")
+    push_to_atlas(research_run(), None, args)
+    err = capsys.readouterr().err
+    assert "[atlas]" in err
+    assert "submit failed" in err
+
+
+@pytest.mark.unit
+def test_atlas_push_reports_findings_without_inventing_baseline(monkeypatch, capsys):
+    def fake_push(*_a, **_k):
+        return {
+            "findings": 2,
+            "module_run_id": "mr_abcdef12",
+            "report_hash": "0123456789ab",
+            "predictions": [],
+            "predictions_skipped_reason": "沒有經驗基準率",
+        }
+
+    monkeypatch.setattr(atlas, "push_run", fake_push)
+    args = SimpleNamespace(atlas="http://x", atlas_workspace="Fleet")
+    push_to_atlas(research_run(), None, args)
+    out = capsys.readouterr().out
+    assert "[atlas] submitted 2 findings" in out
+    assert "predictions skipped" in out
+    assert "mr_abcde" in out
