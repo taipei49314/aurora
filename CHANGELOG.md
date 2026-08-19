@@ -17,6 +17,8 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 - `--atlas [URL]` on the demo CLI submits that same report to Frontier Atlas.
   Findings land as observations. The demo does not invent a retention baseline,
   so predictions are skipped. A failed submit does not fail the research run.
+- Demo `--atlas` / `--brain` provenance uses the parsed argv, not `sys.argv`,
+  so `main(["--brain", vault])` records the arguments actually passed.
 
 ## [0.1.47] — 2026-08-07
 

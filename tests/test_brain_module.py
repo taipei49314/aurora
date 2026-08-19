@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from aurora import atlas, brain
-from aurora.cli import build_parser, push_to_atlas, push_to_brain
+from aurora.cli import build_parser, cli_inputs, push_to_atlas, push_to_brain
 
 
 def hypothesis(**kw):
@@ -218,3 +218,30 @@ def test_atlas_push_reports_findings_without_inventing_baseline(monkeypatch, cap
     assert "[atlas] submitted 2 findings" in out
     assert "predictions skipped" in out
     assert "mr_abcde" in out
+
+
+@pytest.mark.unit
+def test_cli_inputs_uses_parsed_argv_not_process_argv():
+    assert cli_inputs(["--atlas", "--brain", r"C:\vaults\nelson"]) == (
+        r"--atlas --brain C:\vaults\nelson"
+    )
+
+
+@pytest.mark.unit
+def test_push_forwards_explicit_inputs(monkeypatch):
+    seen: dict = {}
+
+    def fake_push(*_a, **kwargs):
+        seen.update(kwargs)
+        return {
+            "findings": 1,
+            "module_run_id": "mr_1",
+            "report_hash": "abcd",
+            "predictions": [],
+            "predictions_skipped_reason": "x",
+        }
+
+    monkeypatch.setattr(atlas, "push_run", fake_push)
+    args = SimpleNamespace(atlas="http://x", atlas_workspace="Fleet")
+    push_to_atlas(research_run(), None, args, inputs="--atlas http://x")
+    assert seen["inputs"] == "--atlas http://x"

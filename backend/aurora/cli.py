@@ -59,7 +59,14 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
-def push_to_atlas(run, snapshot, args) -> None:
+def cli_inputs(argv: list[str] | None = None) -> str:
+    """Provenance string for Atlas / Vault. Prefer the argv actually parsed."""
+    if argv is not None:
+        return " ".join(str(item) for item in argv)
+    return " ".join(sys.argv[1:])
+
+
+def push_to_atlas(run, snapshot, args, *, inputs: str | None = None) -> None:
     """Submit observations to Atlas. A failed push never fails the research run.
 
     The demo CLI does not invent a retention baseline. Findings still land;
@@ -73,7 +80,7 @@ def push_to_atlas(run, snapshot, args) -> None:
             snapshot,
             base_url=args.atlas,
             workspace=args.atlas_workspace,
-            inputs=" ".join(sys.argv[1:]),
+            inputs=cli_inputs() if inputs is None else inputs,
         )
     except atlas.AtlasError as exc:
         print(f"\n[atlas] submit failed: {exc}", file=sys.stderr)
@@ -92,7 +99,7 @@ def push_to_atlas(run, snapshot, args) -> None:
     print("Atlas claims stay unreviewed until a human accepts them.")
 
 
-def push_to_brain(run, snapshot, args) -> None:
+def push_to_brain(run, snapshot, args, *, inputs: str | None = None) -> None:
     """Send experience to md-brain. A failed ingest never fails the research run."""
     from aurora import brain
 
@@ -103,7 +110,7 @@ def push_to_brain(run, snapshot, args) -> None:
             vault=args.brain,
             mdbrain_bin=args.brain_bin,
             report_dir=args.brain_report_dir,
-            inputs=" ".join(sys.argv[1:]),
+            inputs=cli_inputs() if inputs is None else inputs,
         )
     except brain.BrainError as exc:
         print(f"\n[brain] Vault ingest failed: {exc}", file=sys.stderr)
@@ -149,10 +156,11 @@ def main(argv=None):
             print(f"[bottleneck] {h.generated_name[:30]:<32} -> "
                   f"{top['entity_id']} score={top['bottleneck_score']} "
                   f"(centrality={top['centrality']}, substitutability={top['substitutability']})")
+    inputs = cli_inputs(argv)
     if args.atlas:
-        push_to_atlas(run, snap, args)
+        push_to_atlas(run, snap, args, inputs=inputs)
     if args.brain:
-        push_to_brain(run, snap, args)
+        push_to_brain(run, snap, args, inputs=inputs)
     return run
 
 
