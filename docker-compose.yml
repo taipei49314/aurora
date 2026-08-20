@@ -1,5 +1,5 @@
-# One-command local stack (spec §4). NOTE: provided as configuration; not
-# verified running on the build machine (no Docker there) — see self-audit.
+# One-command local stack (spec §4). See docs/docker-readiness.md for the
+# static contract audit and runtime smoke check.
 services:
   backend:
     build: ./backend
@@ -16,6 +16,8 @@ services:
   frontend:
     build: ./frontend
     command: npm run dev -- --host 0.0.0.0
+    environment:
+      - AURORA_API_PROXY_TARGET=http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules

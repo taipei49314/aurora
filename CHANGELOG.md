@@ -20,6 +20,13 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 - Demo `--atlas` / `--brain` provenance uses the parsed argv, not `sys.argv`,
   so `main(["--brain", vault])` records the arguments actually passed.
 
+### Fixed
+
+- The Compose frontend now points Vite's `/api` proxy at the `backend` service
+  instead of its own localhost. Host-local frontend development keeps the
+  `http://localhost:8000` default, and the static Docker audit covers both
+  targets.
+
 ## [0.1.47] — 2026-08-07
 
 ### Added
