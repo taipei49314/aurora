@@ -1,8 +1,10 @@
+# Full API/test stack requires Python 3.10+; safe python-multipart releases no longer support 3.9.
+# The stdlib core remains Python 3.9-compatible; use requirements-engine-test.txt for its gate.
 # --- runtime (API layer) ---
 fastapi>=0.110
 uvicorn[standard]>=0.29
 pydantic>=2.6
-python-multipart>=0.0.9   # FastAPI form-data endpoints; importing the app fails without it
+python-multipart>=0.0.32  # FastAPI form-data endpoints; importing the app fails without it
 
 # --- persistence (optional store; core runs without it) ---
 sqlalchemy>=2.0        # SQLite persistence layer (aurora.store_sql)

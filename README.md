@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Engine](https://img.shields.io/badge/engine-0.1.47-blue.svg)](CHANGELOG.md)
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](backend/requirements.txt)
+[![Core: Python 3.9+](https://img.shields.io/badge/core-Python%203.9%2B-blue.svg)](pyproject.toml)
 
 AURORA looks for **industries that may be forming but are not yet named**, from
 dispersed signals (patents, hiring, capex, supply chain, standards, news, notes).
@@ -32,16 +32,17 @@ The engine clusters cross-source structure, compares to a known taxonomy, hunts
 
 ## Quick start
 
-**Requirements:** Python **3.9+** (3.11+ recommended). Core engine is **stdlib-only**.
+**Requirements:** The stdlib-only core supports Python **3.9+**. The optional API and
+full test stack require Python **3.10+** (3.11+ recommended).
 
 ```bash
 git clone https://github.com/taipei49314/aurora.git
 cd aurora
 
-# optional: API + tests (needs SQLAlchemy; on Windows may require MSVC for greenlet)
+# optional on Python 3.10+: API + full tests (needs SQLAlchemy)
 python -m pip install -r backend/requirements.txt
 
-# Windows without C++ Build Tools — engine tests only (recommended default):
+# Python 3.9, or Windows without C++ Build Tools: engine tests only
 python -m pip install -r backend/requirements-engine-test.txt
 
 # Windows PowerShell
