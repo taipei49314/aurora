@@ -19,10 +19,13 @@ Thanks for helping make research tools more honest.
 ## Development
 
 ```bash
-# Python 3.9+ (3.11+ preferred)
-python -m pip install -r backend/requirements.txt
+# Core/engine gate: Python 3.9+
+python -m pip install -r backend/requirements-engine-test.txt
 export PYTHONPATH=backend   # Windows: $env:PYTHONPATH = "backend"
+python scripts/check_engine.py
 
+# Full API/test gate: Python 3.10+ (3.11+ preferred)
+python -m pip install -r backend/requirements.txt
 python -m pytest tests/ -q
 make demo                   # or: PYTHONPATH=backend python backend/aurora/cli.py
 ```

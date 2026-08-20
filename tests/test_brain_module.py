@@ -57,6 +57,7 @@ def test_fleet_report_is_the_atlas_contract(tmp_path):
     path = brain.write_fleet_report(research_run(), directory=tmp_path, inputs="demo --scale 1")
     text = path.read_text(encoding="utf-8")
     assert path.name.endswith(".fleet.md")
+    assert b"\r\n" not in path.read_bytes()
     assert "- module_id: aurora" in text
     assert "FINDING 1:" in text
     assert "test-cluster" in text

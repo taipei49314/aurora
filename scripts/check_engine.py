@@ -50,6 +50,8 @@ def main() -> int:
                 "-q",
                 "--tb=line",
                 f"--basetemp={basetemp}",
+                "-m",
+                "not integration",
                 "--ignore=tests/test_api.py",
                 "--ignore=tests/test_persistence.py",
             ],

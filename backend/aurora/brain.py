@@ -54,7 +54,8 @@ def write_fleet_report(
         raise BrainError("this run has no citable findings; not sending an empty report")
     path = fleet_report_path(run, directory)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(report.render(), encoding="utf-8", newline="\n")
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(report.render())
     return path
 
 
