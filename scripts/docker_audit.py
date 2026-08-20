@@ -215,7 +215,52 @@ def _audit_compose(
         in backend.lists.get("environment", []),
         "backend must point AURORA_TAXONOMY at /datasets/taxonomy/taxonomy.json",
     )
+    check(
+        "AURORA_API_PROXY_TARGET=http://backend:8000"
+        in frontend.lists.get("environment", []),
+        "frontend must set AURORA_API_PROXY_TARGET=http://backend:8000",
+    )
     check("backend" in frontend.lists.get("depends_on", []), "frontend must depend on backend")
+
+
+def _audit_vite_config(
+    path: Path,
+    root: Path,
+    issues: List[AuditIssue],
+    checks: List[int],
+) -> None:
+    text = _read_text(path, root, issues)
+    if text is None:
+        return
+    relative = str(path.relative_to(root)).replace("\\", "/")
+
+    def check(condition: bool, message: str) -> None:
+        checks.append(1)
+        if not condition:
+            issues.append(AuditIssue(relative, message))
+
+    check(
+        bool(
+            re.search(
+                r"apiProxyTarget\s*=\s*env\.AURORA_API_PROXY_TARGET\s*\|\|",
+                text,
+            )
+        ),
+        "API proxy target must read AURORA_API_PROXY_TARGET",
+    )
+    check(
+        '"http://localhost:8000"' in text or "'http://localhost:8000'" in text,
+        "API proxy target must default to http://localhost:8000",
+    )
+    check(
+        bool(
+            re.search(
+                r"proxy\s*:\s*\{\s*[\"']/api[\"']\s*:\s*apiProxyTarget\s*\}",
+                text,
+            )
+        ),
+        "/api must use the resolved API proxy target",
+    )
 
 
 def audit_stack(root: Path) -> AuditReport:
@@ -255,6 +300,7 @@ def audit_stack(root: Path) -> AuditReport:
             ("frontend command", lambda line: line.startswith("CMD ") and "npm" in line and "run" in line and "dev" in line, "start the Vite dev server"),
         ),
     )
+    _audit_vite_config(root / "frontend" / "vite.config.ts", root, issues, checks)
     _audit_compose(root / "docker-compose.yml", root, issues, checks)
     return AuditReport(checks=len(checks), issues=tuple(issues))
 
