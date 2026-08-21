@@ -81,13 +81,21 @@ HYPE_CLUSTER                    27.9    89      0  0.00  quantum-mining-superpos
 INSUFFICIENT_EVIDENCE           25.0    73     55  0.00  volumetric-display-free-space-optics
 ```
 
-## Feeding md-brain (experience, not claims)
+## Optional companions: Frontier Atlas and md-brain
 
-Frontier Atlas keeps claims. [md-brain](https://github.com/taipei49314/md-brain)
-keeps identity and experience. After a run, `--brain <vault>` writes the same
-contract-shaped `FINDING` report the mothership adapter would submit, then calls
-the `mdbrain` CLI (`ingest --module aurora`). That opens an episodic **proposal**.
-Nothing is written into `memory/` until a person approves it.
+> **Both companions are private, single-user projects and are not published.**
+> `--atlas` and `--brain` are opt-in, off by default, and fail open. AURORA is a
+> complete tool without either: nothing on this page requires them, and no test
+> in this repo contacts them.
+
+Frontier Atlas keeps claims. md-brain keeps identity and experience.
+
+### Feeding md-brain (experience, not claims)
+
+After a run, `--brain <vault>` writes the same contract-shaped `FINDING` report
+the mothership adapter would submit, then calls the `mdbrain` CLI
+(`ingest --module aurora`). That opens an episodic **proposal**. Nothing is
+written into `memory/` until a person approves it.
 
 ```powershell
 $env:PYTHONPATH = "backend"
@@ -98,11 +106,18 @@ A failed ingest never fails the research run. This tool does not import md-brain
 the engine stays stdlib-only. Override the binary with `--brain-bin` if `mdbrain`
 is not on `PATH`. Without `--brain`, AURORA does not touch a Vault.
 
+### Submitting to Frontier Atlas (claims)
+
 `--atlas [URL]` is the claim-ledger sibling (default `http://127.0.0.1:8000`).
 It submits the same FINDING report. The demo CLI does **not** invent a retention
 baseline, so predictions are skipped until a measured backtest is supplied.
 A failed submit never fails the research run. Without `--atlas`, AURORA does
 not contact the mothership.
+
+The client for this is **vendored**, not installed:
+`backend/aurora/_vendor/atlas_client.py` is a copy of the mothership's
+single-file SDK, kept so the engine stays stdlib-only. Do not edit it in place —
+`tests/test_vendored_sdk_pinned.py` pins its digest and will fail if you do.
 
 ## Bring your own data (import package)
 
