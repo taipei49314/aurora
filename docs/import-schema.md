@@ -44,8 +44,19 @@ content-addressed ids and does not double-count evidence.
 | `Observation.observed_at` | When the **underlying event** occurred | Prefer event date over crawl date; use `null` if unknown — **do not** invent with retrieve time |
 | `Source.retrieved_at` | Set by importer to import wall-clock | Callers cannot override today |
 
-**Leakage rule:** cutoff runs keep only observations with `observed_at <= cutoff`
-(and treat missing dates per `leakage.py` / pipeline data-quality penalty).
+**Leakage rule:** cutoff runs keep an observation only when **both** dates are on
+or before the cutoff — its own `observed_at` **and** its source's `published_at`.
+Availability at the cutoff is what matters, not age: a 2023 article describing a
+2020 event was not readable in 2021, so it does not enter a 2021 run. Because
+this table asks you to put the *event* date in `observed_at`, retrospective
+sources are normal in real dumps, and checking `observed_at` alone would let all
+of them through.
+
+Anything whose date cannot be established is excluded rather than assumed old —
+an undated observation, an observation whose source is undated, and an
+observation whose source is absent from the package. The four counts are
+reported separately in the cutoff manifest (`excluded_future_*`,
+`excluded_undated_*`), so an exclusion is never silent.
 
 Invalid date strings are recorded as import row errors (`SOURCE_DATE_MISSING`)
 but do not always hard-fail the whole package.

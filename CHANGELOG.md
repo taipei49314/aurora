@@ -22,6 +22,30 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 ### Fixed
 
+- **Cutoff runs no longer admit retrospective sources.** Leakage was checked on
+  `Observation.observed_at` alone, so a document published after the cutoff
+  still entered the run as long as the event it described was old: at a
+  2021-12-31 cutoff, a 2020 observation carried by a 2023 article was included,
+  the manifest reported `excluded_future_observation_count: 0`, and
+  `assert_no_leakage` passed. `Source.published_at` is now part of both the
+  filter and the hard re-check, and observations whose source is undated or
+  absent are excluded rather than assumed old. The manifest gains
+  `excluded_future_source_observation_count` and
+  `excluded_undated_source_observation_count`.
+
+  This is the documented path, not an edge case: `docs/import-schema.md` asks
+  importers to put the *event* date in `observed_at`, which makes retrospective
+  sources normal for real dumps. It survived because the Northstar generator
+  sets both dates from the same variable, so the only corpus that exercises the
+  backtest cannot produce the divergence. Northstar results are therefore
+  unchanged — same 9 classifications, same median lead of 1277 days, same zero
+  leakage violations — which also means that corpus cannot tell whether this
+  check exists. Real dumps are what the fix protects.
+
+  `assert_no_leakage` now takes `sources` as a required argument. A check that
+  can be called without half the data it inspects reports success on the half it
+  can see, which is how this survived.
+
 - The Compose frontend now points Vite's `/api` proxy at the `backend` service
   instead of its own localhost. Host-local frontend development keeps the
   `http://localhost:8000` default, and the static Docker audit covers both

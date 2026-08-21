@@ -75,7 +75,7 @@ def test_patentsview_imports_and_independence(pv_pkg):
 def test_patentsview_cutoff_leakage_zero(pv_pkg):
     snap = import_package(strip_package(pv_pkg))
     cut = leakage_mod.apply_cutoff(snap.observations, snap.sources, "2020-12-31")
-    leakage_mod.assert_no_leakage(cut["observations"], "2020-12-31")
+    leakage_mod.assert_no_leakage(cut["observations"], cut["sources"], "2020-12-31")
     assert cut["manifest"]["excluded_future_observation_count"] > 0
     assert cut["manifest"]["included_observation_count"] > 0
     # early run must complete

@@ -115,7 +115,7 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
     observations = cut["observations"]
     sources = cut["sources"]
     sources_by_id = {s.source_id: s for s in sources}
-    leakage.assert_no_leakage(observations, cutoff_date)
+    leakage.assert_no_leakage(observations, sources, cutoff_date)
     entities = snapshot.entities
     resolved_group = snapshot.resolved_group
     mark("cutoff")

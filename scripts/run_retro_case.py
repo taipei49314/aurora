@@ -164,7 +164,7 @@ def run_case(case_dir: Path) -> dict:
         cut = leakage_mod.apply_cutoff(snap.observations, snap.sources, date)
         # explicit leakage re-check on included set
         try:
-            leakage_mod.assert_no_leakage(cut["observations"], date)
+            leakage_mod.assert_no_leakage(cut["observations"], cut["sources"], date)
             leak_v = 0
         except Exception as exc:  # noqa: BLE001
             leak_v = 1

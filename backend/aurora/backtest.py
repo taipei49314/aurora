@@ -32,9 +32,9 @@ def run_backtest(snapshot, taxonomy, cutoffs, cfg: EngineConfig = DEFAULT_CONFIG
     per_cutoff = []
     for c in cutoffs:
         run = run_pipeline(snapshot, taxonomy, cfg, cutoff_date=c)
-        # hard leakage check for every historical run
-        leakage.assert_no_leakage(
-            leakage.apply_cutoff(snapshot.observations, snapshot.sources, c)["observations"], c)
+        # hard leakage check for every historical run, on both dates
+        cut = leakage.apply_cutoff(snapshot.observations, snapshot.sources, c)
+        leakage.assert_no_leakage(cut["observations"], cut["sources"], c)
         per_cutoff.append({
             "cutoff": c,
             "clusters": [{"entities": set(h.entity_ids), "status": h.status,
