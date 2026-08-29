@@ -130,6 +130,11 @@ class AtlasClient:
             raise AtlasError(
                 f"cannot reach Frontier Atlas at {self.base_url}: {exc.reason}. "
                 f"Is the server running?") from exc
+        except TimeoutError as exc:
+            raise AtlasError(
+                f"{method} {path} timed out after {self.timeout} seconds while "
+                "reading Frontier Atlas's response"
+            ) from exc
         if not body:
             return None
         try:

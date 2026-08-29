@@ -22,7 +22,7 @@ import hashlib
 from pathlib import Path
 
 # sha256 of frontier-atlas/sdk/atlas_client.py, line endings normalized to LF.
-UPSTREAM_SHA256 = "7835182e98d5c5486a925d3aa7cb410dba343751b3b7ec5d7a40db3f94d5f3ea"
+UPSTREAM_SHA256 = "f4d173d45f41ddb081141b7c6a75620893c16cebeaddc8e885f7fe0213ed300e"
 
 VENDORED = (
     Path(__file__).resolve().parents[1]
