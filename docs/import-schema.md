@@ -205,6 +205,30 @@ Without `ref`, observations cannot attach to the source.
 **Warning:** changing excerpt truncation length changes `content_hash` and thus `source_id`.
 Adapters should canonicalize excerpt (e.g. first 500 chars of abstract, stable whitespace).
 
+### Source-ref collisions and provenance aliases
+
+`ref` is an integrity key, not a last-write-wins label. Package merging raises an
+error when the same non-empty `ref` is reused for different source content. The
+importer applies the same fail-closed rule to packages that bypass adapters: it
+emits `SOURCE_REF_COLLISION`, removes the ambiguous ref from resolution, and
+rejects observations that try to use it instead of guessing which source was
+intended.
+
+Rows with the same content identity still collapse to the existing content-
+addressed `source_id`. When their caller refs or provenance differ, the engine
+keeps every original variant in the canonical source's sorted
+`metadata.provenance_aliases` list. Each alias retains its ref, URL/path,
+retrieval time, license, corpus lineage, and other source metadata. The
+first-class source fields are a deterministic representative; consumers that
+need the full acquisition history must inspect the aliases. Aliases are audit
+provenance and do not create additional independent evidence. Alias
+canonicalization is idempotent: absent and empty metadata are equivalent, so
+re-merging an already merged package cannot invent provenance variants.
+
+This is backward compatible with existing packages: an exact duplicate remains
+one ordinary source without an alias list, and the `content_hash` / `source_id`
+formula is unchanged.
+
 ### Real-data conventions (metadata + independence)
 
 ```json
@@ -225,6 +249,12 @@ normalized input manifest and research-run identity change when the dataset
 version or acquisition manifest changes. The compact object contains the
 dataset id/version, retrieval timestamp, origin/license, the artifact SHA-256,
 and the canonical `manifest_sha256`.
+
+Import also retains the authoritative package object as
+`metadata.package_lineage` on normalized rows. This protects packages produced
+by callers that declare package lineage but do not stamp each row: persistence,
+the full input manifest, and backtest identities still bind the artifact and
+manifest digests without overwriting more precise row-level lineage.
 
 Artifact-level SHA-256 belongs in a separate `corpus-manifest.json`; it is not
 the same as the engine's short row `Source.content_hash`. The PatentsView case
@@ -514,7 +544,7 @@ Feed the export back into `POST /api/imports` for a round-trip check.
 
 | Item | Value |
 |------|-------|
-| Document | import-schema 0.1.0 |
+| Document | import-schema 0.1.1 |
 | Engine package | see `config.ENGINE_VERSION` |
 | Breaking changes | require engine minor bump + example updates |
 

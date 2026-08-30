@@ -32,10 +32,14 @@ export interface Hypothesis {
 
 export interface RunSummary {
   run_id: string;
+  snapshot_id?: string;
+  input_manifest_hash?: string;
   cutoff_date: string | null;
   status: string;
   created_at: string;
   n_hypotheses: number;
+  is_active?: boolean;
+  is_current_snapshot?: boolean;
 }
 
 async function j<T>(url: string, init?: RequestInit): Promise<T> {
@@ -44,11 +48,12 @@ async function j<T>(url: string, init?: RequestInit): Promise<T> {
   return r.json();
 }
 
-export const getHealth = () => j<{ status: string; engine: string; snapshot: string; runs: number }>(`/api/health`);
+export const getHealth = () => j<{ status: string; engine: string; snapshot: string; input_manifest_hash: string; runs: number }>(`/api/health`);
 
 export interface CorpusStats {
   engine: string;
   snapshot_id: string;
+  input_manifest_hash: string;
   counts: Record<string, number>;
   entities_total: number;
   entities_with_external_ids: number;
@@ -85,7 +90,15 @@ export interface CorpusStats {
   external_id_systems?: Record<string, number>;
 }
 
-export const getStats = () => j<CorpusStats>(`/api/stats`);
+export const getStats = async (expectedManifestHash?: string) => {
+  const result = await j<CorpusStats>(`/api/stats`);
+  if (expectedManifestHash && result.input_manifest_hash !== expectedManifestHash) {
+    throw new Error(
+      `409 /api/stats snapshot changed (expected ${expectedManifestHash}, got ${result.input_manifest_hash})`,
+    );
+  }
+  return result;
+};
 export const getRuns = () => j<RunSummary[]>(`/api/research-runs`);
 export const getHypotheses = (runId: string) => j<Hypothesis[]>(`/api/research-runs/${runId}/hypotheses`);
 export const getEntities = (
@@ -148,8 +161,18 @@ export const getDocuments = (opts?: { q?: string; include_stubs?: boolean }) => 
   if (opts?.include_stubs === false) params.set("include_stubs", "false");
   return j<any[]>(`/api/documents?${params.toString()}`);
 };
-export const getGraph = (id: string) => j<{ nodes: any[]; edges: any[] }>(`/api/hypotheses/${id}/graph`);
-export const getTimeline = (id: string) => j<{ timeline: any[] }>(`/api/hypotheses/${id}/timeline`);
+export const getGraph = (id: string, runId?: string) => {
+  const params = runId ? `?run_id=${encodeURIComponent(runId)}` : "";
+  return j<{ run_id: string; snapshot_id: string; nodes: any[]; edges: any[] }>(
+    `/api/hypotheses/${id}/graph${params}`,
+  );
+};
+export const getTimeline = (id: string, runId?: string) => {
+  const params = runId ? `?run_id=${encodeURIComponent(runId)}` : "";
+  return j<{ run_id: string; snapshot_id: string; timeline: any[] }>(
+    `/api/hypotheses/${id}/timeline${params}`,
+  );
+};
 export const getBottlenecks = (id: string) => j<any[]>(`/api/hypotheses/${id}/bottlenecks`);
 
 export const createRun = (cutoff: string | null) =>

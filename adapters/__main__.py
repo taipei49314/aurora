@@ -21,7 +21,12 @@ from .filings import convert_filings
 from .jobs import convert_jobs
 from .news import convert_news
 from .openalex import convert_openalex
-from .package_util import merge_packages, package_stats, strip_package
+from .package_util import (
+    MERGE_ADAPTER_VERSION,
+    merge_packages,
+    package_stats,
+    strip_package,
+)
 from .patentsview import convert_patentsview
 from .uspto import convert_uspto
 
@@ -232,7 +237,7 @@ def _cmd_merge(args: argparse.Namespace) -> int:
     pkg = merge_packages(packages)
     pkg["_adapter"] = {
         "id": "merge",
-        "version": "0.1.0",
+        "version": MERGE_ADAPTER_VERSION,
         "inputs": [str(p) for p in args.inputs],
         "input_count": len(args.inputs),
     }

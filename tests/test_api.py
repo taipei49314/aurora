@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from threading import Event, RLock, Thread
+from types import SimpleNamespace
 
 import pytest
 
@@ -85,6 +87,7 @@ def test_stats_endpoint(client):
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["entities_total"] > 0
+    assert body["input_manifest_hash"] == client.get("/api/health").json()["input_manifest_hash"]
     assert "reliability_tier_counts" in body
     assert "source_type_counts" in body
     assert "sources_total" in body
@@ -420,3 +423,241 @@ def test_post_snapshots_persists_to_sqlite_and_is_idempotent(client, tmp_path, m
     engine = store_sql.make_engine()
     back = store_sql.load_snapshot(engine, sid)
     assert len(back.entities) > 0 and len(back.observations) > 0
+
+
+def test_latest_run_summary_and_hypothesis_snapshot_isolation(client, monkeypatch):
+    """Active/latest selection and graph/timeline must not cross snapshots."""
+    old_hyp = SimpleNamespace(
+        hypothesis_id="hyp-shared",
+        created_from_run="run-old",
+        entity_ids=["entity-shared"],
+        observation_ids=["obs-old"],
+        score_explanation={
+            "value_chain": {
+                "nodes": [{"entity_id": "entity-shared", "role": "PROCESS"}],
+                "edges": [],
+            },
+            "bottlenecks": [],
+        },
+    )
+    new_hyp = SimpleNamespace(
+        hypothesis_id="hyp-shared",
+        created_from_run="run-new",
+        entity_ids=["entity-shared"],
+        observation_ids=["obs-new"],
+        score_explanation={
+            "value_chain": {
+                "nodes": [{"entity_id": "entity-shared", "role": "APPLICATION"}],
+                "edges": [],
+            },
+            "bottlenecks": [],
+        },
+    )
+    old_snapshot = SimpleNamespace(
+        snapshot_id="snapshot-shared",
+        input_manifest_hash=lambda: "sha256:old-manifest",
+        entities=[SimpleNamespace(entity_id="entity-shared", canonical_name="Old Entity")],
+        observations=[
+            SimpleNamespace(
+                observation_id="obs-old",
+                subject_entity="entity-shared",
+                observed_at="2020-01-02",
+                observation_type="PATENT_ACTIVITY",
+            ),
+        ],
+    )
+    new_snapshot = SimpleNamespace(
+        snapshot_id="snapshot-shared",
+        input_manifest_hash=lambda: "sha256:new-manifest",
+        counts={"entities": 1, "sources": 1, "observations": 1},
+        import_errors=[],
+        entities=[SimpleNamespace(entity_id="entity-shared", canonical_name="New Entity")],
+        observations=[
+            SimpleNamespace(
+                observation_id="obs-new",
+                subject_entity="entity-shared",
+                observed_at="2030-03-04",
+                observation_type="HIRING_ACTIVITY",
+            ),
+        ],
+    )
+    old_run = SimpleNamespace(
+        run_id="run-old",
+        snapshot_id=old_snapshot.snapshot_id,
+        input_manifest_hash=old_snapshot.input_manifest_hash(),
+        cutoff_date=None,
+        status="COMPLETE",
+        created_at="2024-01-01T00:00:00+00:00",
+        hypotheses=[old_hyp],
+    )
+    new_run = SimpleNamespace(
+        run_id="run-new",
+        snapshot_id=new_snapshot.snapshot_id,
+        input_manifest_hash=new_snapshot.input_manifest_hash(),
+        cutoff_date="2030-12-31",
+        status="COMPLETE",
+        created_at="2031-01-01T00:00:00+00:00",
+        hypotheses=[new_hyp],
+    )
+
+    repo = api._Repo.__new__(api._Repo)
+    repo._lock = RLock()
+    repo.snapshot = old_snapshot
+    repo.taxonomy = object()
+    repo.snapshots = {repo.snapshot_key(old_snapshot): old_snapshot}
+    repo.runs = {old_run.run_id: old_run}
+    repo.active_run_id = old_run.run_id
+    repo.backtests = {}
+    monkeypatch.setattr(api, "REPO", repo)
+    monkeypatch.setattr(api, "run_pipeline", lambda *_args, **_kwargs: new_run)
+    monkeypatch.setattr(api, "import_package", lambda _raw: new_snapshot)
+
+    uploaded = client.post(
+        "/api/imports",
+        files={"file": ("same-ids.json", b"{}", "application/json")},
+    )
+    assert uploaded.status_code == 200, uploaded.text
+    assert uploaded.json()["input_manifest_hash"] == new_snapshot.input_manifest_hash()
+    assert repo.active_run_id is None
+    before_run = client.get("/api/research-runs").json()
+    assert before_run[0]["is_active"] is False
+    assert before_run[0]["is_current_snapshot"] is False
+    assert before_run[0]["snapshot_id"] == new_snapshot.snapshot_id
+    assert before_run[0]["input_manifest_hash"] == old_snapshot.input_manifest_hash()
+    # The same row-ID set with changed payload must not fall back to an old run.
+    assert client.get("/api/hypotheses/hyp-shared").status_code == 404
+    assert client.get("/api/hypotheses/hyp-shared/evidence").status_code == 404
+    assert client.get("/api/hypotheses/hyp-shared/graph").status_code == 404
+    assert client.get("/api/hypotheses/hyp-shared/timeline").status_code == 404
+
+    created = client.post("/api/research-runs", json={"cutoff_date": "2030-12-31"})
+    assert created.status_code == 200, created.text
+
+    summaries = client.get("/api/research-runs").json()
+    assert summaries[0]["run_id"] == new_run.run_id
+    assert summaries[0]["snapshot_id"] == new_snapshot.snapshot_id
+    assert summaries[0]["input_manifest_hash"] == new_snapshot.input_manifest_hash()
+    assert summaries[0]["is_active"] is True
+    assert summaries[0]["is_current_snapshot"] is True
+    assert summaries[1]["is_active"] is False
+    assert summaries[1]["is_current_snapshot"] is False
+    assert summaries[1]["input_manifest_hash"] == old_snapshot.input_manifest_hash()
+
+    current_graph = client.get("/api/hypotheses/hyp-shared/graph").json()
+    assert current_graph["run_id"] == new_run.run_id
+    assert current_graph["snapshot_id"] == new_snapshot.snapshot_id
+    assert current_graph["nodes"][0]["name"] == "New Entity"
+
+    old_graph = client.get(
+        "/api/hypotheses/hyp-shared/graph?run_id=run-old"
+    ).json()
+    assert old_graph["run_id"] == old_run.run_id
+    assert old_graph["snapshot_id"] == old_snapshot.snapshot_id
+    assert old_graph["nodes"][0]["name"] == "Old Entity"
+
+    old_timeline = client.get(
+        "/api/hypotheses/hyp-shared/timeline?run_id=run-old"
+    ).json()
+    assert old_timeline["run_id"] == old_run.run_id
+    assert old_timeline["snapshot_id"] == old_snapshot.snapshot_id
+    assert old_timeline["timeline"] == [
+        {"year": "2020", "by_type": {"PATENT_ACTIVITY": 1}, "total": 1},
+    ]
+
+
+def test_concurrent_import_rejects_stale_run_without_activating(client, monkeypatch):
+    """A run may finish for an old corpus, but it must never become active."""
+    old_snapshot = SimpleNamespace(
+        snapshot_id="snapshot-shared",
+        input_manifest_hash=lambda: "v2:old-manifest",
+    )
+    new_snapshot = SimpleNamespace(
+        snapshot_id="snapshot-shared",
+        input_manifest_hash=lambda: "v2:new-manifest",
+    )
+    repo = api._Repo.__new__(api._Repo)
+    repo._lock = RLock()
+    repo.snapshot = old_snapshot
+    repo.taxonomy = object()
+    repo.snapshots = {repo.snapshot_key(old_snapshot): old_snapshot}
+    repo.runs = {}
+    repo.active_run_id = None
+    repo.backtests = {}
+
+    pipeline_started = Event()
+    allow_pipeline_finish = Event()
+
+    def delayed_pipeline(snapshot, *_args, **_kwargs):
+        assert snapshot is old_snapshot
+        pipeline_started.set()
+        assert allow_pipeline_finish.wait(timeout=5)
+        return SimpleNamespace(
+            run_id="run-old-corpus",
+            snapshot_id=old_snapshot.snapshot_id,
+            input_manifest_hash=old_snapshot.input_manifest_hash(),
+            cutoff_date=None,
+            status="COMPLETE",
+            created_at="2030-01-01T00:00:00+00:00",
+            hypotheses=[],
+        )
+
+    monkeypatch.setattr(api, "REPO", repo)
+    monkeypatch.setattr(api, "run_pipeline", delayed_pipeline)
+    response_box = {}
+
+    def request_run():
+        response_box["response"] = client.post(
+            "/api/research-runs", json={"cutoff_date": None}
+        )
+
+    worker = Thread(target=request_run)
+    worker.start()
+    assert pipeline_started.wait(timeout=5)
+    repo.set_snapshot(new_snapshot)
+    allow_pipeline_finish.set()
+    worker.join(timeout=5)
+    assert not worker.is_alive()
+
+    response = response_box["response"]
+    assert response.status_code == 409, response.text
+    body = response.json()
+    assert body["error_code"] == "SNAPSHOT_CHANGED_DURING_RUN"
+    assert body["details"]["started_input_manifest_hash"] == "v2:old-manifest"
+    assert body["details"]["current_input_manifest_hash"] == "v2:new-manifest"
+    assert repo.snapshot is new_snapshot
+    assert repo.active_run_id is None
+    assert repo.runs == {}
+    assert client.get(
+        "/api/hypotheses/hyp-shared/graph?run_id=missing"
+    ).status_code == 404
+
+
+def test_backtest_api_uses_engine_identity_and_fails_closed(client, monkeypatch):
+    result = {
+        "backtest_identity": "bt_0123456789abcdef",
+        "backtest_manifest_hash": "sha256:" + "a" * 64,
+        "backtest_manifest": {"schema_version": "aurora-backtest-manifest/v1"},
+        "cutoffs": ["2024-12-31"],
+        "tracks": [],
+        "median_early_discovery_lead_days": None,
+        "false_positive_candidates": [],
+        "future_leakage_violations": 0,
+    }
+    monkeypatch.setattr(api, "run_backtest", lambda *_args, **_kwargs: dict(result))
+
+    created = client.post("/api/backtests", json={"cutoffs": ["2024-12-31"]})
+    assert created.status_code == 200, created.text
+    assert created.json()["backtest_id"] == result["backtest_identity"]
+    assert created.json()["backtest_manifest_hash"] == result["backtest_manifest_hash"]
+
+    loaded = client.get(f"/api/backtests/{result['backtest_identity']}")
+    assert loaded.status_code == 200, loaded.text
+    assert loaded.json() == created.json()
+
+    conflicting = dict(result)
+    conflicting["backtest_manifest_hash"] = "sha256:" + "b" * 64
+    monkeypatch.setattr(
+        api, "run_backtest", lambda *_args, **_kwargs: dict(conflicting)
+    )
+    collision = client.post("/api/backtests", json={"cutoffs": ["2024-12-31"]})
+    assert collision.status_code == 409

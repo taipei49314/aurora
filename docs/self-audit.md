@@ -10,10 +10,10 @@ and (where observable) browser-verified. The Northstar corpus now hits the
 target scale (**199 entities / 3120 observations**), enabled by a MinHash-LSH
 dedup path.
 
-Run everything: `make test` (398 tests) · `make demo` · `make backtest` ·
+Run everything: `make test` (417 tests) · `make demo` · `make backtest` ·
 `make benchmark` · `make api` + `make frontend`.
-Test buckets: `pytest -m unit` (266) · `-m integration` (93) · `-m e2e` (14),
-plus 25 unmarked support/contract tests.
+Test buckets: `pytest -m unit` (276) · `-m integration` (99) · `-m e2e` (14),
+plus 27 unmarked support/contract tests.
 
 | # | Requirement (spec §) | Status | Evidence file | Command / test |
 |---|---|---|---|---|
@@ -49,12 +49,12 @@ plus 25 unmarked support/contract tests.
 | 30 | Quality metrics vs ground truth (§30) | **PASS** | `test_quality_groundtruth.py` | precision ≥0.85, recall ≥0.80, status accuracy 100% |
 | 31 | Provenance completeness 100% (§30) | **PASS** | `pipeline.py` | `test_errors_isolation.py::test_provenance_completeness...` |
 | 32 | Benchmark + per-stage timing (§31) | **PASS** | `benchmarks/bench.py` | `make benchmark` (measured, not claimed) |
-| 33 | Full API surface (§26) | **PASS** | `backend/api.py` | ~27 endpoints; `/imports` upload, `/exports` (raw-format round-trip), `POST /snapshots` (SQLite persist, idempotent) added 2026-07-23; `tests/test_api.py` now has 22 TestClient tests |
+| 33 | Full API surface (§26) | **PASS** | `backend/api.py` | ~27 endpoints; `/imports` upload, `/exports` (raw-format round-trip), `POST /snapshots` (SQLite persist, idempotent), active/current-snapshot run metadata, and run-addressed graph/timeline reads; `tests/test_api.py` has 24 TestClient tests |
 | 34 | Error model, no bare 500 (§27) | **PASS** | `errors.py`, `api.py` handler | bad cutoff → 422; `test_errors_isolation.py` |
 | 35 | Frontend — all 8 pages (§25) | **PASS** | `frontend/src/pages/` | all 8 pages built, `tsc` clean, wired to API; 2026-07-23 the remaining 5 (Hypothesis Explorer, Timeline, Bottleneck Lab, Data Explorer, Run Comparison) were each driven live in a browser with zero console errors — every page now browser-verified |
 | 36 | SQLite/SQLAlchemy persistence (§4) | **PASS** | `store_sql.py` | normalized snapshot tables, including complete document payloads, + runs; 28 persistence tests cover round-trip identity, same-id conflict rejection, legacy document backfill, migration-managed creation, and exact-current/exact-legacy/refuse adoption paths. Alembic builds all 6 tables, and a separate installed-wheel smoke verifies packaged migrations off-checkout |
 | 37 | Docker compose one-command up (§4) | **PASS** | `docker-compose.yml`, Dockerfiles, `frontend/vite.config.ts`, `scripts/docker_audit.py` | static contract audit passes; 2026-08-21 runtime build/start and frontend-proxied `/api/health` verified with HTTP 200 |
-| 38 | Test-count targets: 55 unit / 15 integ / 8 e2e (§28) | **PASS** | `tests/` (markers) | 398 tests: **266 unit / 93 integration / 14 e2e**, plus 25 unmarked support/contract tests. Select via `pytest -m <bucket>` |
+| 38 | Test-count targets: 55 unit / 15 integ / 8 e2e (§28) | **PASS** | `tests/` (markers) | 417 tests: **276 unit / 99 integration / 14 e2e**, plus 28 unmarked support/contract tests. Select via `pytest -m <bucket>` |
 | 39 | Phase 0 specification-audit docs (§33) | **PASS** | `docs/` | architecture, requirements matrix, import schema, 2 ADRs, and separate feature/clustering/scoring/hype/value-chain/counterevidence/bottleneck/leakage/backtest/threat-model docs |
 
 ## Known limitations / honest gaps
@@ -81,7 +81,8 @@ plus 25 unmarked support/contract tests.
   Compose service-DNS target, but should not replace a runtime smoke check after
   Docker or Vite configuration changes.
 - **API**: `/imports` upload, `/exports` round-trip and `POST /snapshots`
-  persistence shipped 2026-07-23; the API suite now has 22 TestClient tests.
+  persistence shipped 2026-07-23; active/current-snapshot run selection and
+  run-addressed graph/timeline reads are regression-locked by 24 TestClient tests.
 - **Alembic**: wired 2026-07-23; the 2026-08-30 document-table migration and
   migration-managed creation, exact current/legacy adoption, and refusal paths
   are covered by the full CI dependency set. Configuration and revisions ship
@@ -89,8 +90,8 @@ plus 25 unmarked support/contract tests.
 - **Runtime note**: this machine's existing Python 3.9 environment can execute
   the whole suite, but the supported fresh API/full-test install is Python 3.10+
   because current safe `python-multipart` releases no longer support 3.9. The
-  stdlib core remains supported on 3.9. Current local suite: 398 green
-  (266 unit / 93 integration / 14 e2e / 25 unmarked).
+  stdlib core remains supported on 3.9. Current local suite: 417 green
+  (276 unit / 99 integration / 14 e2e / 28 unmarked).
 
 ## What is genuinely proven now (verified this session)
 - All 9 archetypes classify exactly as their hidden ground truth at full scale
@@ -103,4 +104,4 @@ plus 25 unmarked support/contract tests.
   EMERGING→REJECTED; hype clusters stay hype at every cutoff.
 - The "quantum" hype cluster scores **11.7** — the engine does **not** inflate
   on buzzwords.
-- **398 tests** green (266 unit / 93 integration / 14 e2e / 25 unmarked).
+- **417 tests** green (276 unit / 99 integration / 14 e2e / 28 unmarked).

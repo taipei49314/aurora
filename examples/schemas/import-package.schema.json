@@ -162,7 +162,10 @@
           "type": "string",
           "description": "Redistribution license (SPDX-ish); required for public corpora (0.1.14+)"
         },
-        "metadata": { "type": "object" }
+        "metadata": {
+          "type": "object",
+          "description": "Extensible source metadata. Same-content provenance variants may be retained in a deterministic provenance_aliases array (engine 0.1.50+)."
+        }
       }
     },
     "observation": {

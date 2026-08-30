@@ -5,6 +5,7 @@ import {
   getDocument,
   getDocuments,
   getEntities,
+  getHealth,
   getObservations,
   getSources,
   getStats,
@@ -212,6 +213,13 @@ function looksLikeResolveRef(s: string): boolean {
 
 export function DataExplorer() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const snapshotIdentity = useQuery({
+    queryKey: ["snapshot-identity"],
+    queryFn: getHealth,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+  });
 
   /** Shareable filter state lives in the URL (Dashboard deep-links, 0.1.29+). */
   const tab = parseTab(searchParams.get("tab"));
@@ -318,7 +326,13 @@ export function DataExplorer() {
   const [resolveStatus, setResolveStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
 
-  const stats = useQuery({ queryKey: ["stats"], queryFn: getStats, staleTime: 30_000 });
+  const statsManifest = snapshotIdentity.data?.input_manifest_hash;
+  const stats = useQuery({
+    queryKey: ["stats", statsManifest],
+    queryFn: () => getStats(statsManifest),
+    enabled: !!statsManifest,
+    staleTime: 30_000,
+  });
 
   // Server-side filter for entities (?q= / ?entity_type= / ?provisional=)
   const serverQ = tab === "entities" && q.trim() && !looksLikeResolveRef(q) ? q.trim() : undefined;

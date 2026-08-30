@@ -8,6 +8,48 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 ## [Unreleased]
 
+## [0.1.50] — 2026-08-30
+
+### Added
+
+- Added `aurora-backtest-manifest/v1`: every historical cutoff and full run is
+  bound to its snapshot, input and result hashes, complete leakage manifest,
+  engine/config/taxonomy versions, and corpus-lineage digests. Canonical
+  SHA-256 manifests now produce deterministic `bt_<digest>` backtest IDs.
+- Added explicit active/latest research-run metadata and run-addressed graph and
+  timeline reads. The API and all run-dependent pages now stay within the
+  selected run's snapshot, including the no-run state after importing a new
+  corpus.
+- Expanded the suite to 417 tests (276 unit, 99 integration, 14 e2e, and 28
+  unmarked support/contract tests).
+
+### Changed
+
+- Same-content sources retain deterministic `metadata.provenance_aliases`, so
+  URL, license, retrieval, and corpus-lineage variants survive package merging
+  and import instead of depending on input order.
+- Package-level lineage is retained in normalized metadata even when callers do
+  not stamp individual rows, and the merge adapter contract is now `0.1.1`.
+- Advanced the engine/package version to `0.1.50`, adapter bundle to `0.1.11`,
+  and frontend package to `0.1.2`. Feature construction is unchanged, so
+  `FEATURE_VERSION` remains `0.1.47`.
+
+### Fixed
+
+- Source refs now fail closed: package merging rejects one ref naming different
+  content, while direct import records `SOURCE_REF_COLLISION` and leaves every
+  observation using that ambiguous ref unbound. Truncated source-ID hash
+  collisions are also reported rather than collapsed.
+- Backtest API storage now uses the engine's deterministic manifest identity
+  instead of Python's process-salted hash, and rejects conflicting payloads for
+  an existing identity.
+- Discovery Map and Timeline include `run_id` in their requests and query keys;
+  historical and current snapshots can no longer bleed into one another when
+  entity or hypothesis IDs happen to match.
+- The full local and GitHub Actions gates now compile the production frontend;
+  loading failures render explicit error states instead of indefinite spinners
+  or empty visualizations.
+
 ## [0.1.49] — 2026-08-30
 
 ### Added

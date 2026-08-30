@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCurrentRun } from "../useRun";
 import { STATUS_COLORS, Hypothesis } from "../api";
+import { NoCurrentRun } from "../NoCurrentRun";
+import { LoadError } from "../LoadError";
 
 function ScoreBar({ label, value }: { label: string; value: number }) {
   return (
@@ -100,7 +102,7 @@ function statusMatches(hStatus: string, filter: string): boolean {
 }
 
 export function HypothesisExplorer() {
-  const { hyps } = useCurrentRun();
+  const { currentRun, incompatibleBackend, runs, hyps } = useCurrentRun();
   const [searchParams, setSearchParams] = useSearchParams();
   const openId = parseOpenId(searchParams);
   const statusFilter = parseStatusFilter(searchParams);
@@ -147,6 +149,12 @@ export function HypothesisExplorer() {
     el.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [openId, hyps.data, statusFilter]);
 
+  if (runs.isError) return <LoadError resource="research runs" />;
+  if (incompatibleBackend) {
+    return <LoadError resource="research runs" detail="Backend version is incompatible with this frontend." />;
+  }
+  if (runs.isSuccess && !currentRun) return <NoCurrentRun />;
+  if (hyps.isError) return <LoadError resource="hypotheses" />;
   if (!hyps.data) return <p>Loading…</p>;
 
   const statusCounts: Record<string, number> = {};

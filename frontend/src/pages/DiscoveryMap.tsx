@@ -2,6 +2,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentRun } from "../useRun";
 import { getGraph } from "../api";
+import { NoCurrentRun } from "../NoCurrentRun";
+import { LoadError } from "../LoadError";
 
 const ROLE_COLORS: Record<string, string> = {
   RAW_INPUT: "#8b5cf6", CORE_COMPONENT: "#0969da", ENABLING_EQUIPMENT: "#0891b2",
@@ -15,12 +17,16 @@ function parseHypId(params: URLSearchParams): string | null {
 }
 
 export function DiscoveryMap() {
-  const { hyps } = useCurrentRun();
+  const { runId, currentRun, incompatibleBackend, runs, hyps } = useCurrentRun();
   const [searchParams, setSearchParams] = useSearchParams();
   const fromUrl = parseHypId(searchParams);
   const known = fromUrl && hyps.data?.some((h) => h.hypothesis_id === fromUrl);
   const id = (known ? fromUrl : null) ?? hyps.data?.[0]?.hypothesis_id ?? null;
-  const graph = useQuery({ queryKey: ["graph", id], queryFn: () => getGraph(id!), enabled: !!id });
+  const graph = useQuery({
+    queryKey: ["graph", runId, id],
+    queryFn: () => getGraph(id!, runId),
+    enabled: !!runId && !!id,
+  });
 
   const setId = (nextId: string) => {
     setSearchParams(
@@ -35,7 +41,15 @@ export function DiscoveryMap() {
     );
   };
 
+  if (runs.isError) return <LoadError resource="research runs" />;
+  if (incompatibleBackend) {
+    return <LoadError resource="research runs" detail="Backend version is incompatible with this frontend." />;
+  }
+  if (runs.isSuccess && !currentRun) return <NoCurrentRun />;
+  if (hyps.isError) return <LoadError resource="hypotheses" />;
   if (!hyps.data) return <p>Loading…</p>;
+  if (graph.isError) return <LoadError resource="discovery graph" />;
+  if (id && graph.isLoading) return <p>Loading graph…</p>;
   const nodes = graph.data?.nodes ?? [];
   const edges = graph.data?.edges ?? [];
   const R = 200, CX = 260, CY = 240;

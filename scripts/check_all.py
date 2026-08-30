@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -99,6 +100,12 @@ def main(argv=None) -> int:
     if args.quick:
         print("ALL OK (quick)")
         return 0
+
+    npm = shutil.which("npm")
+    if not npm:
+        print("FAIL: frontend-build: npm was not found", file=sys.stderr)
+        return 1
+    run("frontend-build", [npm, "run", "build", "--prefix", "frontend"])
 
     run(
         "validate-example",

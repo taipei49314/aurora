@@ -81,16 +81,40 @@ The returned dictionary contains:
 - `median_early_discovery_lead_days`;
 - `false_positive_candidates`; and
 - `future_leakage_violations`, which is `0` for a completed result because a
-  detected violation raises before return.
+  detected violation raises before return; and
+- additive audit fields `backtest_identity`, `backtest_manifest_hash`, and
+  `backtest_manifest`.
 
-Every internal cutoff `ResearchRun` records its snapshot id, cutoff, engine,
-feature and taxonomy versions, scoring and algorithm configuration, input and
-result manifest hashes, and a leakage manifest. The current
-`run_backtest` return value does not include those `ResearchRun` objects or the
-per-cutoff leakage manifests; it exposes only the compact track history and the
-aggregate zero-violation field. `scripts/run_backtest.py` prints that compact
-result, and `POST /api/backtests` stores and returns the same dictionary in the
-process-local API repository.
+The compact track fields above are retained for existing CLI, UI, and API
+consumers. The audit manifest uses schema `aurora-backtest-manifest/v1` and
+binds the replay to:
+
+- `snapshot_id` and the full normalized `input_manifest_hash`;
+- the canonical engine configuration and its full SHA-256 digest;
+- engine, feature, and taxonomy version strings;
+- sorted, deduplicated corpus-lineage references; and
+- one reference for every cutoff run plus the full-data run. Each run reference
+  contains its cutoff, deterministic `run_id`, input and result manifest hashes,
+  and complete leakage manifest.
+
+Corpus references retain dataset identity/version plus artifact and acquisition
+manifest SHA-256 values. They deliberately do not duplicate mutable origin
+URLs, local artifact paths, retrieval descriptions, or license prose from row
+metadata. Both row-level `corpus_lineage` and importer-retained
+`package_lineage` are scanned, including source provenance aliases. The
+snapshot input hash still covers the complete normalized row metadata,
+including those omitted fields.
+
+`backtest_manifest_hash` is the full SHA-256 of canonical JSON for the audit
+manifest. `backtest_identity` is the compact `bt_`-prefixed deterministic id
+derived from that digest. Equivalent replays therefore have the same identity;
+input content, corpus lineage, configuration, version, cutoff, result, or
+leakage-manifest changes produce a different manifest digest and identity.
+Runtime timestamps and stage timings are deliberately excluded, because they do
+not describe replay semantics. `build_backtest_manifest`,
+`backtest_manifest_sha256`, and `backtest_identity` are the shared helpers for
+API/storage integration; an API should use the returned `backtest_identity` as
+its stored and public `backtest_id`, while retaining the full digest for audit.
 
 ## Interpretation limits
 
@@ -127,6 +151,15 @@ process-local API repository.
   reversal behavior.
 - `tests/test_leakage_backtest.py::test_backtest_detects_industries_before_full_run`
   requires at least one final candidate to have an earlier emerging cutoff.
+- `tests/test_leakage_backtest.py::test_backtest_audit_manifest_is_deterministic`
+  verifies replay-stable identity plus snapshot, input, configuration, version,
+  per-run result, and leakage references.
+- `tests/test_leakage_backtest.py::test_backtest_identity_changes_with_config`
+  verifies that a configuration change changes both the full manifest digest
+  and compact identity.
+- `tests/test_leakage_backtest.py::test_backtest_identity_changes_with_corpus_lineage`
+  verifies that corpus-digest changes alter the full input binding and identity,
+  while lineage references remain digest-focused.
 - The remaining tests in `tests/test_leakage_backtest.py` cover cutoff boundaries,
   invalid dates, missing or future source publication dates, and the hard
   leakage assertion.

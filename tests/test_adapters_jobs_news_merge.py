@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import sys
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from adapters import (  # noqa: E402
+    MERGE_ADAPTER_VERSION,
     convert_jobs,
     convert_news,
     convert_uspto,
@@ -18,6 +20,7 @@ from adapters import (  # noqa: E402
     strip_package,
 )
 from adapters.package_util import package_stats  # noqa: E402
+from adapters.__main__ import _cmd_merge  # noqa: E402
 from aurora import import_package  # noqa: E402
 
 FIX = ROOT / "adapters" / "fixtures"
@@ -119,6 +122,31 @@ def test_merge_pipeline_runs(uspto_pkg, jobs_pkg, news_pkg):
     run = run_pipeline(snap, tax, DEFAULT_CONFIG, cutoff_date=None)
     assert run.run_id
     assert isinstance(run.hypotheses, list)
+
+
+@pytest.mark.integration
+def test_merge_cli_stamps_current_contract_version(tmp_path, jobs_pkg, news_pkg):
+    jobs_path = tmp_path / "jobs.json"
+    news_path = tmp_path / "news.json"
+    output_path = tmp_path / "merged.json"
+    jobs_path.write_text(json.dumps(jobs_pkg), encoding="utf-8")
+    news_path.write_text(json.dumps(news_pkg), encoding="utf-8")
+
+    result = _cmd_merge(
+        SimpleNamespace(
+            inputs=[str(jobs_path), str(news_path)],
+            output=str(output_path),
+            strip=False,
+            validate=False,
+            run=False,
+            strict=False,
+        )
+    )
+    merged = json.loads(output_path.read_text(encoding="utf-8"))
+
+    assert result == 0
+    assert MERGE_ADAPTER_VERSION == "0.1.1"
+    assert merged["_adapter"]["version"] == MERGE_ADAPTER_VERSION
 
 
 @pytest.mark.unit

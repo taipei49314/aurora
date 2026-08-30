@@ -1,14 +1,22 @@
 """Temporal cutoff, future-leakage prevention, historical backtest."""
 from __future__ import annotations
 
+from copy import deepcopy
+from dataclasses import replace
+
 import pytest as _pytest
 pytestmark = _pytest.mark.integration
 
 import pytest
 
-from aurora import run_pipeline, DEFAULT_CONFIG
+from aurora import import_package, run_pipeline, DEFAULT_CONFIG
 from aurora import leakage
-from aurora.backtest import run_backtest
+from aurora.backtest import (
+    BACKTEST_MANIFEST_SCHEMA,
+    backtest_identity,
+    backtest_manifest_sha256,
+    run_backtest,
+)
 from aurora.errors import AuroraError
 
 
@@ -76,6 +84,196 @@ def test_backtest_detects_industries_before_full_run(snapshot, taxonomy):
     emerging_tracks = [t for t in bt["tracks"]
                        if t["final_status"] == "INDUSTRY_CANDIDATE" and t["first_emerging_cutoff"]]
     assert emerging_tracks, "at least one real industry should be detectable before the last cutoff"
+
+
+def test_backtest_audit_manifest_is_deterministic(fast_snapshot, taxonomy):
+    cutoffs = ["2022-12-31", "2020-12-31"]
+    first = run_backtest(fast_snapshot, taxonomy, cutoffs, DEFAULT_CONFIG)
+    replay = run_backtest(fast_snapshot, taxonomy, cutoffs, DEFAULT_CONFIG)
+
+    # Existing compact consumers remain valid; audit fields are additive.
+    assert {
+        "cutoffs",
+        "tracks",
+        "median_early_discovery_lead_days",
+        "false_positive_candidates",
+        "future_leakage_violations",
+    } <= first.keys()
+    assert first["backtest_manifest"] == replay["backtest_manifest"]
+    assert first["backtest_manifest_hash"] == replay["backtest_manifest_hash"]
+    assert first["backtest_identity"] == replay["backtest_identity"]
+
+    manifest = first["backtest_manifest"]
+    assert manifest["schema_version"] == BACKTEST_MANIFEST_SCHEMA
+    assert manifest["snapshot_id"] == fast_snapshot.snapshot_id
+    assert manifest["input_manifest_hash"] == fast_snapshot.input_manifest_hash()
+    assert manifest["config_manifest"] == DEFAULT_CONFIG.manifest()
+    assert manifest["config_manifest_hash"].startswith("sha256:")
+    assert manifest["versions"] == {
+        "engine_version": DEFAULT_CONFIG.engine_version,
+        "feature_version": DEFAULT_CONFIG.feature_version,
+        "taxonomy_version": DEFAULT_CONFIG.taxonomy_version,
+    }
+    assert manifest["cutoffs"] == sorted(cutoffs)
+    assert [run["cutoff"] for run in manifest["cutoff_runs"]] == sorted(cutoffs)
+    assert manifest["full_run"]["cutoff"] is None
+    for run in [*manifest["cutoff_runs"], manifest["full_run"]]:
+        assert run["run_id"].startswith("run_")
+        assert run["input_manifest_hash"] == manifest["input_manifest_hash"]
+        assert run["result_manifest_hash"]
+        assert isinstance(run["leakage_manifest"], dict)
+
+    assert first["backtest_manifest_hash"] == backtest_manifest_sha256(manifest)
+    assert first["backtest_identity"] == backtest_identity(manifest)
+
+
+def test_backtest_identity_changes_with_config(fast_snapshot, taxonomy):
+    changed_cfg = replace(
+        DEFAULT_CONFIG,
+        classification=replace(
+            DEFAULT_CONFIG.classification,
+            candidate_min_overall=DEFAULT_CONFIG.classification.candidate_min_overall + 1,
+        ),
+    )
+    baseline = run_backtest(
+        fast_snapshot, taxonomy, ["2022-12-31"], DEFAULT_CONFIG
+    )
+    changed = run_backtest(
+        fast_snapshot, taxonomy, ["2022-12-31"], changed_cfg
+    )
+
+    assert (
+        baseline["backtest_manifest"]["input_manifest_hash"]
+        == changed["backtest_manifest"]["input_manifest_hash"]
+    )
+    assert (
+        baseline["backtest_manifest"]["config_manifest_hash"]
+        != changed["backtest_manifest"]["config_manifest_hash"]
+    )
+    assert baseline["backtest_manifest_hash"] != changed["backtest_manifest_hash"]
+    assert baseline["backtest_identity"] != changed["backtest_identity"]
+
+
+def _snapshot_with_corpus_lineage(snapshot, digest_character):
+    changed = deepcopy(snapshot)
+    source = changed.sources[0]
+    source.metadata = dict(source.metadata or {})
+    source.metadata["corpus_lineage"] = {
+        "schema_version": "aurora-package-lineage/v1",
+        "datasets": [
+            {
+                "schema_version": "aurora-corpus-lineage/v1",
+                "dataset_id": "audit-fixture",
+                "dataset_version": "2026-08",
+                "artifact_sha256": "sha256:" + digest_character * 64,
+                "manifest_sha256": "sha256:" + digest_character * 64,
+                "origin_url": "https://example.invalid/mutable-location",
+                "license": "example license prose is intentionally not copied",
+            }
+        ],
+    }
+    return changed
+
+
+def test_backtest_identity_changes_with_corpus_lineage(fast_snapshot, taxonomy):
+    corpus_a = _snapshot_with_corpus_lineage(fast_snapshot, "a")
+    corpus_b = _snapshot_with_corpus_lineage(fast_snapshot, "b")
+    first = run_backtest(corpus_a, taxonomy, ["2022-12-31"], DEFAULT_CONFIG)
+    changed = run_backtest(corpus_b, taxonomy, ["2022-12-31"], DEFAULT_CONFIG)
+
+    first_manifest = first["backtest_manifest"]
+    changed_manifest = changed["backtest_manifest"]
+    assert first_manifest["snapshot_id"] == changed_manifest["snapshot_id"]
+    assert first_manifest["input_manifest_hash"] != changed_manifest["input_manifest_hash"]
+    assert first_manifest["corpus_lineage_refs"] != changed_manifest["corpus_lineage_refs"]
+    assert first["backtest_manifest_hash"] != changed["backtest_manifest_hash"]
+    assert first["backtest_identity"] != changed["backtest_identity"]
+
+    assert first_manifest["corpus_lineage_refs"] == [{
+        "schema_version": "aurora-corpus-lineage/v1",
+        "dataset_id": "audit-fixture",
+        "dataset_version": "2026-08",
+        "artifact_sha256": "sha256:" + "a" * 64,
+        "manifest_sha256": "sha256:" + "a" * 64,
+    }]
+
+
+def test_backtest_manifest_keeps_lineage_from_source_provenance_aliases(
+    fast_snapshot, taxonomy
+):
+    snapshot = _snapshot_with_corpus_lineage(fast_snapshot, "a")
+    snapshot.sources[0].metadata["provenance_aliases"] = [
+        {
+            "metadata": {
+                "corpus_lineage": {
+                    "schema_version": "aurora-corpus-lineage/v1",
+                    "dataset_id": "second-corpus",
+                    "dataset_version": "2026-09",
+                    "artifact_sha256": "sha256:" + "b" * 64,
+                    "manifest_sha256": "sha256:" + "c" * 64,
+                }
+            }
+        }
+    ]
+
+    result = run_backtest(
+        snapshot, taxonomy, ["2022-12-31"], DEFAULT_CONFIG
+    )
+    references = result["backtest_manifest"]["corpus_lineage_refs"]
+
+    assert {reference["dataset_id"] for reference in references} == {
+        "audit-fixture",
+        "second-corpus",
+    }
+
+
+def test_package_level_lineage_changes_snapshot_and_backtest_identity(taxonomy):
+    def package(digest_character):
+        return {
+            "lineage": {
+                "schema_version": "aurora-corpus-lineage/v1",
+                "dataset_id": "package-only-lineage",
+                "dataset_version": "2026-08",
+                "artifact_sha256": "sha256:" + digest_character * 64,
+                "manifest_sha256": "sha256:" + digest_character * 64,
+            },
+            "entities": [
+                {"entity_type": "COMPANY", "canonical_name": "Lineage Co"}
+            ],
+            "sources": [
+                {
+                    "ref": "lineage-source",
+                    "source_type": "NEWS",
+                    "publisher": "Audit Wire",
+                    "title": "Lineage report",
+                    "excerpt": "Lineage Co launched a product.",
+                }
+            ],
+            "observations": [
+                {
+                    "source_ref": "lineage-source",
+                    "observation_type": "PRODUCT_LAUNCH",
+                    "subject": "Lineage Co",
+                    "observed_at": "2024-01-01",
+                }
+            ],
+        }
+
+    snapshot_a = import_package(
+        package("a"), created_at="2026-08-30T00:00:00+00:00"
+    )
+    snapshot_b = import_package(
+        package("b"), created_at="2026-08-30T00:00:00+00:00"
+    )
+    first = run_backtest(snapshot_a, taxonomy, ["2024-12-31"], DEFAULT_CONFIG)
+    changed = run_backtest(snapshot_b, taxonomy, ["2024-12-31"], DEFAULT_CONFIG)
+
+    assert snapshot_a.snapshot_id == snapshot_b.snapshot_id
+    assert snapshot_a.input_manifest_hash() != snapshot_b.input_manifest_hash()
+    assert first["backtest_manifest"]["corpus_lineage_refs"] != changed[
+        "backtest_manifest"
+    ]["corpus_lineage_refs"]
+    assert first["backtest_identity"] != changed["backtest_identity"]
 
 
 # --- source publication date (spec §19: available at the cutoff, not merely old) ---

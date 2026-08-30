@@ -1,9 +1,17 @@
 import { Link } from "react-router-dom";
 import { useCurrentRun } from "../useRun";
+import { NoCurrentRun } from "../NoCurrentRun";
+import { LoadError } from "../LoadError";
 
 // Compares bottleneck candidates across every hypothesis that has them.
 export function BottleneckLab() {
-  const { hyps } = useCurrentRun();
+  const { currentRun, incompatibleBackend, runs, hyps } = useCurrentRun();
+  if (runs.isError) return <LoadError resource="research runs" />;
+  if (incompatibleBackend) {
+    return <LoadError resource="research runs" detail="Backend version is incompatible with this frontend." />;
+  }
+  if (runs.isSuccess && !currentRun) return <NoCurrentRun />;
+  if (hyps.isError) return <LoadError resource="hypotheses" />;
   if (!hyps.data) return <p>Loading…</p>;
   const rows: {
     hypothesis_id: string;

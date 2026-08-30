@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from threading import RLock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "datasets" / "northstar"))
@@ -38,38 +39,152 @@ TAXONOMY_PATH = ROOT / "datasets" / "taxonomy" / "taxonomy.json"
 
 class _Repo:
     def __init__(self):
+        self._lock = RLock()
         pkg, _gt = generate.generate()
         self.snapshot = import_package(pkg)
         self.taxonomy = Taxonomy.load(TAXONOMY_PATH)
+        self.snapshots: dict[tuple[str, str], object] = {
+            self.snapshot_key(self.snapshot): self.snapshot,
+        }
         self.runs: dict[str, object] = {}
+        self.active_run_id: Optional[str] = None
         self.backtests: dict[str, dict] = {}
         # seed one full run
         self.create_run(None)
 
     def create_run(self, cutoff):
-        run = run_pipeline(self.snapshot, self.taxonomy, DEFAULT_CONFIG, cutoff_date=cutoff)
-        self.runs[run.run_id] = run
+        # The pipeline is intentionally run outside the state lock: a long
+        # research run must not block imports. Capture the immutable input,
+        # then compare-and-activate only if it is still current.
+        with self._lock:
+            snapshot = self.snapshot
+            snapshot_key = self.snapshot_key(snapshot)
+            taxonomy = self.taxonomy
+        run = run_pipeline(snapshot, taxonomy, DEFAULT_CONFIG, cutoff_date=cutoff)
+        if self.run_snapshot_key(run) != snapshot_key:
+            raise AuroraError(
+                "RUN_NOT_REPRODUCIBLE",
+                "research run input manifest does not match its captured snapshot",
+                stage="pipeline",
+                run_id=getattr(run, "run_id", None),
+                details={
+                    "expected_snapshot_id": snapshot_key[0],
+                    "expected_input_manifest_hash": snapshot_key[1],
+                    "actual_snapshot_id": self.run_snapshot_key(run)[0],
+                    "actual_input_manifest_hash": self.run_snapshot_key(run)[1],
+                },
+            )
+        with self._lock:
+            current_key = self.snapshot_key(self.snapshot)
+            if current_key != snapshot_key:
+                raise AuroraError(
+                    "SNAPSHOT_CHANGED_DURING_RUN",
+                    "current snapshot changed while the research run was executing; retry against the new snapshot",
+                    stage="pipeline",
+                    run_id=getattr(run, "run_id", None),
+                    details={
+                        "started_snapshot_id": snapshot_key[0],
+                        "started_input_manifest_hash": snapshot_key[1],
+                        "current_snapshot_id": current_key[0],
+                        "current_input_manifest_hash": current_key[1],
+                    },
+                )
+            self.snapshots[snapshot_key] = snapshot
+            self.runs[run.run_id] = run
+            self.active_run_id = run.run_id
         return run
+
+    @staticmethod
+    def snapshot_key(snapshot):
+        """Full immutable snapshot identity, including non-row-ID payload."""
+        return snapshot.snapshot_id, snapshot.input_manifest_hash()
+
+    @staticmethod
+    def run_snapshot_key(run):
+        return run.snapshot_id, run.input_manifest_hash
+
+    def run_is_current(self, run):
+        with self._lock:
+            return self.run_snapshot_key(run) == self.snapshot_key(self.snapshot)
+
+    def set_snapshot(self, snapshot):
+        """Make *snapshot* current without activating a run from another corpus."""
+        with self._lock:
+            self.snapshot = snapshot
+            snapshot_key = self.snapshot_key(snapshot)
+            self.snapshots[snapshot_key] = snapshot
+            matching = sorted(
+                (
+                    run
+                    for run in self.runs.values()
+                    if self.run_snapshot_key(run) == snapshot_key
+                ),
+                key=lambda run: (run.created_at, run.run_id),
+                reverse=True,
+            )
+            self.active_run_id = matching[0].run_id if matching else None
+
+    def ordered_runs(self):
+        """Newest run first, with the explicitly active run taking precedence."""
+        with self._lock:
+            rows = sorted(
+                self.runs.values(),
+                key=lambda run: (run.created_at, run.run_id),
+                reverse=True,
+            )
+            if self.active_run_id:
+                rows.sort(key=lambda run: run.run_id != self.active_run_id)
+            return rows
+
+    def run_summaries(self):
+        """Return active/current run flags from one atomic state view."""
+        with self._lock:
+            current_key = self.snapshot_key(self.snapshot)
+            active_run_id = self.active_run_id
+            return [
+                {
+                    "run_id": run.run_id,
+                    "snapshot_id": run.snapshot_id,
+                    "input_manifest_hash": run.input_manifest_hash,
+                    "cutoff_date": run.cutoff_date,
+                    "status": run.status,
+                    "created_at": run.created_at,
+                    "n_hypotheses": len(run.hypotheses),
+                    "is_active": run.run_id == active_run_id,
+                    "is_current_snapshot": self.run_snapshot_key(run) == current_key,
+                }
+                for run in self.ordered_runs()
+            ]
 
     def hyp(self, run_id, hyp_id):
         run = self.runs.get(run_id)
         if not run:
-            for r in self.runs.values():
-                for h in r.hypotheses:
-                    if h.hypothesis_id == hyp_id:
-                        return h
             return None
         for h in run.hypotheses:
             if h.hypothesis_id == hyp_id:
                 return h
         return None
 
-    def find_hyp(self, hyp_id):
-        for r in self.runs.values():
+    def hyp_context(self, hyp_id, run_id=None):
+        """Return ``(hypothesis, run, snapshot)`` without crossing snapshots."""
+        if run_id is not None:
+            run = self.runs.get(run_id)
+            candidates = [run] if run is not None else []
+        else:
+            run = self.runs.get(self.active_run_id) if self.active_run_id else None
+            candidates = [run] if run is not None and self.run_is_current(run) else []
+        for r in candidates:
             for h in r.hypotheses:
                 if h.hypothesis_id == hyp_id:
-                    return h
+                    snapshot = self.snapshots.get(self.run_snapshot_key(r))
+                    if snapshot is None:
+                        return None
+                    return h, r, snapshot
         return None
+
+    def find_hyp(self, hyp_id):
+        context = self.hyp_context(hyp_id)
+        return context[0] if context else None
 
 
 REPO = _Repo()
@@ -78,14 +193,21 @@ REPO = _Repo()
 @app.exception_handler(AuroraError)
 async def aurora_error_handler(_request, exc: AuroraError):
     from fastapi.responses import JSONResponse
-    status = 422 if exc.error_code in {"INVALID_CUTOFF_DATE", "SCHEMA_VALIDATION_FAILED"} else 400
+    if exc.error_code == "SNAPSHOT_CHANGED_DURING_RUN":
+        status = 409
+    elif exc.error_code in {"INVALID_CUTOFF_DATE", "SCHEMA_VALIDATION_FAILED"}:
+        status = 422
+    else:
+        status = 400
     return JSONResponse(status_code=status, content=exc.to_dict())
 
 
 @app.get("/api/health")
 def health():
     return {"status": "ok", "engine": DEFAULT_CONFIG.engine_version,
-            "snapshot": REPO.snapshot.snapshot_id, "runs": len(REPO.runs)}
+            "snapshot": REPO.snapshot.snapshot_id,
+            "input_manifest_hash": REPO.snapshot.input_manifest_hash(),
+            "runs": len(REPO.runs)}
 
 
 @app.get("/api/stats")
@@ -195,6 +317,7 @@ def stats():
             ext_systems[sys] = ext_systems.get(sys, 0) + 1
     return {
         "snapshot_id": s.snapshot_id,
+        "input_manifest_hash": s.input_manifest_hash(),
         "counts": dict(s.counts or {}),
         "entities_with_external_ids": with_ext,
         "entities_total": len(s.entities),
@@ -505,7 +628,9 @@ def observations(
 @app.get("/api/snapshots")
 def snapshots():
     s = REPO.snapshot
-    return [{"snapshot_id": s.snapshot_id, "created_at": s.created_at, "counts": s.counts}]
+    return [{"snapshot_id": s.snapshot_id,
+             "input_manifest_hash": s.input_manifest_hash(),
+             "created_at": s.created_at, "counts": s.counts}]
 
 
 @app.post("/api/imports")
@@ -519,8 +644,9 @@ async def import_upload(file: UploadFile = File(...)):
     if not isinstance(raw, dict):
         raise HTTPException(400, "package must be a JSON object with entities/sources/observations")
     snap = import_package(raw)
-    REPO.snapshot = snap
-    return {"snapshot_id": snap.snapshot_id, "counts": snap.counts,
+    REPO.set_snapshot(snap)
+    return {"snapshot_id": snap.snapshot_id,
+            "input_manifest_hash": snap.input_manifest_hash(), "counts": snap.counts,
             "import_errors": len(snap.import_errors)}
 
 
@@ -667,8 +793,7 @@ def create_run(req: RunRequest):
 
 @app.get("/api/research-runs")
 def list_runs():
-    return [{"run_id": r.run_id, "cutoff_date": r.cutoff_date, "status": r.status,
-             "created_at": r.created_at, "n_hypotheses": len(r.hypotheses)} for r in REPO.runs.values()]
+    return REPO.run_summaries()
 
 
 @app.get("/api/research-runs/{run_id}")
@@ -752,35 +877,58 @@ def hyp_bottlenecks(hyp_id: str):
 
 
 @app.get("/api/hypotheses/{hyp_id}/graph")
-def hyp_graph(hyp_id: str):
+def hyp_graph(hyp_id: str, run_id: Optional[str] = None):
     """Nodes (value-chain roles) + edges + bottleneck flags for the Discovery Map."""
-    h = REPO.find_hyp(hyp_id)
-    if not h:
+    context = REPO.hyp_context(hyp_id, run_id=run_id)
+    if not context:
         raise HTTPException(404, "hypothesis not found")
+    h, run, snapshot = context
     vc = h.score_explanation.get("value_chain", {})
     bn_ids = {b["entity_id"]: b["bottleneck_score"] for b in h.score_explanation.get("bottlenecks", [])}
-    name_by_id = {e.entity_id: e.canonical_name for e in REPO.snapshot.entities}
+    name_by_id = {e.entity_id: e.canonical_name for e in snapshot.entities}
     nodes = [{"id": n["entity_id"], "name": name_by_id.get(n["entity_id"], n["entity_id"]),
               "role": n["role"], "bottleneck_score": bn_ids.get(n["entity_id"], 0.0)}
              for n in vc.get("nodes", [])]
-    return {"nodes": nodes, "edges": vc.get("edges", [])}
+    return {
+        "run_id": run.run_id,
+        "snapshot_id": snapshot.snapshot_id,
+        "nodes": nodes,
+        "edges": vc.get("edges", []),
+    }
 
 
 @app.get("/api/hypotheses/{hyp_id}/timeline")
-def hyp_timeline(hyp_id: str):
+def hyp_timeline(hyp_id: str, run_id: Optional[str] = None):
     """Observation activity over time, grouped by year and observation type."""
-    h = REPO.find_hyp(hyp_id)
-    if not h:
+    context = REPO.hyp_context(hyp_id, run_id=run_id)
+    if not context:
         raise HTTPException(404, "hypothesis not found")
+    h, run, snapshot = context
     ents = set(h.entity_ids)
+    observation_ids = set(getattr(h, "observation_ids", []) or [])
     buckets: dict[str, dict[str, int]] = {}
-    for o in REPO.snapshot.observations:
-        if o.subject_entity in ents and o.observed_at:
+    for o in snapshot.observations:
+        in_hypothesis = (
+            o.observation_id in observation_ids
+            if observation_ids
+            else o.subject_entity in ents
+        )
+        if in_hypothesis and o.observed_at:
             year = o.observed_at[:4]
             buckets.setdefault(year, {}).setdefault(o.observation_type, 0)
             buckets[year][o.observation_type] += 1
-    return {"timeline": [{"year": y, "by_type": buckets[y],
-                          "total": sum(buckets[y].values())} for y in sorted(buckets)]}
+    return {
+        "run_id": run.run_id,
+        "snapshot_id": snapshot.snapshot_id,
+        "timeline": [
+            {
+                "year": y,
+                "by_type": buckets[y],
+                "total": sum(buckets[y].values()),
+            }
+            for y in sorted(buckets)
+        ],
+    }
 
 
 class BacktestRequest(BaseModel):
@@ -790,7 +938,10 @@ class BacktestRequest(BaseModel):
 @app.post("/api/backtests")
 def create_backtest(req: BacktestRequest):
     bt = run_backtest(REPO.snapshot, REPO.taxonomy, req.cutoffs, DEFAULT_CONFIG)
-    bt_id = f"bt_{abs(hash(tuple(req.cutoffs)))}"
+    bt_id = bt["backtest_identity"]
+    existing = REPO.backtests.get(bt_id)
+    if existing is not None and existing != bt:
+        raise HTTPException(409, "backtest identity collision")
     REPO.backtests[bt_id] = bt
     return {"backtest_id": bt_id, **bt}  # includes tracks so the UI can render them
 
@@ -800,7 +951,7 @@ def get_backtest(bt_id: str):
     bt = REPO.backtests.get(bt_id)
     if not bt:
         raise HTTPException(404, "backtest not found")
-    return bt
+    return {"backtest_id": bt_id, **bt}
 
 
 @app.get("/api/research-runs/{run_id}/compare/{other_id}")

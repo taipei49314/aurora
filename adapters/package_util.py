@@ -7,6 +7,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 
 Package = Dict[str, Any]
+MERGE_ADAPTER_VERSION = "0.1.1"
 
 # Keep in sync with backend/aurora/char_span.py (adapters stay backend-independent).
 _MIN_EXCERPT_LEN = 4
@@ -396,11 +397,78 @@ def ensure_documents(pkg: Package, **kwargs: Any) -> Package:
     return align_observation_char_spans(out, append_unmatched=append_unmatched)
 
 
+def _canonical_json(value: Any) -> str:
+    """Return a stable key for JSON-like package data."""
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str
+    )
+
+
+def _normalized_source_text(value: Any) -> str:
+    """Mirror ``aurora.ids.normalize_text`` without importing the backend."""
+    return " ".join(str(value or "").lower().split())
+
+
+def _source_content_key(source: dict) -> tuple:
+    """Identity inputs used by the engine's source content hash."""
+    return (
+        source.get("source_type"),
+        source.get("publisher"),
+        _normalized_source_text(source.get("title")),
+        _normalized_source_text(source.get("excerpt")),
+    )
+
+
+def _source_without_aliases(source: dict) -> dict:
+    out = dict(source)
+    metadata = dict(out.get("metadata") or {})
+    metadata.pop("provenance_aliases", None)
+    if metadata:
+        out["metadata"] = metadata
+    else:
+        # Missing and empty metadata are the same provenance. Normalizing them
+        # prevents a previously merged source from inventing a new alias when
+        # it is merged again.
+        out.pop("metadata", None)
+    return out
+
+
+def _source_provenance_variants(source: dict) -> List[dict]:
+    """Flatten prior provenance aliases and the current source row."""
+    variants: List[dict] = []
+    metadata = source.get("metadata") or {}
+    aliases = metadata.get("provenance_aliases") if isinstance(metadata, dict) else None
+    if isinstance(aliases, list):
+        variants.extend(dict(item) for item in aliases if isinstance(item, dict))
+    variants.append(_source_without_aliases(source))
+    return variants
+
+
+def _merge_source_provenance(left: dict, right: dict) -> dict:
+    """Merge same-content rows without discarding URL/license/lineage variants."""
+    variants_by_key = {
+        _canonical_json(variant): variant
+        for variant in _source_provenance_variants(left)
+        + _source_provenance_variants(right)
+    }
+    ordered = [variants_by_key[key] for key in sorted(variants_by_key)]
+    if len(ordered) == 1:
+        return dict(ordered[0])
+
+    # The representative is content-independent and therefore package-order stable.
+    representative = dict(ordered[0])
+    metadata = dict(representative.get("metadata") or {})
+    metadata["provenance_aliases"] = ordered
+    representative["metadata"] = metadata
+    return representative
+
+
 def merge_packages(packages: Iterable[Package]) -> Package:
     """Union entities (by type+name), concat sources/observations/documents.
 
-    Source ``ref`` collisions: later package wins for that ref (last-write),
-    and observations that pointed at the replaced ref still use the same key.
+    Source ``ref`` collisions fail closed when their content identities differ.
+    Same-content provenance variants are retained under
+    ``metadata.provenance_aliases`` instead of being silently overwritten.
     Documents merge by ``document_id`` (prefer non-empty text).
     """
     entities: Dict[tuple, dict] = {}
@@ -438,7 +506,15 @@ def merge_packages(packages: Iterable[Package]) -> Package:
         for src in clean["sources"]:
             ref = src.get("ref")
             if ref:
-                sources_by_ref[ref] = dict(src)
+                previous = sources_by_ref.get(ref)
+                if previous is None:
+                    sources_by_ref[ref] = dict(src)
+                elif _source_content_key(previous) != _source_content_key(src):
+                    raise ValueError(
+                        f"source ref collision for {ref!r}: different content identities"
+                    )
+                else:
+                    sources_by_ref[ref] = _merge_source_provenance(previous, src)
             else:
                 sources_no_ref.append(dict(src))
         observations.extend(dict(o) for o in clean["observations"])
@@ -455,7 +531,8 @@ def merge_packages(packages: Iterable[Package]) -> Package:
 
     merged: Package = {
         "entities": list(entities.values()),
-        "sources": list(sources_by_ref.values()) + sources_no_ref,
+        "sources": [sources_by_ref[key] for key in sorted(sources_by_ref)]
+        + sources_no_ref,
         "observations": observations,
     }
     if documents_by_id:

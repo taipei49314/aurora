@@ -17,6 +17,8 @@ Opt-in ``stage_unresolved`` creates provisional entities for unknown names
 """
 from __future__ import annotations
 
+import json
+from copy import deepcopy
 from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -130,6 +132,34 @@ def _latest_source_retrieved_at(raw: dict) -> str:
         if value:
             values.append(value)
     return _latest_timestamp(values)
+
+
+def _retain_package_lineage(raw: dict) -> dict:
+    """Persist package-level lineage through normalized row metadata.
+
+    Package lineage is authoritative for the imported artifact as a whole. It
+    is copied into a dedicated key so row-specific ``corpus_lineage`` remains
+    precise, while snapshot manifests, persistence, and backtests still bind
+    the package digest even when an adapter did not stamp every row.
+    """
+    lineage = raw.get("lineage")
+    if not isinstance(lineage, dict) or not lineage:
+        return raw
+    normalized = dict(raw)
+    for collection in ("entities", "sources", "observations", "documents"):
+        rows = []
+        for row in raw.get(collection) or []:
+            if not isinstance(row, dict):
+                rows.append(row)
+                continue
+            cloned = dict(row)
+            metadata = dict(cloned.get("metadata") or {})
+            metadata["package_lineage"] = deepcopy(lineage)
+            cloned["metadata"] = metadata
+            rows.append(cloned)
+        if collection in raw:
+            normalized[collection] = rows
+    return normalized
 
 
 def _extract_document_id(row: dict, meta: dict) -> str:
@@ -360,6 +390,166 @@ def _valid_date(d) -> bool:
         return False
 
 
+def _source_provenance_record(source: Source, ref: str) -> dict:
+    """Lossless, JSON-like representation of one source provenance variant."""
+    metadata = dict(source.metadata or {})
+    metadata.pop("provenance_aliases", None)
+    return {
+        "ref": ref,
+        "source_type": source.source_type,
+        "publisher": source.publisher,
+        "title": source.title,
+        "published_at": source.published_at,
+        "retrieved_at": source.retrieved_at,
+        "url_or_local_path": source.url_or_local_path,
+        "content_hash": source.content_hash,
+        "independence_group": source.independence_group,
+        "reliability_tier": source.reliability_tier,
+        "language": source.language,
+        "family_id": source.family_id,
+        "event_date": source.event_date,
+        "event_id": source.event_id,
+        "outlet_domain": source.outlet_domain,
+        "wire_id": source.wire_id,
+        "geo": dict(source.geo or {}),
+        "license": source.license,
+        "metadata": metadata,
+    }
+
+
+def _canonical_json(value: Any) -> str:
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str
+    )
+
+
+def _source_provenance_variants(source: Source, ref: str) -> List[dict]:
+    """Flatten aliases created by adapters or an earlier source merge."""
+    variants: List[dict] = []
+    aliases = (source.metadata or {}).get("provenance_aliases")
+    if isinstance(aliases, list):
+        variants.extend(dict(item) for item in aliases if isinstance(item, dict))
+    variants.append(_source_provenance_record(source, ref))
+    return variants
+
+
+def _merge_source_provenance(
+    existing: Source,
+    candidate: Source,
+    *,
+    existing_ref: str,
+    candidate_ref: str,
+) -> Tuple[Source, str]:
+    """Collapse same-content sources while retaining every provenance variant."""
+    existing_record = _source_provenance_record(existing, existing_ref)
+    candidate_record = _source_provenance_record(candidate, candidate_ref)
+    existing_key = _canonical_json(existing_record)
+    candidate_key = _canonical_json(candidate_record)
+    if candidate_key < existing_key:
+        primary, primary_ref = candidate, candidate_ref
+    else:
+        primary, primary_ref = existing, existing_ref
+
+    variants_by_key = {
+        _canonical_json(variant): variant
+        for variant in _source_provenance_variants(existing, existing_ref)
+        + _source_provenance_variants(candidate, candidate_ref)
+    }
+    ordered = [variants_by_key[key] for key in sorted(variants_by_key)]
+    metadata = dict(primary.metadata or {})
+    metadata.pop("provenance_aliases", None)
+    if len(ordered) > 1:
+        metadata["provenance_aliases"] = ordered
+
+    values = dict(vars(primary))
+    values["metadata"] = metadata
+    return Source(**values), primary_ref
+
+
+def _source_from_row(
+    row: dict,
+    *,
+    sid: str,
+    chash: str,
+    created_at: str,
+    package_license: str,
+    errors: list,
+    row_index: int,
+) -> Source:
+    """Promote a validated package source row to the canonical model."""
+    meta = dict(row.get("metadata", {}))
+    if "excerpt" in row:
+        meta["excerpt"] = row["excerpt"]
+    family_id = _extract_family_id(row, meta)
+    if family_id and meta.get("family_id") == family_id:
+        meta.pop("family_id", None)
+    event_date = _extract_event_date(row, meta)
+    if event_date and str(meta.get("event_date") or "")[:10] == event_date:
+        meta.pop("event_date", None)
+    event_id = _extract_event_id(row, meta)
+    if event_id and meta.get("event_id") == event_id:
+        meta.pop("event_id", None)
+    outlet_domain = _extract_outlet_domain(row, meta)
+    if outlet_domain and meta.get("outlet_domain") == outlet_domain:
+        meta.pop("outlet_domain", None)
+    if outlet_domain and meta.get("domain") == outlet_domain:
+        meta.pop("domain", None)
+    wire_id = _extract_wire_id(row, meta)
+    if wire_id and meta.get("wire_id") == wire_id:
+        meta.pop("wire_id", None)
+    geo = _extract_geo(row, meta)
+    if geo:
+        meta.pop("geo", None)
+        meta.pop("location", None)
+        meta.pop("country", None)
+        meta.pop("jurisdiction", None)
+    license_s = _extract_license(row, meta, default=package_license)
+    if license_s:
+        meta.pop("license", None)
+    retrieved_at = _extract_retrieved_at(row, meta, default=created_at)
+    if _timestamp_candidate(retrieved_at) is None:
+        errors.append(RowError(
+            row_index,
+            "retrieved_at",
+            "SOURCE_RETRIEVED_AT_INVALID",
+            "unparseable retrieved_at; import timestamp used",
+            str(retrieved_at),
+        ))
+        retrieved_at = created_at
+    meta.pop("retrieved_at", None)
+    indep = (row.get("independence_group") or "").strip()
+    if not indep:
+        indep = _derive_independence_group(
+            row,
+            meta,
+            family_id=family_id,
+            event_id=event_id,
+            wire_id=wire_id,
+            outlet_domain=outlet_domain,
+        )
+    return Source(
+        source_id=sid,
+        source_type=row["source_type"],
+        publisher=row["publisher"],
+        title=row["title"],
+        published_at=(row.get("published_at") or None),
+        retrieved_at=retrieved_at,
+        url_or_local_path=row.get("url_or_local_path", ""),
+        content_hash=chash,
+        independence_group=indep,
+        reliability_tier=row.get("reliability_tier", "C"),
+        language=row.get("language", "en"),
+        family_id=family_id,
+        event_date=event_date,
+        event_id=event_id,
+        outlet_domain=outlet_domain,
+        wire_id=wire_id,
+        geo=geo,
+        license=license_s,
+        metadata=meta,
+    )
+
+
 def _merge_entity_row(existing: Entity, *, aliases, description, country, ext_ids, meta) -> None:
     for a in aliases or []:
         if a not in existing.aliases:
@@ -384,6 +574,7 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         created_at = _latest_timestamp(
             (_lineage_retrieved_at(raw), _latest_source_retrieved_at(raw))
         ) or _now()
+    raw = _retain_package_lineage(raw)
     errors: list[RowError] = []
 
     # Optional package-level default license for public corpora (0.1.14+)
@@ -500,6 +691,9 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
     # --- 2. build sources (dedup by content hash) ---
     sources: dict[str, Source] = {}
     ref_to_sid: dict[str, str] = {}
+    source_primary_ref: dict[str, str] = {}
+    source_content_identity: dict[str, tuple] = {}
+    ambiguous_source_refs = set()
     for i, row in enumerate(raw.get("sources", [])):
         missing = _REQUIRED_SOURCE - set(k for k, v in row.items() if v not in (None, ""))
         if missing:
@@ -522,73 +716,71 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
         chash = content_hash(row.get("source_type"), normalize_text(row["title"]),
                              normalize_text(row.get("excerpt", "")), row.get("publisher"))
         sid = prefixed_id("src", chash)
-        if sid not in sources:
-            meta = dict(row.get("metadata", {}))
-            if "excerpt" in row:
-                meta["excerpt"] = row["excerpt"]
-            family_id = _extract_family_id(row, meta)
-            # Prefer first-class field; drop duplicate from metadata when promoted
-            if family_id and meta.get("family_id") == family_id:
-                meta.pop("family_id", None)
-            event_date = _extract_event_date(row, meta)
-            if event_date and str(meta.get("event_date") or "")[:10] == event_date:
-                meta.pop("event_date", None)
-            event_id = _extract_event_id(row, meta)
-            if event_id and meta.get("event_id") == event_id:
-                meta.pop("event_id", None)
-            outlet_domain = _extract_outlet_domain(row, meta)
-            if outlet_domain and meta.get("outlet_domain") == outlet_domain:
-                meta.pop("outlet_domain", None)
-            # also drop alias key when promoted
-            if outlet_domain and meta.get("domain") == outlet_domain:
-                meta.pop("domain", None)
-            wire_id = _extract_wire_id(row, meta)
-            if wire_id and meta.get("wire_id") == wire_id:
-                meta.pop("wire_id", None)
-            geo = _extract_geo(row, meta)
-            if geo:
-                # promote out of metadata once first-class
-                meta.pop("geo", None)
-                meta.pop("location", None)
-                meta.pop("country", None)
-                meta.pop("jurisdiction", None)
-            license_s = _extract_license(row, meta, default=package_license)
-            if license_s:
-                meta.pop("license", None)
-            retrieved_at = _extract_retrieved_at(row, meta, default=created_at)
-            if _timestamp_candidate(retrieved_at) is None:
+        candidate_identity = (
+            row.get("source_type"),
+            normalize_text(row["title"]),
+            normalize_text(row.get("excerpt", "")),
+            row.get("publisher"),
+        )
+        candidate = _source_from_row(
+            row,
+            sid=sid,
+            chash=chash,
+            created_at=created_at,
+            package_license=package_license,
+            errors=errors,
+            row_index=i,
+        )
+        ref = row.get("ref", "")
+        previous = sources.get(sid)
+        if previous is None:
+            sources[sid] = candidate
+            source_primary_ref[sid] = ref
+            source_content_identity[sid] = candidate_identity
+        elif source_content_identity[sid] != candidate_identity:
+            # A truncated-hash collision must never collapse unrelated content.
+            ref = row.get("ref", "")
+            if ref not in (None, ""):
+                # The candidate was discarded, so its ref cannot safely resolve.
+                # If it also named the first claimant, invalidate that mapping.
+                ref_to_sid.pop(ref, None)
+                ambiguous_source_refs.add(ref)
+            errors.append(RowError(
+                i,
+                "source",
+                "SOURCE_CONTENT_HASH_COLLISION",
+                f"source id {sid} maps to different content identities",
+                str(ref),
+            ))
+            continue
+        else:
+            merged, primary_ref = _merge_source_provenance(
+                previous,
+                candidate,
+                existing_ref=source_primary_ref.get(sid, ""),
+                candidate_ref=ref,
+            )
+            sources[sid] = merged
+            source_primary_ref[sid] = primary_ref
+
+        if ref not in (None, ""):
+            if ref in ambiguous_source_refs:
+                continue
+            previous_sid = ref_to_sid.get(ref)
+            if previous_sid is None:
+                ref_to_sid[ref] = sid
+            elif previous_sid != sid:
+                # Remove the key entirely: observations must not bind to either
+                # claimant when one caller ref names different source content.
+                ref_to_sid.pop(ref, None)
+                ambiguous_source_refs.add(ref)
                 errors.append(RowError(
                     i,
-                    "retrieved_at",
-                    "SOURCE_RETRIEVED_AT_INVALID",
-                    "unparseable retrieved_at; import timestamp used",
-                    str(retrieved_at),
+                    "ref",
+                    "SOURCE_REF_COLLISION",
+                    f"source ref {ref!r} maps to different source contents",
+                    str(ref),
                 ))
-                retrieved_at = created_at
-            # First-class value wins; never retain a contradictory metadata alias.
-            meta.pop("retrieved_at", None)
-            indep = (row.get("independence_group") or "").strip()
-            if not indep:
-                indep = _derive_independence_group(
-                    row,
-                    meta,
-                    family_id=family_id,
-                    event_id=event_id,
-                    wire_id=wire_id,
-                    outlet_domain=outlet_domain,
-                )
-            sources[sid] = Source(
-                source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
-                title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=retrieved_at,
-                url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
-                independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
-                language=row.get("language", "en"), family_id=family_id,
-                event_date=event_date, event_id=event_id,
-                outlet_domain=outlet_domain, wire_id=wire_id, geo=geo,
-                license=license_s, metadata=meta,
-            )
-        if "ref" in row:
-            ref_to_sid[row["ref"]] = sid
 
     indep = resolve_independence(list(sources.values()))
     resolved_group = indep["resolved_group"]

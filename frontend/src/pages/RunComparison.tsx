@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { createRun, getDivergence } from "../api";
 import { useCurrentRun } from "../useRun";
+import { NoCurrentRun } from "../NoCurrentRun";
+import { LoadError } from "../LoadError";
 
 export function RunComparison() {
-  const { runId } = useCurrentRun();
+  const { runId, currentRun, incompatibleBackend, runs } = useCurrentRun();
   const [cutoff, setCutoff] = useState("2022-12-31");
   const [result, setResult] = useState<any>(null);
 
@@ -15,6 +17,12 @@ export function RunComparison() {
     },
     onSuccess: setResult,
   });
+
+  if (runs.isError) return <LoadError resource="research runs" />;
+  if (incompatibleBackend) {
+    return <LoadError resource="research runs" detail="Backend version is incompatible with this frontend." />;
+  }
+  if (runs.isSuccess && !currentRun) return <NoCurrentRun />;
 
   return (
     <div>
@@ -29,6 +37,7 @@ export function RunComparison() {
         <button onClick={() => compare.mutate()} disabled={!runId}>Compare</button>
       </div>
       {compare.isPending && <p>Comparing…</p>}
+      {compare.isError && <LoadError resource="run comparison" />}
       {result && (
         <div style={{ border: "1px solid #d0d7de", borderRadius: 8, padding: 14, fontSize: 13 }}>
           <div><b>First divergence stage:</b> {result.first_divergence_stage ?? "none (identical)"}</div>

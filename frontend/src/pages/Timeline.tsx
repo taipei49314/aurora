@@ -2,6 +2,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentRun } from "../useRun";
 import { getTimeline } from "../api";
+import { NoCurrentRun } from "../NoCurrentRun";
+import { LoadError } from "../LoadError";
 
 /** Shareable hypothesis id from URL (`id`, `hypothesis_id`, or short `h`). */
 function parseHypId(params: URLSearchParams): string | null {
@@ -9,12 +11,16 @@ function parseHypId(params: URLSearchParams): string | null {
 }
 
 export function Timeline() {
-  const { hyps } = useCurrentRun();
+  const { runId, currentRun, incompatibleBackend, runs, hyps } = useCurrentRun();
   const [searchParams, setSearchParams] = useSearchParams();
   const fromUrl = parseHypId(searchParams);
   const known = fromUrl && hyps.data?.some((h) => h.hypothesis_id === fromUrl);
   const id = (known ? fromUrl : null) ?? hyps.data?.[0]?.hypothesis_id ?? null;
-  const tl = useQuery({ queryKey: ["timeline", id], queryFn: () => getTimeline(id!), enabled: !!id });
+  const tl = useQuery({
+    queryKey: ["timeline", runId, id],
+    queryFn: () => getTimeline(id!, runId),
+    enabled: !!runId && !!id,
+  });
 
   const setId = (nextId: string) => {
     setSearchParams(
@@ -29,7 +35,15 @@ export function Timeline() {
     );
   };
 
+  if (runs.isError) return <LoadError resource="research runs" />;
+  if (incompatibleBackend) {
+    return <LoadError resource="research runs" detail="Backend version is incompatible with this frontend." />;
+  }
+  if (runs.isSuccess && !currentRun) return <NoCurrentRun />;
+  if (hyps.isError) return <LoadError resource="hypotheses" />;
   if (!hyps.data) return <p>Loading…</p>;
+  if (tl.isError) return <LoadError resource="timeline" />;
+  if (id && tl.isLoading) return <p>Loading timeline…</p>;
   const rows = tl.data?.timeline ?? [];
   const max = Math.max(1, ...rows.map((r: any) => r.total));
 

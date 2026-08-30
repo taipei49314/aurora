@@ -4,6 +4,7 @@ __pycache__/
 .hypothesis/
 node_modules/
 frontend/dist/
+/.vite/
 backend/aurora.db
 aurora.db
 .env

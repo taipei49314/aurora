@@ -8,7 +8,7 @@
   explicit publication steps.
 - GitHub Actions is live. `docs/ci-github-actions.yml` remains the reference copy.
 
-## Shipped (through 0.1.49)
+## Shipped (through 0.1.50)
 
 | Ver | Highlights |
 |-----|------------|
@@ -58,11 +58,13 @@
 | 0.1.47 | Manifest hash v2 (full input digest); Frontier Atlas mothership submit |
 | 0.1.48 | Calendar-window hype fade; unit-safe bottleneck lead time; focused value-chain regressions |
 | 0.1.49 | Real USPTO PatentsView sample; digest-bound corpus lineage; current API field fidelity |
+| 0.1.50 | Fail-closed source refs; provenance aliases; snapshot-isolated active runs; auditable backtest manifests |
 
 ## Next
 
-1. Reference corpus/run digests from backtest outputs
-2. Add a second independently licensed real corpus to exercise merged lineage
+1. Add a second independently licensed real corpus to exercise merged lineage
+2. Add point-in-time survivorship, taxonomy-drift, and calibration diagnostics
+   to historical backtest reports
 
 ## Done
 

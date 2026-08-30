@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useCurrentRun } from "../useRun";
 import { STATUS_COLORS, Hypothesis, getStats } from "../api";
+import { NoCurrentRun } from "../NoCurrentRun";
+import { LoadError } from "../LoadError";
 
 function Badge({ status }: { status: string }) {
   return (
@@ -27,19 +29,33 @@ function counts(hyps: Hypothesis[]) {
 }
 
 export function Dashboard() {
-  const { runs, hyps } = useCurrentRun();
-  const stats = useQuery({ queryKey: ["stats"], queryFn: getStats, staleTime: 30_000 });
+  const { currentRun, incompatibleBackend, runs, hyps } = useCurrentRun();
+  const statsManifest = currentRun?.input_manifest_hash;
+  const stats = useQuery({
+    queryKey: ["stats", statsManifest],
+    queryFn: () => getStats(statsManifest),
+    enabled: !!statsManifest,
+    staleTime: 30_000,
+  });
 
   if (runs.isError) {
+    return <LoadError resource="research runs" />;
+  }
+  if (incompatibleBackend) {
     return (
-      <p style={{ color: "#cf222e" }}>
-        API not reachable — run <code>make api</code>.
-      </p>
+      <LoadError
+        resource="research runs"
+        detail="The API does not expose the active/current snapshot contract required by this frontend. Deploy matching AURORA versions."
+      />
     );
   }
+  if (runs.isSuccess && !currentRun) {
+    return <NoCurrentRun />;
+  }
+  if (hyps.isError) return <LoadError resource="hypotheses" />;
   if (!hyps.data) return <p>Loading…</p>;
   const c = counts(hyps.data);
-  const run = runs.data![0];
+  const run = currentRun!;
   const st = stats.data;
 
   return (

@@ -9,6 +9,7 @@ from .jobs import convert_jobs
 from .news import convert_news
 from .openalex import convert_openalex
 from .package_util import (
+    MERGE_ADAPTER_VERSION,
     align_char_span,
     align_observation_char_spans,
     ensure_observation_raw_mentions,
@@ -20,6 +21,7 @@ from .patentsview import convert_patentsview
 from .uspto import convert_uspto
 
 __all__ = [
+    "MERGE_ADAPTER_VERSION",
     "convert_uspto",
     "convert_patentsview",
     "convert_jobs",
@@ -33,4 +35,4 @@ __all__ = [
     "merge_packages",
     "strip_package",
 ]
-__version__ = "0.1.10"
+__version__ = "0.1.11"
