@@ -1,8 +1,8 @@
 """Discovery pipeline orchestration (spec §10, §22).
 
-Runs every stage in order and produces an immutable ResearchRun of scored,
-classified hypotheses with full provenance. Each stage is a separate module with
-its own inputs/outputs — there is deliberately no monolithic
+Runs every stage in order and produces a read-only-contract ResearchRun of
+scored, classified hypotheses with full provenance. Each stage is a separate
+module with its own inputs/outputs — there is deliberately no monolithic
 ``discover_industries()`` (spec §10 forbids it).
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 from .config import EngineConfig, DEFAULT_CONFIG
 from .ids import content_hash, prefixed_id
-from .models import Hypothesis, REAL_INVESTMENT_TYPES, DEMAND_TYPES
+from .models import Hypothesis, DEMAND_TYPES, is_real_investment_observation
 from .store import ResearchRun, Snapshot
 from . import leakage, clustering, graph as graphmod, scoring, classify
 from .taxonomy import Taxonomy
@@ -158,7 +158,10 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
         # cluster-level ratios
         types = Counter(o.observation_type for o in cluster_obs)
         n = len(cluster_obs)
-        real_ratio = sum(types[t] for t in REAL_INVESTMENT_TYPES) / n
+        real_ratio = sum(
+            1 for observation in cluster_obs
+            if is_real_investment_observation(observation)
+        ) / n
         demand_ratio = sum(types[t] for t in DEMAND_TYPES) / n
         accel = sum(sig.get(e, {}).get("acceleration", 0.0) for e in cluster) / max(1, len(cluster))
         src_ids = [o.source_id for o in cluster_obs]
@@ -233,7 +236,15 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
     result_hash = content_hash([
         [h.hypothesis_id, h.status, h.overall_score, h.entity_ids] for h in hypotheses
     ])
-    run_id = f"run_{content_hash(snapshot.snapshot_id, cutoff_date or 'full', cfg.manifest(), result_hash)}"
+    input_manifest_hash = snapshot.input_manifest_hash()
+    run_identity_hash = content_hash(
+        snapshot.snapshot_id,
+        input_manifest_hash,
+        cutoff_date or "full",
+        cfg.manifest(),
+        result_hash,
+    )
+    run_id = f"run_{run_identity_hash}"
     for h in hypotheses:
         h.created_from_run = run_id
 
@@ -244,7 +255,7 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
         engine_version=cfg.engine_version, feature_version=cfg.feature_version,
         taxonomy_version=cfg.taxonomy_version, algorithm_config=algorithm_config,
         scoring_config=cfg.manifest()["scoring"], created_at=datetime.now(timezone.utc).isoformat(),
-        status="COMPLETE", input_manifest_hash=snapshot.input_manifest_hash(),
+        status="COMPLETE", input_manifest_hash=input_manifest_hash,
         result_manifest_hash=result_hash, hypotheses=hypotheses,
         leakage_manifest={**cut["manifest"], "cluster_agreement": round(agreement, 4)},
         stage_timings=timings,

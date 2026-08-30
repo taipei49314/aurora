@@ -12,7 +12,11 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .models import OBSERVATION_TYPES, NEGATIVE_TYPES, REAL_INVESTMENT_TYPES, DEMAND_TYPES
+from .models import (
+    DEMAND_TYPES,
+    is_negative_observation,
+    is_real_investment_observation,
+)
 
 # observation types we EXPECT a genuine forming industry to eventually show
 _EXPECTED_TYPES = [
@@ -25,9 +29,13 @@ def analyze(cluster, observations, dedup_resolved_group) -> dict:
     obs = [o for o in observations if o.subject_entity in cluster]
     types = Counter(o.observation_type for o in obs)
 
-    supporting = [o for o in obs if o.observation_type in (REAL_INVESTMENT_TYPES | DEMAND_TYPES)]
+    supporting = [
+        o
+        for o in obs
+        if is_real_investment_observation(o) or o.observation_type in DEMAND_TYPES
+    ]
     supporting.sort(key=lambda o: (-(o.confidence or 0), o.observation_id))
-    counter = [o for o in obs if o.observation_type in NEGATIVE_TYPES]
+    counter = [o for o in obs if is_negative_observation(o)]
     counter.sort(key=lambda o: (-(o.confidence or 0), o.observation_id))
 
     # structural red flag: single-entity domination

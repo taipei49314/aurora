@@ -4,8 +4,8 @@
 This is deliberately a static readiness check.  It verifies the small,
 versioned contract between ``docker-compose.yml`` and the two Dockerfiles,
 but it does not parse images, pull dependencies, or start containers.  A
-passing report therefore never changes the self-audit's Docker status from
-PARTIAL to PASS.
+passing report therefore cannot replace the separate runtime smoke evidence
+recorded in ``docs/docker-readiness.md``.
 """
 from __future__ import annotations
 
@@ -317,7 +317,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print("DOCKER STATIC AUDIT FAILED")
         return 1
     print("DOCKER STATIC AUDIT PASS")
-    print("Runtime start still requires verification on a Docker host.")
+    print(
+        "Static checks do not replace the runtime smoke; repeat it after "
+        "Docker, Compose, or Vite configuration changes."
+    )
     return 0
 
 

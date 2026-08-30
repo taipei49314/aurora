@@ -1,8 +1,11 @@
-"""Immutable snapshots + research-run records (spec §22).
+"""Insert-once snapshots + research-run records (spec §22).
 
-Snapshots and runs are content-addressed and never mutated in place. Persistence
-is plain JSON on disk (deterministic, diffable). SQLAlchemy/SQLite is the
-intended production store and is tracked as PARTIAL in the self-audit.
+The engine treats snapshots and runs as read-only after construction, while the
+persistence layers enforce insert-once ids. ``snapshot_id`` identifies the
+stable row-id set; ``input_manifest_hash`` covers the complete normalized input.
+Plain JSON remains the deterministic, diffable audit format. The implemented
+SQLAlchemy/SQLite store in ``store_sql.py`` provides indexed persistence while
+preserving byte-identical result hashes across round trips.
 """
 from __future__ import annotations
 

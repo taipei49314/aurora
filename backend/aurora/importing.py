@@ -3,9 +3,10 @@
 Raw package -> Schema Validation -> Canonicalization -> Entity Resolution ->
 Source Dedup -> Temporal Validation -> Observation Extraction -> Snapshot.
 
-Determinism & idempotency: every id is content-derived, so re-importing the same
-package produces the same ids and dedupes to the same snapshot — importing twice
-never doubles the evidence (spec §34.3).
+Determinism & idempotency: generated ids are content-derived and caller-supplied
+stable ids are preserved, so re-importing the same package produces the same ids
+and dedupes to the same snapshot — importing twice never doubles the evidence
+(spec §34.3).
 
 Entities that share an ``external_ids`` key are merged into the first entity
 that claimed that key (aliases + external_ids union). Observations may resolve

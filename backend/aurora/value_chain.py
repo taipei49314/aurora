@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from .ids import prefixed_id
-from .models import ValueChainNode
+from .models import ValueChainNode, is_capacity_contraction
 
 _TYPE_TO_ROLE = {
     "MATERIAL": "RAW_INPUT",
@@ -39,10 +39,14 @@ _COMPLETENESS_ROLES = [
 ]
 
 
-def _role_for(entity, obs_types) -> str:
+def _role_for(entity, observations) -> str:
     role = _TYPE_TO_ROLE.get(entity.entity_type, "INTEGRATION")
     # equipment purchase / capex signals promote a company toward INFRASTRUCTURE
-    if "CAPACITY_EXPANSION" in obs_types and entity.entity_type == "COMPANY":
+    if entity.entity_type == "COMPANY" and any(
+        o.observation_type == "CAPACITY_EXPANSION"
+        and not is_capacity_contraction(o)
+        for o in observations
+    ):
         role = "INFRASTRUCTURE"
     return role
 
@@ -59,9 +63,9 @@ def build(hypothesis_id, cluster, entities, observations):
         e = by_id.get(eid)
         if not e:
             continue
-        etypes = {o.observation_type for o in obs_by_subject.get(eid, [])}
-        role = _role_for(e, etypes)
-        ev = [o.observation_id for o in obs_by_subject.get(eid, [])]
+        entity_observations = obs_by_subject.get(eid, [])
+        role = _role_for(e, entity_observations)
+        ev = [o.observation_id for o in entity_observations]
         nodes.append(ValueChainNode(
             value_chain_node_id=prefixed_id("vcn", hypothesis_id, eid),
             hypothesis_id=hypothesis_id,
@@ -90,7 +94,10 @@ def build(hypothesis_id, cluster, entities, observations):
             })
 
     roles_present = {n.role for n in nodes}
-    completeness = len(roles_present & set(_COMPLETENESS_ROLES)) / len(_COMPLETENESS_ROLES)
+    coverage_roles = set(roles_present)
+    if "INFRASTRUCTURE" in coverage_roles:
+        coverage_roles.add("INTEGRATION")
+    completeness = len(coverage_roles & set(_COMPLETENESS_ROLES)) / len(_COMPLETENESS_ROLES)
     return {
         "nodes": nodes,
         "edges": edges,

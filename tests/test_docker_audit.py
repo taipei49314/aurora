@@ -78,8 +78,9 @@ def test_static_audit_catches_proxy_target_drift(tmp_path, relative, old, new, e
 
 
 @pytest.mark.unit
-def test_cli_states_runtime_verification_is_still_required(capsys):
+def test_cli_distinguishes_static_audit_from_runtime_smoke(capsys):
     assert main([str(ROOT)]) == 0
     output = capsys.readouterr().out
     assert "DOCKER STATIC AUDIT PASS" in output
-    assert "Runtime start still requires verification on a Docker host." in output
+    assert "Static checks do not replace the runtime smoke" in output
+    assert "repeat it after Docker, Compose, or Vite configuration changes" in output

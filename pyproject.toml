@@ -32,14 +32,22 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+persistence = [
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+]
 api = [
   "fastapi>=0.110",
   "uvicorn[standard]>=0.29",
   "pydantic>=2.6",
   "python-multipart>=0.0.32",
   "sqlalchemy>=2.0",
+  "alembic>=1.13",
 ]
 test = [
+  "build>=1.2",
+  "setuptools>=68",
+  "wheel>=0.42",
   "pytest>=8.0",
   "hypothesis>=6.100",
   "httpx>=0.27",
@@ -47,6 +55,7 @@ test = [
   "pydantic>=2.6",
   "python-multipart>=0.0.32",
   "sqlalchemy>=2.0",
+  "alembic>=1.13",
 ]
 dev = [
   "aurora-discovery[api,test]",
@@ -61,6 +70,15 @@ Changelog = "https://github.com/taipei49314/aurora/blob/master/CHANGELOG.md"
 [tool.setuptools.packages.find]
 where = ["backend"]
 include = ["aurora*"]
+
+[tool.setuptools.package-data]
+aurora = [
+  "alembic.ini",
+  "migrations/README",
+  "migrations/env.py",
+  "migrations/script.py.mako",
+  "migrations/versions/*.py",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

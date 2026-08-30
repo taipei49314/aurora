@@ -11,22 +11,26 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-if config.config_file_name is not None:
+if config.config_file_name is not None and config.get_section("loggers"):
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+package_parent = str(Path(__file__).resolve().parents[2])
+if package_parent not in sys.path:
+    sys.path.insert(0, package_parent)
 
 from aurora.store_sql import Base  # noqa: E402
 
 target_metadata = Base.metadata
 
-# allow overriding the db url (tests point this at a temp file)
-if os.environ.get("AURORA_DB_URL"):
+# Allow overriding the CLI database URL. Programmatic callers supply an exact
+# connection instead, which must never be redirected by ambient environment.
+if config.attributes.get("connection") is None and os.environ.get("AURORA_DB_URL"):
     config.set_main_option("sqlalchemy.url", os.environ["AURORA_DB_URL"])
 
 # other values from the config, defined by the needs of env.py,
@@ -66,6 +70,19 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    def run(connection) -> None:
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+    connection = config.attributes.get("connection")
+    if connection is not None:
+        run(connection)
+        return
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -73,12 +90,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
-
-        with context.begin_transaction():
-            context.run_migrations()
+        run(connection)
 
 
 if context.is_offline_mode():

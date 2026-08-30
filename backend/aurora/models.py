@@ -2,9 +2,9 @@
 
 Implemented as plain dataclasses rather than SQLAlchemy rows so the discovery
 engine can run fully in-memory and offline with zero third-party runtime deps.
-A JSON snapshot store (see ``store.py``) provides persistence. SQLAlchemy/SQLite
-is the intended production persistence layer and is tracked as PARTIAL in the
-self-audit.
+The JSON snapshot store (see ``store.py``) remains the deterministic audit
+format; ``store_sql.py`` supplies the implemented SQLAlchemy/SQLite persistence
+path without making the core depend on SQLAlchemy.
 
 Enum values are kept as plain string constants (not ``enum.Enum``) so that
 serialized snapshots are trivially diffable and stable across Python versions.
@@ -41,8 +41,8 @@ OBSERVATION_TYPES = [
     "CANCELLATION_SIGNAL", "SHUTDOWN_SIGNAL",
 ]
 
-# observation types that represent *real physical/economic investment* rather
-# than mere narrative. Used by the hype filter and real-investment score.
+# observation types that can represent *real physical/economic investment*
+# rather than mere narrative. The predicate below excludes negative capacity.
 REAL_INVESTMENT_TYPES = {
     "PATENT_ACTIVITY", "HIRING_ACTIVITY", "CAPEX_ACTIVITY", "CAPACITY_EXPANSION",
     "SUPPLIER_RELATIONSHIP", "STANDARD_ACTIVITY",
@@ -50,6 +50,31 @@ REAL_INVESTMENT_TYPES = {
 DEMAND_TYPES = {"CUSTOMER_RELATIONSHIP", "ADOPTION_SIGNAL", "DEMAND_SIGNAL"}
 NARRATIVE_TYPES = {"PRODUCT_LAUNCH", "STRATEGIC_INVESTMENT"}
 NEGATIVE_TYPES = {"CANCELLATION_SIGNAL", "SHUTDOWN_SIGNAL", "PRICE_PRESSURE", "LEAD_TIME_PRESSURE"}
+
+
+def is_capacity_contraction(observation) -> bool:
+    """Treat a negative expansion amount as a contraction/scarcity signal."""
+    return (
+        getattr(observation, "observation_type", None) == "CAPACITY_EXPANSION"
+        and getattr(observation, "numeric_value", None) is not None
+        and observation.numeric_value < 0
+    )
+
+
+def is_real_investment_observation(observation) -> bool:
+    """Return whether an observation is positive real-investment evidence."""
+    return (
+        getattr(observation, "observation_type", None) in REAL_INVESTMENT_TYPES
+        and not is_capacity_contraction(observation)
+    )
+
+
+def is_negative_observation(observation) -> bool:
+    """Return whether an observation is explicit disconfirming evidence."""
+    return (
+        getattr(observation, "observation_type", None) in NEGATIVE_TYPES
+        or is_capacity_contraction(observation)
+    )
 
 HYPOTHESIS_STATUS = [
     "SEED", "EMERGING_CAPABILITY_CLUSTER", "INDUSTRY_CANDIDATE",

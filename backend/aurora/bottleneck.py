@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from collections import defaultdict, deque
 
-from .models import BottleneckCandidate
+from .models import BottleneckCandidate, is_capacity_contraction
 
 _BN_WEIGHTS = {
     "centrality": 0.30,
@@ -142,8 +142,15 @@ def analyze(hypothesis_id, cluster, entities, observations, all_clusters, adj):
             downstream_dependents=sorted(downstream),
             substitute_exists=bool(alt_suppliers),
             substitution_time_note="qualification typically multi-quarter" if not alt_suppliers else "alternatives exist",
-            scarcity_evidence_ids=[o.observation_id for o in observations
-                                   if o.subject_entity == e and o.observation_type in {"LEAD_TIME_PRESSURE", "CAPACITY_EXPANSION"}],
+            scarcity_evidence_ids=[
+                o.observation_id
+                for o in observations
+                if o.subject_entity == e
+                and (
+                    o.observation_type == "LEAD_TIME_PRESSURE"
+                    or is_capacity_contraction(o)
+                )
+            ],
             disconfirming_data_note="new qualified suppliers or a substitute technology would remove this bottleneck",
         ))
     candidates.sort(key=lambda c: (-c.bottleneck_score, c.entity_id))

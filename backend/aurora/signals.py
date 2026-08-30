@@ -14,7 +14,11 @@ import math
 from collections import defaultdict
 from datetime import date
 
-from .models import Observation, REAL_INVESTMENT_TYPES, NEGATIVE_TYPES
+from .models import (
+    Observation,
+    is_negative_observation,
+    is_real_investment_observation,
+)
 from .dedup import independent_sources_for
 
 
@@ -53,8 +57,8 @@ def entity_signal_summary(observations, resolved_group) -> dict[str, dict]:
         source_types = {o.metadata.get("source_type") for o in obs if o.metadata.get("source_type")}
         indep = independent_sources_for(src_ids, resolved_group)
         raw = len(set(src_ids)) or 1
-        real_inv = sum(1 for o in obs if o.observation_type in REAL_INVESTMENT_TYPES)
-        negative = sum(1 for o in obs if o.observation_type in NEGATIVE_TYPES)
+        real_inv = sum(1 for o in obs if is_real_investment_observation(o))
+        negative = sum(1 for o in obs if is_negative_observation(o))
         out[eid] = {
             "observation_count": n,
             "strength": min(1.0, strength),

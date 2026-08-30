@@ -13,7 +13,9 @@ from __future__ import annotations
 from collections import Counter
 
 from .models import (
-    REAL_INVESTMENT_TYPES, DEMAND_TYPES, NARRATIVE_TYPES,
+    DEMAND_TYPES,
+    NARRATIVE_TYPES,
+    is_real_investment_observation,
 )
 
 _HYPE_WEIGHTS = {
@@ -47,7 +49,7 @@ def hype_assessment(cluster, observations) -> dict:
     n = len(obs) or 1
     types = Counter(o.observation_type for o in obs)
 
-    real = sum(types[t] for t in REAL_INVESTMENT_TYPES)
+    real = sum(1 for o in obs if is_real_investment_observation(o))
     demand = sum(types[t] for t in DEMAND_TYPES)
     narrative = sum(types[t] for t in NARRATIVE_TYPES) + types["NEWS_MENTION"] if "NEWS_MENTION" in types else sum(types[t] for t in NARRATIVE_TYPES)
     # count NEWS source-type observations as narrative too
@@ -57,7 +59,14 @@ def hype_assessment(cluster, observations) -> dict:
     indep_groups = {o.metadata.get("independence_group", o.source_id) for o in obs}
     independence_ratio = len(indep_groups) / (len(set(src_ids)) or 1)
 
-    has_supply_chain = any(o.observation_type in {"SUPPLIER_RELATIONSHIP", "TECHNICAL_DEPENDENCY", "CAPACITY_EXPANSION"} for o in obs)
+    has_supply_chain = any(
+        o.observation_type in {"SUPPLIER_RELATIONSHIP", "TECHNICAL_DEPENDENCY"}
+        or (
+            o.observation_type == "CAPACITY_EXPANSION"
+            and is_real_investment_observation(o)
+        )
+        for o in obs
+    )
     has_standards = any(o.observation_type in {"STANDARD_ACTIVITY", "REGULATORY_SUPPORT"} for o in obs)
 
     narrative_dominance = min(1.0, (narrative + news_src) / n / 0.6)  # saturates when >60% narrative
