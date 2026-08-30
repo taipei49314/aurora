@@ -3,7 +3,7 @@
 **Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Engine](https://img.shields.io/badge/engine-0.1.47-blue.svg)](CHANGELOG.md)
+[![Engine](https://img.shields.io/badge/engine-0.1.48-blue.svg)](CHANGELOG.md)
 
 [![Core: Python 3.9+](https://img.shields.io/badge/core-Python%203.9%2B-blue.svg)](pyproject.toml)
 
@@ -81,9 +81,9 @@ make frontend     # Vite :5173
 
 ```
 STATUS                       OVERALL  HYPE CONTRA   SIM  NAME
-INDUSTRY_CANDIDATE              73.8     7      5  0.00  analog-inference-compute-in-memory ...
-HYPE_CLUSTER                    27.9    89      0  0.00  quantum-mining-superposition-hash
-INSUFFICIENT_EVIDENCE           25.0    73     55  0.00  volumetric-display-free-space-optics
+INDUSTRY_CANDIDATE              72.3     7      5  0.00  analog-inference-compute-in-memory ...
+HYPE_CLUSTER                    11.7    95      0  0.00  quantum-mining-superposition-hash
+INSUFFICIENT_EVIDENCE           17.2    73     55  0.00  volumetric-display-free-space-optics
 ```
 
 ## Optional companions: Frontier Atlas and md-brain
@@ -199,7 +199,7 @@ tests/            pytest (unit / integration / e2e)
 
 ## Version
 
-- Engine: **0.1.47** — see [CHANGELOG.md](CHANGELOG.md)
+- Engine: **0.1.48** — see [CHANGELOG.md](CHANGELOG.md)
 - License: **MIT** — see [LICENSE](LICENSE)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security: [SECURITY.md](SECURITY.md)

@@ -45,6 +45,23 @@ def test_cutoff_run_has_fewer_or_equal_candidates(snapshot, taxonomy):
     assert n_early <= n_full
 
 
+def test_pipeline_anchors_hype_windows_at_cutoff(snapshot, taxonomy, monkeypatch):
+    import aurora.pipeline as pipeline_module
+
+    real_assessment = pipeline_module.hype_assessment
+    seen_as_of = []
+
+    def capture_assessment(cluster, observations, *, as_of=None):
+        seen_as_of.append(as_of)
+        return real_assessment(cluster, observations, as_of=as_of)
+
+    monkeypatch.setattr(pipeline_module, "hype_assessment", capture_assessment)
+    run_pipeline(snapshot, taxonomy, DEFAULT_CONFIG, cutoff_date="2021-12-31")
+
+    assert seen_as_of
+    assert set(seen_as_of) == {"2021-12-31"}
+
+
 def test_backtest_reports_no_leakage_and_tracks(snapshot, taxonomy):
     bt = run_backtest(snapshot, taxonomy, ["2020-12-31", "2022-12-31", "2024-12-31"], DEFAULT_CONFIG)
     assert bt["future_leakage_violations"] == 0

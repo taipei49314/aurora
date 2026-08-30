@@ -150,7 +150,7 @@ def run_pipeline(snapshot: Snapshot, taxonomy: Taxonomy, cfg: EngineConfig = DEF
         match = taxonomy.best_match(cvec)
 
         ng = naming_gap(cluster, entities, observations, vectors, match["similarity"])
-        hy = hype_assessment(cluster, observations)
+        hy = hype_assessment(cluster, observations, as_of=cutoff_date)
         ce = counter_analyze(cluster, observations, resolved_group)
         vc = build_value_chain(hid, cluster, entities, observations)
         bn = bottleneck_analyze(hid, cluster, entities, observations, fs_clusters, adj)

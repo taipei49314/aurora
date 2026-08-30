@@ -1,24 +1,31 @@
-# OWNER_ACTIONS — aurora v0.1.47 release candidate
+# OWNER_ACTIONS — aurora v0.1.48 release candidate
 
-Branch: `closure/aurora-20260807`
+Branch: `master` (local commits ahead of `origin/master`)
 
-Cursor must **not** merge, force-push, delete tags, or publish the GitHub Release.
+Automation must **not** force-push, delete tags, or publish the GitHub Release.
 
 ## Context
 
-- Latest **public** GitHub Release: `v0.1.31` (2026-07-24)
-- Declared engine on this branch: **0.1.47** (`ENGINE_VERSION` / `pyproject` / README / CHANGELOG)
-- Drift from `v0.1.31` to HEAD is **real unreleased work** (changelog packs `0.1.32`–`0.1.46`), plus post-`0.1.46` tip commits (manifest hash v2, Frontier Atlas submit, CI multipart fix) that were still labeled `0.1.46` — corrected to **0.1.47** on this branch without rewriting history.
+- The local repository contains tag `v0.1.47`; verify the current public release
+  state before publishing anything.
+- Declared engine on this branch: **0.1.48** (`ENGINE_VERSION` / `pyproject` /
+  README / CHANGELOG). `FEATURE_VERSION` remains `0.1.47` because feature
+  construction did not change.
+- The `0.1.48` pack includes persistence hardening, complete Phase 0 model
+  documentation, calendar-window hype fade, unit-safe bottleneck lead time,
+  and focused value-chain model regressions.
 
 ## Required owner actions
 
-1. **Review** branch `closure/aurora-20260807` (open a PR to `master` if desired).
-2. **Merge** only after CI is green on the PR (`check-all` + engine version sanity).
-3. After merge, create annotated tag **`v0.1.47`** on the merged default-branch SHA.
-4. **Publish** GitHub Release `v0.1.47` using `CHANGELOG.md` section `[0.1.47]` (optionally roll up notes from `0.1.32`–`0.1.46` for a single public catch-up release).
-5. Do **not** rewrite or delete historical tags `v0.1.1`–`v0.1.31`.
+1. **Review** the local commits and diff against `origin/master`.
+2. **Push** only after the full local gate is green; let GitHub Actions run
+   `check-all` plus the engine-version sanity check.
+3. After CI is green on the intended release SHA, create annotated tag
+   **`v0.1.48`**.
+4. **Publish** GitHub Release `v0.1.48` using `CHANGELOG.md` section `[0.1.48]`.
+5. Do **not** rewrite or delete historical tags.
 
-## Explicit non-actions for Cursor
+## Explicit non-actions for automation
 
 - No merge of own PR
 - No force-push

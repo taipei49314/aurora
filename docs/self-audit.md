@@ -10,9 +10,9 @@ and (where observable) browser-verified. The Northstar corpus now hits the
 target scale (**199 entities / 3120 observations**), enabled by a MinHash-LSH
 dedup path.
 
-Run everything: `make test` (322 tests) · `make demo` · `make backtest` ·
+Run everything: `make test` (383 tests) · `make demo` · `make backtest` ·
 `make benchmark` · `make api` + `make frontend`.
-Test buckets: `pytest -m unit` (197) · `-m integration` (86) · `-m e2e` (14),
+Test buckets: `pytest -m unit` (257) · `-m integration` (87) · `-m e2e` (14),
 plus 25 unmarked support/contract tests.
 
 | # | Requirement (spec §) | Status | Evidence file | Command / test |
@@ -37,7 +37,7 @@ plus 25 unmarked support/contract tests.
 | 18 | Counterevidence engine + downgrade (§16) | **PASS** | `counterevidence.py`, `classify.py` | `test_scenarios.py::test_scenario_f...` |
 | 19 | Value-chain construction w/ evidence + inferred flag (§17) | **PASS** | `value_chain.py` | endpoint `/value-chain`; `test_scenarios` provenance |
 | 20 | Bottleneck analysis (structural, not volume) (§18) | **PASS** | `bottleneck.py` (Brandes betweenness) | `test_scenarios.py::test_scenario_d...` |
-| 21 | Temporal cutoff + leakage prevention (§19) | **PASS** | `leakage.py` | `test_leakage_backtest.py` (4 tests) |
+| 21 | Temporal cutoff + leakage prevention (§19) | **PASS** | `leakage.py` | `test_leakage_backtest.py` cutoff/source-date contracts |
 | 22 | Historical backtest + lead time (§20) | **PASS** | `backtest.py` | `make backtest`; `test_leakage_backtest.py` |
 | 23 | First-divergence analysis (§21) | **PASS** | `divergence.py` | `test_scoring_determinism_divergence.py` (3 tests) |
 | 24 | Insert-once Research Run w/ manifests (§22) | **PASS** | `store.py`, `pipeline.py` | read-only engine contract + insert-or-verify persistence; full input manifest participates in `run_id`; `test_determinism_50_runs`; per-run feature-space candidate diagnostics |
@@ -54,7 +54,7 @@ plus 25 unmarked support/contract tests.
 | 35 | Frontend — all 8 pages (§25) | **PASS** | `frontend/src/pages/` | all 8 pages built, `tsc` clean, wired to API; 2026-07-23 the remaining 5 (Hypothesis Explorer, Timeline, Bottleneck Lab, Data Explorer, Run Comparison) were each driven live in a browser with zero console errors — every page now browser-verified |
 | 36 | SQLite/SQLAlchemy persistence (§4) | **PASS** | `store_sql.py` | normalized snapshot tables, including complete document payloads, + runs; 28 persistence tests cover round-trip identity, same-id conflict rejection, legacy document backfill, migration-managed creation, and exact-current/exact-legacy/refuse adoption paths. Alembic builds all 6 tables, and a separate installed-wheel smoke verifies packaged migrations off-checkout |
 | 37 | Docker compose one-command up (§4) | **PASS** | `docker-compose.yml`, Dockerfiles, `frontend/vite.config.ts`, `scripts/docker_audit.py` | static contract audit passes; 2026-08-21 runtime build/start and frontend-proxied `/api/health` verified with HTTP 200 |
-| 38 | Test-count targets: 55 unit / 15 integ / 8 e2e (§28) | **PASS** | `tests/` (markers) | 322 tests: **197 unit / 86 integration / 14 e2e**, plus 25 unmarked support/contract tests. Select via `pytest -m <bucket>` |
+| 38 | Test-count targets: 55 unit / 15 integ / 8 e2e (§28) | **PASS** | `tests/` (markers) | 383 tests: **257 unit / 87 integration / 14 e2e**, plus 25 unmarked support/contract tests. Select via `pytest -m <bucket>` |
 | 39 | Phase 0 specification-audit docs (§33) | **PASS** | `docs/` | architecture, requirements matrix, import schema, 2 ADRs, and separate feature/clustering/scoring/hype/value-chain/counterevidence/bottleneck/leakage/backtest/threat-model docs |
 
 ## Known limitations / honest gaps
@@ -89,8 +89,8 @@ plus 25 unmarked support/contract tests.
 - **Runtime note**: this machine's existing Python 3.9 environment can execute
   the whole suite, but the supported fresh API/full-test install is Python 3.10+
   because current safe `python-multipart` releases no longer support 3.9. The
-  stdlib core remains supported on 3.9. Current local suite: 322 green
-  (197 unit / 86 integration / 14 e2e / 25 unmarked).
+  stdlib core remains supported on 3.9. Current local suite: 383 green
+  (257 unit / 87 integration / 14 e2e / 25 unmarked).
 
 ## What is genuinely proven now (verified this session)
 - All 9 archetypes classify exactly as their hidden ground truth at full scale
@@ -101,6 +101,6 @@ plus 25 unmarked support/contract tests.
   real industries ~3.5 years early (median lead 1277 d) with **0 future-leakage
   violations and 0 false positives**; the failed cluster downgrades
   EMERGING→REJECTED; hype clusters stay hype at every cutoff.
-- The "quantum" hype cluster scores **27.9** — the engine does **not** inflate
+- The "quantum" hype cluster scores **11.7** — the engine does **not** inflate
   on buzzwords.
-- **322 tests** green (197 unit / 86 integration / 14 e2e / 25 unmarked).
+- **383 tests** green (257 unit / 87 integration / 14 e2e / 25 unmarked).

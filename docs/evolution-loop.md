@@ -8,7 +8,7 @@
   explicit publication steps.
 - GitHub Actions is live. `docs/ci-github-actions.yml` remains the reference copy.
 
-## Shipped (through 0.1.47)
+## Shipped (through 0.1.48)
 
 | Ver | Highlights |
 |-----|------------|
@@ -56,11 +56,12 @@
 | 0.1.45 | Per-run blocking diagnostics add accepted-block entity coverage |
 | 0.1.46 | Offline Docker/Compose readiness audit; runtime was PARTIAL at release (verified 2026-08-21) |
 | 0.1.47 | Manifest hash v2 (full input digest); Frontier Atlas mothership submit |
+| 0.1.48 | Calendar-window hype fade; unit-safe bottleneck lead time; focused value-chain regressions |
 
 ## Next
 
 1. Real PatentsView dump (human data)
-2. Add focused unit coverage for value-chain role mapping and confirmed-edge direction
+2. Record real-corpus source/license/hash lineage in backtest outputs
 
 ## Done
 
@@ -76,6 +77,9 @@
 - **Named Phase 0 model docs completed** (2026-08-30). Features, value chain,
   counterevidence, bottlenecks, backtesting, and threat boundaries now have
   separate code-grounded documents instead of architecture-only summaries.
+- **Model semantic regressions completed** (v0.1.48). Hype fade uses cutoff-
+  anchored calendar windows, bottleneck lead time is unit-safe, and every
+  value-chain role plus confirmed edge direction has focused coverage.
 
 ## Out of scope
 

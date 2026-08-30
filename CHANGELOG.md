@@ -8,14 +8,18 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 ## [Unreleased]
 
+## [0.1.48] — 2026-08-30
+
 ### Changed
 
 - Completed the named Phase 0 model-document set for features, value chains,
   counterevidence, bottlenecks, backtesting, and the threat model.
 - Reconciled maintenance docs with the implemented SQLite store, live GitHub
   Actions, and the Docker Compose runtime verification completed on 2026-08-21.
-- Refreshed self-audit evidence from the current suite: 322 tests total
-  (197 unit, 86 integration, 14 e2e, and 25 unmarked support/contract tests).
+- Refreshed self-audit evidence from the current suite: 383 tests total
+  (257 unit, 87 integration, 14 e2e, and 25 unmarked support/contract tests).
+- Advanced the engine/package version to `0.1.48`. Feature construction is
+  unchanged, so `FEATURE_VERSION` remains `0.1.47`.
 
 ### Added
 
@@ -28,8 +32,23 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
   so predictions are skipped. A failed submit does not fail the research run.
 - Demo `--atlas` / `--brain` provenance uses the parsed argv, not `sys.argv`,
   so `main(["--brain", vault])` records the arguments actually passed.
+- Focused model regressions now cover all value-chain entity-role mappings,
+  confirmed relationship directions and provenance, temporal hype windows,
+  and bottleneck lead-time units and boundary values.
 
 ### Fixed
+
+- Hype temporal fade now compares equal-duration calendar windows anchored at
+  the run cutoff. The former count-third calculation made the late bucket at
+  least as large as the early bucket and therefore forced `faded` to zero.
+  The result now includes auditable window boundaries and exclusion counts;
+  undated or post-cutoff observations cannot create temporal evidence.
+- Bottleneck lead-time pressure no longer turns a missing or zero value into a
+  synthetic 12-month delay. Days, weeks, and months are normalized against an
+  explicit two-year horizon; missing, non-positive, non-finite, and unsupported
+  values (including conversion overflow) fail closed, and multiple observations
+  take their maximum. Only rows that contribute positive normalized pressure
+  enter scarcity provenance.
 
 - SQLite snapshot round-trips now preserve complete `documents[]` payloads via
   a dedicated table and Alembic migration. Re-saving an older snapshot

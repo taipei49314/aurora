@@ -55,8 +55,14 @@ Three observation types supply additional bottleneck factors:
    and no alternative, `0.5` with one alternative, otherwise `0.0`.
 5. Count distinct feature-space clusters that contain entities depending on the
    candidate, and cap `cross_cluster_dependency` at `1.0` after two clusters.
-6. Normalize lead-time pressure as `min(1, numeric_value / 24)`. The current code
-   substitutes `12` when the value is missing or falsey. Capacity constraint is
+6. Normalize lead-time pressure against an explicit two-year horizon: `730`
+   days, `104` weeks, or `24` months maps to `1.0`. Unit matching is
+   case-insensitive and accepts the singular/plural forms plus `d`, `w`, `wk`,
+   `wks`, `mo`, `mos`, `mth`, and `mths`. Multiple observations for one entity
+   contribute their maximum normalized pressure rather than being summed.
+   Missing, zero, negative, non-finite, conversion-overflow, or unsupported-unit
+   values contribute `0.0`; values above the horizon are clamped to `1.0`.
+   Capacity constraint is
    binary: `1.0` only for a negative capacity-expansion value, otherwise `0.0`.
 7. Compute the score:
 
@@ -83,10 +89,11 @@ Unlike overall scoring and clustering thresholds, the factor weights live in
 
 Each `BottleneckCandidate` records the factor values, downstream entity ids,
 whether an alternative exists, a short limitation description, and
-`scarcity_evidence_ids` for lead-time or negative capacity observations attached
-to that candidate. Positive capacity-expansion observations are excluded from
-this scarcity provenance. The analyzer returns the complete sorted candidate list and
-the top score.
+`scarcity_evidence_ids` for valid, positive, supported-unit lead-time pressure
+or negative capacity observations attached to that candidate. Invalid or
+zero-scoring lead-time rows and positive capacity expansion are excluded from
+this scarcity provenance. The analyzer returns the complete sorted candidate
+list and the top score.
 
 The pipeline:
 
@@ -109,12 +116,13 @@ measured confidence interval or sourced qualification-time estimate.
 - Alternatives are inferred from same-downstream, same-relation co-supply. The
   model does not evaluate technical equivalence, price, geography, contracts,
   available capacity, or qualification status.
-- The import schema recommends `months` for lead-time values, but the analyzer
-  does not inspect `unit`; incorrectly scaled input changes the score.
-- Missing lead-time values on `LEAD_TIME_PRESSURE` observations receive the
-  current 12-month fallback. That is a heuristic default, not observed evidence.
-  Negative values are clamped at the existing zero floor and do not reduce the
-  score below zero.
+- Lead-time normalization accepts only the documented day, week, and month
+  units. Durations expressed in hours, years, quarters, or free text are ignored
+  until an adapter converts them to a supported unit. The conversion is a fixed
+  scoring convention, not calendar arithmetic or a measured confidence model.
+- Missing or invalid lead-time values do not create synthetic pressure. A zero
+  or negative duration contributes zero, and multiple valid rows cannot push
+  the factor above the largest individual observation.
 - Capacity pressure recognizes only a negative `CAPACITY_EXPANSION` numeric
   value. It does not infer pressure from prose or normalize physical units.
 - Cross-cluster dependency depends on the current feature-space partition.
@@ -131,6 +139,9 @@ measured confidence interval or sourced qualification-time estimate.
 - `tests/test_scenarios.py::test_scenario_d_shared_supplier_has_no_false_substitutes`
   locks the same-downstream, same-dependency-type substitute rule and expects
   zero substitutability when no true co-supplier exists.
-- No dedicated test locks every factor weight and normalization rule. Review
-  those literals against `backend/aurora/bottleneck.py`; the complete engine
-  gate is available through `python scripts/check_engine.py`.
+- `tests/test_bottleneck_units.py` locks lead-time missing/zero/negative,
+  non-finite/overflow handling, supported unit conversion, saturation,
+  unknown-unit rejection, and maximum-over-observations behavior.
+- No dedicated test locks every factor weight. Review those literals against
+  `backend/aurora/bottleneck.py`; the complete engine gate is available through
+  `python scripts/check_engine.py`.

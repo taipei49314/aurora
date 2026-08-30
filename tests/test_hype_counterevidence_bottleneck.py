@@ -21,6 +21,7 @@ def _observation(
     observation_type,
     *,
     value=None,
+    unit=None,
     subject="upstream",
     object_entity=None,
 ):
@@ -32,7 +33,7 @@ def _observation(
         subject_entity=subject,
         object_entity=object_entity,
         numeric_value=value,
-        unit=None,
+        unit=unit,
         text_excerpt=observation_id,
         confidence=1.0,
     )
@@ -92,7 +93,7 @@ def test_bottleneck_scarcity_provenance_excludes_positive_expansion():
         ),
         _observation("positive-capacity", "CAPACITY_EXPANSION", value=10),
         _observation("negative-capacity", "CAPACITY_EXPANSION", value=-1),
-        _observation("lead-time", "LEAD_TIME_PRESSURE", value=12),
+        _observation("lead-time", "LEAD_TIME_PRESSURE", value=12, unit="months"),
     ]
     result = analyze_bottlenecks(
         "hypothesis",

@@ -12,6 +12,7 @@ entities supply the same role), not hardcoded.
 from __future__ import annotations
 
 from collections import defaultdict, deque
+import math
 
 from .models import BottleneckCandidate, is_capacity_contraction
 
@@ -23,6 +24,42 @@ _BN_WEIGHTS = {
     "capacity_constraint": 0.10,
     "cross_cluster_dependency": 0.12,
 }
+
+# Lead-time pressure saturates at a two-year horizon.  Keep the accepted units
+# deliberately small and explicit so a typo or an unsupported duration cannot
+# silently inflate a bottleneck score.
+_LEAD_TIME_HORIZONS = {
+    "d": 730.0,
+    "day": 730.0,
+    "days": 730.0,
+    "w": 104.0,
+    "wk": 104.0,
+    "wks": 104.0,
+    "week": 104.0,
+    "weeks": 104.0,
+    "mo": 24.0,
+    "mos": 24.0,
+    "mth": 24.0,
+    "mths": 24.0,
+    "month": 24.0,
+    "months": 24.0,
+}
+
+
+def _normalize_lead_time(value, unit) -> float:
+    """Return lead-time pressure in ``0..1``, failing closed on bad input."""
+    if value is None or not isinstance(unit, str):
+        return 0.0
+    horizon = _LEAD_TIME_HORIZONS.get(unit.strip().casefold())
+    if horizon is None:
+        return 0.0
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return 0.0
+    if not math.isfinite(numeric) or numeric <= 0.0:
+        return 0.0
+    return min(1.0, numeric / horizon)
 
 
 def _brandes_betweenness(nodes, adj) -> dict[str, float]:
@@ -90,7 +127,8 @@ def analyze(hypothesis_id, cluster, entities, observations, all_clusters, adj):
     for o in observations:
         if o.subject_entity in cluster:
             if o.observation_type == "LEAD_TIME_PRESSURE":
-                lead_time[o.subject_entity] = max(lead_time[o.subject_entity], min(1.0, (o.numeric_value or 12) / 24.0))
+                normalized = _normalize_lead_time(o.numeric_value, o.unit)
+                lead_time[o.subject_entity] = max(lead_time[o.subject_entity], normalized)
             if o.observation_type == "CAPACITY_EXPANSION" and (o.numeric_value or 0) < 0:
                 capacity[o.subject_entity] = 1.0
 
@@ -147,7 +185,10 @@ def analyze(hypothesis_id, cluster, entities, observations, all_clusters, adj):
                 for o in observations
                 if o.subject_entity == e
                 and (
-                    o.observation_type == "LEAD_TIME_PRESSURE"
+                    (
+                        o.observation_type == "LEAD_TIME_PRESSURE"
+                        and _normalize_lead_time(o.numeric_value, o.unit) > 0.0
+                    )
                     or is_capacity_contraction(o)
                 )
             ],

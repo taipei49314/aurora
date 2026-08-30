@@ -221,11 +221,15 @@ one accepted sparse block, how many are uncovered by skipped oversized blocks,
 and the resulting coverage ratio. This makes sparse-block exclusions visible
 without changing candidate-pair or clustering semantics.
 
+## 44. Focused value-chain model coverage — **done (v0.1.48)**
+
+All controlled entity types now have explicit role-mapping tests. Confirmed
+supplier, technical-dependency, and customer edges lock direction, provenance,
+cluster boundaries, and infrastructure-promotion completeness.
+
 ## Suggested next issues
 
 - Wire real PatentsView dump into `cases/patentsview-sample` (human data)
-- Add focused unit coverage for value-chain role mapping and confirmed-edge
-  direction; current coverage reaches it primarily through end-to-end scenarios
 
 The named Phase 0 model docs, Docker runtime verification, and GitHub Actions
 are complete. Re-run the Docker smoke after deployment-contract changes, but do

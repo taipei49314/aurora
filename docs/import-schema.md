@@ -412,7 +412,7 @@ Preferred `unit` strings when `numeric_value` is set:
 |---------|------|------------------------|
 | Open roles | `openings` | headcount openings |
 | Capex | `USD` / `TWD` / `EUR` | amount in that currency (**no FX normalization in engine**) |
-| Lead time | `months` | months (bottleneck scales `/24`) |
+| Lead time | `days` / `weeks` / `months` | duration (bottleneck normalizes each unit to an explicit two-year horizon) |
 | Capacity delta | `pct` or physical unit | negative used as capacity stress signal |
 
 Document currency also under `metadata.currency` when unit is ambiguous.
