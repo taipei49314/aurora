@@ -1,12 +1,12 @@
 # Evolution loop
 
-## Operating mode (user)
+## Operating mode
 
-- **Mode A (active):** short-interval **scheduler (~20m)** continues development + push without user typing.
-- Session can still request intensive work while chat is open.
-- Autonomous git: commit/push/tag on meaningful slices.
-- Pushing `.github/workflows/*` requires a `workflow`-scoped OAuth token. The account
-  token now has it and CI is live; `docs/ci-github-actions.yml` is kept as the reference copy.
+- **Current:** manual trigger. This file preserves the historical autonomous
+  cycles; it is not evidence that a scheduler is still running.
+- A session may prepare and verify focused local commits. Pushes and tags are
+  explicit publication steps.
+- GitHub Actions is live. `docs/ci-github-actions.yml` remains the reference copy.
 
 ## Shipped (through 0.1.47)
 
@@ -54,13 +54,13 @@
 | 0.1.43 | Adapter default raw mentions + deterministic entity-graph blocking |
 | 0.1.44 | Per-run feature-space blocking diagnostics in research manifests |
 | 0.1.45 | Per-run blocking diagnostics add accepted-block entity coverage |
-| 0.1.46 | Offline Docker/Compose readiness audit; runtime status remains PARTIAL |
+| 0.1.46 | Offline Docker/Compose readiness audit; runtime was PARTIAL at release (verified 2026-08-21) |
 | 0.1.47 | Manifest hash v2 (full input digest); Frontier Atlas mothership submit |
 
 ## Next
 
 1. Real PatentsView dump (human data)
-2. Keep Docker PARTIAL honest until verified on a Docker host
+2. Add focused unit coverage for value-chain role mapping and confirmed-edge direction
 
 ## Done
 
@@ -70,6 +70,12 @@
   is no longer human-blocked.
   The first run caught a real defect: `python-multipart` was never declared in
   `backend/requirements.txt`, so a clean install could not import the FastAPI app.
+- **Docker Compose runtime verified** (2026-08-21). Both images built and
+  started, the frontend-proxied `/api/health` returned HTTP 200, and the stack
+  was removed cleanly. See `docs/docker-readiness.md` and PR #9.
+- **Named Phase 0 model docs completed** (2026-08-30). Features, value chain,
+  counterevidence, bottlenecks, backtesting, and threat boundaries now have
+  separate code-grounded documents instead of architecture-only summaries.
 
 ## Out of scope
 

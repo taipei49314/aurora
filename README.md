@@ -39,8 +39,11 @@ full test stack require Python **3.10+** (3.11+ recommended).
 git clone https://github.com/taipei49314/aurora.git
 cd aurora
 
-# optional on Python 3.10+: API + full tests (needs SQLAlchemy)
+# optional on Python 3.10+: API + full tests (needs SQLAlchemy + Alembic)
 python -m pip install -r backend/requirements.txt
+
+# package install with only the persistent SQLite store
+python -m pip install ".[persistence]"
 
 # Python 3.9, or Windows without C++ Build Tools: engine tests only
 python -m pip install -r backend/requirements-engine-test.txt
@@ -58,6 +61,8 @@ python scripts/check_engine.py        # engine gate (skips API/SQL tests)
 python -m pytest tests/ -q            # full suite (needs full requirements)
 python scripts/check_all.py --engine-only   # same as check_engine
 python scripts/check_all.py           # full pre-push: tests + cases + resolve smoke
+# source-checkout Alembic CLI (migration assets also ship in the wheel)
+python -m alembic -c backend/aurora/alembic.ini current
 ```
 
 With Make (if available):
@@ -156,10 +161,13 @@ Snapshot → Features → Clustering → Taxonomy → Naming gap
         → Transparent scoring → Classification → Research run
 ```
 
-Docs: [architecture](docs/architecture.md) · [scoring](docs/scoring-model.md) ·
-[hype filter](docs/hype-filter.md) · [leakage](docs/leakage-prevention.md) ·
-[import schema](docs/import-schema.md) · [self-audit](docs/self-audit.md) ·
-[evolution loop](docs/evolution-loop.md)
+Docs: [architecture](docs/architecture.md) · [feature model](docs/feature-model.md) ·
+[clustering](docs/clustering-model.md) · [scoring](docs/scoring-model.md) ·
+[value chain](docs/value-chain-model.md) ·
+[counterevidence](docs/counterevidence-model.md) ·
+[bottlenecks](docs/bottleneck-model.md) ·
+[backtesting](docs/backtest-methodology.md) · [threat model](docs/threat-model.md) ·
+[import schema](docs/import-schema.md) · [self-audit](docs/self-audit.md)
 
 ## Honesty (read before starring)
 
@@ -169,7 +177,8 @@ Docs: [architecture](docs/architecture.md) · [scoring](docs/scoring-model.md) �
   it does **not** claim real-world early discovery of iron-air storage.
 - **PatentsView sample dump** is a **format-compatible fixture** by default; replace
   `dump.json` with a real export without code changes.
-- See [docs/self-audit.md](docs/self-audit.md) for PASS / PARTIAL items (e.g. Docker not verified on all machines).
+- See [docs/self-audit.md](docs/self-audit.md) for requirement evidence and known
+  limitations. A PASS row does not erase the stated model or validation boundaries.
 - `python scripts/docker_audit.py` checks the Docker/Compose contract offline;
   it does not replace starting the stack on a Docker host.
 

@@ -18,7 +18,7 @@ overall      = clip( weighted_sum
 | coherence_score | capability coherence | how tightly the cluster hangs together |
 | acceleration_score | mean entity acceleration | signals rising, not a one-off |
 | value_chain_score | `value_chain.build` | fraction of chain roles present |
-| real_investment_score | saturating(real-obs ratio, 0.35) | patents/hiring/capex/supply/standards |
+| real_investment_score | saturating(real-obs ratio, 0.35) | positive patents/hiring/capex/supply/standards; negative capacity is excluded |
 | demand_score | saturating(demand ratio, 0.18) | customers/adoption/demand-pull |
 | bottleneck_score | top bottleneck | scarcity structure present |
 | naming_gap_score | `naming_gap` | coherent field, no agreed name |
@@ -38,4 +38,4 @@ overall      = clip( weighted_sum
 ## Transparency (UI/API)
 `hypothesis.score_explanation.scoring` returns every component score, its weight,
 its contribution, the three penalty amounts, the confidence band, and the
-formula string. Changing any weight forces a new immutable run.
+formula string. Changing any weight produces a new content-addressed run.

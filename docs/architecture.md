@@ -9,7 +9,7 @@ config, which is what makes runs reproducible.
 ```
 raw package
   └─ importing.py         schema-validate → canonicalize → resolve entities
-                          → dedup/independence → temporal-validate → Snapshot (immutable)
+                          → dedup/independence → temporal-validate → Snapshot (read-only contract)
 Snapshot
   └─ leakage.py           apply cutoff, assert no future data
   └─ features.py          entity documents → TF-IDF + n-grams + obs-type dims
@@ -25,7 +25,7 @@ Snapshot
   └─ bottleneck.py        Brandes betweenness + derived substitutability
   └─ scoring.py           transparent weighted overall score
   └─ classify.py          status gates (§3)
-  └─ pipeline.py          assembles the immutable ResearchRun
+  └─ pipeline.py          assembles the read-only-contract ResearchRun
 ```
 
 ## Data model (`models.py`, spec §6)
@@ -34,8 +34,12 @@ EvidenceLink, ValueChainNode, BottleneckCandidate`. Controlled vocabularies are
 string constants for stable, diffable snapshots.
 
 ## Determinism (spec §22, §29)
-- **Content-addressed IDs** (`ids.py`): every id is `sha256(stable content)`.
-  Re-import → same ids → dedup → no double counting.
+- **Generated content IDs** (`ids.py`) hash stable normalized fields. Imported
+  external/document ids remain caller-visible stable keys. Re-importing the
+  same package produces the same row ids, so dedup does not double-count it.
+- **Two snapshot identities**: `snapshot_id` preserves the sorted row-id-set
+  contract; the versioned `input_manifest_hash` covers full normalized payloads.
+  `run_id` includes both, so same row ids with changed content cannot collide.
 - **Stable ordering** everywhere: sorted iteration, tie-breaks on smallest id,
   fixed RNG seed for the stability bootstrap.
 - **Config, not code**, drives every threshold/weight (`config.py`). Changing a
@@ -53,11 +57,17 @@ non-determinism), offline/local-first, and zero-friction install on restricted
 networks. scikit-learn / networkx are optional accelerators, not runtime deps.
 
 ## Model docs
-`scoring-model.md`, `hype-filter.md`, `clustering-model.md`,
-`leakage-prevention.md`. The feature model, value-chain model, counterevidence
-model, bottleneck model, backtest methodology and threat model are described
-inline in their modules' docstrings and summarized here; promoting each to its
-own doc file is tracked in the self-audit.
+
+- [Feature model](feature-model.md)
+- [Clustering model](clustering-model.md)
+- [Scoring model](scoring-model.md)
+- [Hype filter](hype-filter.md)
+- [Value-chain model](value-chain-model.md)
+- [Counterevidence model](counterevidence-model.md)
+- [Bottleneck model](bottleneck-model.md)
+- [Leakage prevention](leakage-prevention.md)
+- [Backtest methodology](backtest-methodology.md)
+- [Threat model](threat-model.md)
 
 ## Frontend / API
 `backend/api.py` (FastAPI) exposes runs, hypotheses, evidence, value chain,

@@ -7,7 +7,7 @@ PYTHONPATH := backend
 .PHONY: help install install-engine-test test test-engine lint demo benchmark audit backtest api generate frontend validate-example adapt-uspto adapt-merge-demo retro-case patentsview-sample multisource-case check-all check-engine docker-audit
 
 help:
-	@echo "make install    - install python deps (fastapi, pytest, hypothesis, sqlalchemy)"
+	@echo "make install    - install python deps (fastapi, pytest, hypothesis, sqlalchemy, alembic)"
 	@echo "make install-engine-test - pytest/hypothesis/httpx only (no greenlet/MSVC)"
 	@echo "make test        - run the full test suite"
 	@echo "make test-engine / check-engine - engine gate without API/persistence tests"

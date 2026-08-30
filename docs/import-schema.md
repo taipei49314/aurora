@@ -370,7 +370,7 @@ USPTO / PatentsView adapters emit `PERSON` from inventor lists; OpenAlex emits
 
 | Group | Types | Role in engine |
 |-------|-------|----------------|
-| Real investment | `PATENT_ACTIVITY`, `HIRING_ACTIVITY`, `CAPEX_ACTIVITY`, `CAPACITY_EXPANSION`, `SUPPLIER_RELATIONSHIP`, `STANDARD_ACTIVITY` | Counter-hype, candidate gates |
+| Real investment | `PATENT_ACTIVITY`, `HIRING_ACTIVITY`, `CAPEX_ACTIVITY`, `CAPACITY_EXPANSION`, `SUPPLIER_RELATIONSHIP`, `STANDARD_ACTIVITY` | Counter-hype, candidate gates; negative capacity values are contractions, not positive investment |
 | Demand | `CUSTOMER_RELATIONSHIP`, `ADOPTION_SIGNAL`, `DEMAND_SIGNAL` | Demand score |
 | Narrative | `PRODUCT_LAUNCH`, `STRATEGIC_INVESTMENT` (+ NEWS sources) | Hype if dominant |
 | Negative | `CANCELLATION_SIGNAL`, `SHUTDOWN_SIGNAL`, `PRICE_PRESSURE`, `LEAD_TIME_PRESSURE` | Counterevidence / constraints |

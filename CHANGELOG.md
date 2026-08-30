@@ -8,6 +8,15 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 ## [Unreleased]
 
+### Changed
+
+- Completed the named Phase 0 model-document set for features, value chains,
+  counterevidence, bottlenecks, backtesting, and the threat model.
+- Reconciled maintenance docs with the implemented SQLite store, live GitHub
+  Actions, and the Docker Compose runtime verification completed on 2026-08-21.
+- Refreshed self-audit evidence from the current suite: 322 tests total
+  (197 unit, 86 integration, 14 e2e, and 25 unmarked support/contract tests).
+
 ### Added
 
 - `--brain <vault>` on the demo CLI: write the same contract-shaped `FINDING`
@@ -21,6 +30,25 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
   so `main(["--brain", vault])` records the arguments actually passed.
 
 ### Fixed
+
+- SQLite snapshot round-trips now preserve complete `documents[]` payloads via
+  a dedicated table and Alembic migration. Re-saving an older snapshot
+  backfills missing document rows, and loads fail closed when the reconstructed
+  snapshot id does not match the requested stable id. Same-id snapshots and
+  runs now reject substantive payload conflicts, while run ids include the
+  complete input-manifest hash. Persistent databases now migrate through
+  Alembic from creation; exact unmanaged current/legacy schemas can be adopted
+  without data loss, while any semantic mismatch is rejected. The full CI
+  dependency set runs these migration regressions instead of skipping them.
+  Alembic configuration and the single revision chain now ship inside the
+  Python package; an offline build/install smoke proves a normal wheel can
+  create and migrate a persistent database outside the source checkout.
+- Capacity-expansion signs are now consistent across scoring: negative values
+  are contraction/counterevidence and scarcity, never positive investment;
+  positive values no longer lower value-chain completeness when a company is
+  relabeled as infrastructure.
+- The Docker static-audit success message now reflects the verified runtime
+  smoke while still requiring a repeat after Docker, Compose, or Vite changes.
 
 - **Cutoff runs no longer admit retrospective sources.** Leakage was checked on
   `Observation.observed_at` alone, so a document published after the cutoff

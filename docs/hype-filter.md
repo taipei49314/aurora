@@ -6,15 +6,18 @@ Separates genuine industry formation from narrative hype. Output is a 0..100
 | factor | weight | high when |
 |---|---|---|
 | narrative_dominance | 0.24 | news/product-launch/investment dominate real activity |
-| low_real_investment | 0.20 | few patents/hiring/capex/supply-chain observations |
+| low_real_investment | 0.20 | few positive patents/hiring/capex/supply-chain observations |
 | low_demand | 0.16 | few customer/adoption/demand signals |
 | low_independence | 0.18 | many reprints of few independent releases |
-| no_supply_chain | 0.10 | no supplier/technical-dependency/capacity signals |
+| no_supply_chain | 0.10 | no supplier/technical-dependency/positive-capacity signals |
 | no_standards_or_contracts | 0.06 | no standards/regulatory activity |
 | faded | 0.06 | activity spiked then collapsed in the last third |
 
 `overall` subtracts a hype penalty proportional to this score, so a high-volume
 cluster **cannot** rank first on noise alone.
+
+A `CAPACITY_EXPANSION` with a negative numeric value is a contraction: it does
+not lower hype risk as real investment or supply-chain evidence.
 
 ## Buzzword neutrality (spec §5.3)
 There is no keyword list and no bonus for "ai/robot/quantum". The Northstar

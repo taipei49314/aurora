@@ -1,8 +1,8 @@
 # AURORA Self-Audit (spec §33 Phase 8)
 
 Honest status of every major requirement. Values: **PASS** / **PARTIAL** /
-**NOT_IMPLEMENTED**. This audit deliberately records what is *not* done — a
-green "all complete" would violate spec §33/§35.
+**NOT_IMPLEMENTED**. PASS means the stated requirement has implementation and
+evidence; it does not erase the model and validation boundaries recorded below.
 
 Scope note: the core discovery engine, data foundation, historical validation,
 API, SQLite persistence and the **full 8-page frontend** are implemented, tested
@@ -10,14 +10,15 @@ and (where observable) browser-verified. The Northstar corpus now hits the
 target scale (**199 entities / 3120 observations**), enabled by a MinHash-LSH
 dedup path.
 
-Run everything: `make test` (78 tests) · `make demo` · `make backtest` ·
+Run everything: `make test` (322 tests) · `make demo` · `make backtest` ·
 `make benchmark` · `make api` + `make frontend`.
-Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
+Test buckets: `pytest -m unit` (197) · `-m integration` (86) · `-m e2e` (14),
+plus 25 unmarked support/contract tests.
 
 | # | Requirement (spec §) | Status | Evidence file | Command / test |
 |---|---|---|---|---|
 | 1 | Local-first, offline, no external API/LLM at runtime | **PASS** | `backend/aurora/*` (pure stdlib core) | `make demo` runs with zero third-party runtime deps |
-| 2 | Deterministic content-addressed IDs (§22) | **PASS** | `ids.py`, `importing.py` | `test_scoring_determinism_divergence.py::test_determinism_50_runs` |
+| 2 | Deterministic content/stable IDs + full manifests (§22) | **PASS** | `ids.py`, `importing.py`, `store.py`, `pipeline.py` | generated record ids are content-derived; stable row-set `snapshot_id` is paired with full-payload `input_manifest_hash`, which is included in `run_id`; 50-run determinism + persistence collision regressions |
 | 3 | Core data model (§6) | **PASS** | `models.py` | imported by all tests |
 | 4 | Import pipeline w/ layered stages (§7) | **PASS** | `importing.py` | `test_import_dedup.py` |
 | 5 | Re-import idempotency (§34.3) | **PASS** | `importing.py` | `test_import_dedup.py::test_reimport_is_idempotent` |
@@ -39,7 +40,7 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
 | 21 | Temporal cutoff + leakage prevention (§19) | **PASS** | `leakage.py` | `test_leakage_backtest.py` (4 tests) |
 | 22 | Historical backtest + lead time (§20) | **PASS** | `backtest.py` | `make backtest`; `test_leakage_backtest.py` |
 | 23 | First-divergence analysis (§21) | **PASS** | `divergence.py` | `test_scoring_determinism_divergence.py` (3 tests) |
-| 24 | Immutable Research Run w/ manifests (§22) | **PASS** | `store.py`, `pipeline.py` | `test_determinism_50_runs`; per-run feature-space candidate diagnostics |
+| 24 | Insert-once Research Run w/ manifests (§22) | **PASS** | `store.py`, `pipeline.py` | read-only engine contract + insert-or-verify persistence; full input manifest participates in `run_id`; `test_determinism_50_runs`; per-run feature-space candidate diagnostics |
 | 25 | Classification into all required statuses (§3) | **PASS** | `classify.py` | `test_scenarios.py`, `test_quality_groundtruth.py` |
 | 26 | Synthetic Northstar corpus w/ archetypes (§23) | **PASS** | `datasets/northstar/generate.py` | 199 entities / 3120 obs (meets 180/3000); all 8 archetype families + reprints/contradictions/missing-dates/aliases + 64-company background noise |
 | 27 | Ground-truth isolation from runtime (§23,§5.10) | **PASS** | `tests/ground_truth/` | `test_errors_isolation.py::test_engine_source_never_reads_ground_truth` |
@@ -48,13 +49,13 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
 | 30 | Quality metrics vs ground truth (§30) | **PASS** | `test_quality_groundtruth.py` | precision ≥0.85, recall ≥0.80, status accuracy 100% |
 | 31 | Provenance completeness 100% (§30) | **PASS** | `pipeline.py` | `test_errors_isolation.py::test_provenance_completeness...` |
 | 32 | Benchmark + per-stage timing (§31) | **PASS** | `benchmarks/bench.py` | `make benchmark` (measured, not claimed) |
-| 33 | Full API surface (§26) | **PASS** | `backend/api.py` | ~27 endpoints; `/imports` upload, `/exports` (raw-format round-trip), `POST /snapshots` (SQLite persist, idempotent) added 2026-07-23, covered by `tests/test_api.py` (5 TestClient tests) |
+| 33 | Full API surface (§26) | **PASS** | `backend/api.py` | ~27 endpoints; `/imports` upload, `/exports` (raw-format round-trip), `POST /snapshots` (SQLite persist, idempotent) added 2026-07-23; `tests/test_api.py` now has 22 TestClient tests |
 | 34 | Error model, no bare 500 (§27) | **PASS** | `errors.py`, `api.py` handler | bad cutoff → 422; `test_errors_isolation.py` |
 | 35 | Frontend — all 8 pages (§25) | **PASS** | `frontend/src/pages/` | all 8 pages built, `tsc` clean, wired to API; 2026-07-23 the remaining 5 (Hypothesis Explorer, Timeline, Bottleneck Lab, Data Explorer, Run Comparison) were each driven live in a browser with zero console errors — every page now browser-verified |
-| 36 | SQLite/SQLAlchemy persistence (§4) | **PASS** | `store_sql.py` | normalized snapshot tables + runs; round-trip reproduces byte-identical result hash (`test_persistence.py`, 4 tests). Alembic wired 2026-07-23: `backend/alembic.ini` + `migrations/` with autogenerated initial revision; `alembic upgrade head` verified to build all 5 tables |
+| 36 | SQLite/SQLAlchemy persistence (§4) | **PASS** | `store_sql.py` | normalized snapshot tables, including complete document payloads, + runs; 28 persistence tests cover round-trip identity, same-id conflict rejection, legacy document backfill, migration-managed creation, and exact-current/exact-legacy/refuse adoption paths. Alembic builds all 6 tables, and a separate installed-wheel smoke verifies packaged migrations off-checkout |
 | 37 | Docker compose one-command up (§4) | **PASS** | `docker-compose.yml`, Dockerfiles, `frontend/vite.config.ts`, `scripts/docker_audit.py` | static contract audit passes; 2026-08-21 runtime build/start and frontend-proxied `/api/health` verified with HTTP 200 |
-| 38 | Test-count targets: 55 unit / 15 integ / 8 e2e (§28) | **PASS** | `tests/` (markers) | 78 tests: **51 unit / 14 integration / 13 e2e** — integration & e2e meet/exceed target, unit 51 vs 55 (close). Select via `pytest -m <bucket>` |
-| 39 | Phase 0 specification-audit docs (§33) | **PARTIAL** | `docs/` | architecture, requirements-matrix, scoring/hype/clustering/leakage models, **import-schema**, offline **adapters** (uspto/jobs/news/merge) + `cases/iron-air-mini`, 2 ADRs; several named model docs still summarized in `architecture.md` |
+| 38 | Test-count targets: 55 unit / 15 integ / 8 e2e (§28) | **PASS** | `tests/` (markers) | 322 tests: **197 unit / 86 integration / 14 e2e**, plus 25 unmarked support/contract tests. Select via `pytest -m <bucket>` |
+| 39 | Phase 0 specification-audit docs (§33) | **PASS** | `docs/` | architecture, requirements matrix, import schema, 2 ADRs, and separate feature/clustering/scoring/hype/value-chain/counterevidence/bottleneck/leakage/backtest/threat-model docs |
 
 ## Known limitations / honest gaps
 - **Windows without MSVC:** full `pip install sqlalchemy` may fail on greenlet
@@ -80,12 +81,16 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
   Compose service-DNS target, but should not replace a runtime smoke check after
   Docker or Vite configuration changes.
 - **API**: `/imports` upload, `/exports` round-trip and `POST /snapshots`
-  persistence shipped 2026-07-23 with 5 TestClient tests.
-- **Alembic**: wired 2026-07-23 (initial autogenerated revision; upgrade verified).
-- **Runtime note**: the whole stack (engine + API + SQL store + alembic) now runs
-  on the machine's canonical Python 3.9 — fastapi/sqlalchemy/alembic/hypothesis
-  installed there; `str | None` runtime annotations converted to `Optional[...]`.
-  Suite: 84 green (78 + 5 API + 1 bottleneck regression).
+  persistence shipped 2026-07-23; the API suite now has 22 TestClient tests.
+- **Alembic**: wired 2026-07-23; the 2026-08-30 document-table migration and
+  migration-managed creation, exact current/legacy adoption, and refusal paths
+  are covered by the full CI dependency set. Configuration and revisions ship
+  as package data, with an offline installed-wheel smoke outside the checkout.
+- **Runtime note**: this machine's existing Python 3.9 environment can execute
+  the whole suite, but the supported fresh API/full-test install is Python 3.10+
+  because current safe `python-multipart` releases no longer support 3.9. The
+  stdlib core remains supported on 3.9. Current local suite: 322 green
+  (197 unit / 86 integration / 14 e2e / 25 unmarked).
 
 ## What is genuinely proven now (verified this session)
 - All 9 archetypes classify exactly as their hidden ground truth at full scale
@@ -98,4 +103,4 @@ Test buckets: `pytest -m unit` (51) · `-m integration` (14) · `-m e2e` (13).
   EMERGING→REJECTED; hype clusters stay hype at every cutoff.
 - The "quantum" hype cluster scores **27.9** — the engine does **not** inflate
   on buzzwords.
-- **78 tests** green (51 unit / 14 integration / 13 e2e).
+- **322 tests** green (197 unit / 86 integration / 14 e2e / 25 unmarked).
