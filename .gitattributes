@@ -1,0 +1,3 @@
+cases/patentsview-sample/dump.json text eol=lf
+cases/patentsview-sample/corpus-manifest.json text eol=lf
+cases/patentsview-sample/package.json text eol=lf

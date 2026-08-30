@@ -79,6 +79,59 @@ def _extract_license(row: dict, meta: dict, default: str = "") -> str:
     return (row.get("license") or meta.get("license") or default or "").strip()
 
 
+def _extract_retrieved_at(row: dict, meta: dict, default: str) -> str:
+    """Preserve explicit source retrieval time before the import wall clock."""
+    raw = row.get("retrieved_at") or meta.get("retrieved_at") or default
+    return str(raw).strip()
+
+
+def _timestamp_candidate(value: Any) -> Optional[Tuple[datetime, str]]:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc), text
+
+
+def _latest_timestamp(values) -> str:
+    candidates = [candidate for value in values if (candidate := _timestamp_candidate(value))]
+    return max(candidates, key=lambda item: item[0])[1] if candidates else ""
+
+
+def _lineage_retrieved_at(raw: dict) -> str:
+    """Return a deterministic package timestamp when compact lineage is present."""
+    lineage = raw.get("lineage")
+    if not isinstance(lineage, dict):
+        return ""
+    candidates = []
+    if lineage.get("schema_version") == "aurora-package-lineage/v1":
+        items = lineage.get("datasets") or []
+    else:
+        items = [lineage]
+    for item in items:
+        if isinstance(item, dict) and item.get("retrieved_at"):
+            candidates.append(item["retrieved_at"])
+    # A merged snapshot cannot predate a corpus acquired later.
+    return _latest_timestamp(candidates)
+
+
+def _latest_source_retrieved_at(raw: dict) -> str:
+    values = []
+    for row in raw.get("sources") or []:
+        if not isinstance(row, dict):
+            continue
+        meta = row.get("metadata") if isinstance(row.get("metadata"), dict) else {}
+        value = row.get("retrieved_at") or meta.get("retrieved_at")
+        if value:
+            values.append(value)
+    return _latest_timestamp(values)
+
+
 def _extract_document_id(row: dict, meta: dict) -> str:
     """First-class document_id with metadata fallback (engine 0.1.15+)."""
     return (row.get("document_id") or meta.get("document_id") or "").strip()
@@ -327,7 +380,10 @@ def _merge_entity_row(existing: Entity, *, aliases, description, country, ext_id
 
 
 def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
-    created_at = created_at or _now()
+    if created_at is None:
+        created_at = _latest_timestamp(
+            (_lineage_retrieved_at(raw), _latest_source_retrieved_at(raw))
+        ) or _now()
     errors: list[RowError] = []
 
     # Optional package-level default license for public corpora (0.1.14+)
@@ -499,6 +555,18 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
             license_s = _extract_license(row, meta, default=package_license)
             if license_s:
                 meta.pop("license", None)
+            retrieved_at = _extract_retrieved_at(row, meta, default=created_at)
+            if _timestamp_candidate(retrieved_at) is None:
+                errors.append(RowError(
+                    i,
+                    "retrieved_at",
+                    "SOURCE_RETRIEVED_AT_INVALID",
+                    "unparseable retrieved_at; import timestamp used",
+                    str(retrieved_at),
+                ))
+                retrieved_at = created_at
+            # First-class value wins; never retain a contradictory metadata alias.
+            meta.pop("retrieved_at", None)
             indep = (row.get("independence_group") or "").strip()
             if not indep:
                 indep = _derive_independence_group(
@@ -511,7 +579,7 @@ def import_package(raw: dict, *, created_at: str | None = None) -> "Snapshot":
                 )
             sources[sid] = Source(
                 source_id=sid, source_type=row["source_type"], publisher=row["publisher"],
-                title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=created_at,
+                title=row["title"], published_at=(row.get("published_at") or None), retrieved_at=retrieved_at,
                 url_or_local_path=row.get("url_or_local_path", ""), content_hash=chash,
                 independence_group=indep, reliability_tier=row.get("reliability_tier", "C"),
                 language=row.get("language", "en"), family_id=family_id,

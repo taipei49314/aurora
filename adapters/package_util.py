@@ -1,6 +1,7 @@
 """Helpers for composing AURORA import packages."""
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -188,7 +189,7 @@ def align_observation_char_spans(
 
 
 def strip_package(raw: dict) -> Package:
-    """Keep only the arrays the engine accepts (entities/sources/observations/documents)."""
+    """Keep engine data plus package defaults and compact corpus lineage."""
     out: Package = {
         "entities": list(raw.get("entities") or []),
         "sources": list(raw.get("sources") or []),
@@ -197,6 +198,16 @@ def strip_package(raw: dict) -> Package:
     docs = raw.get("documents")
     if docs:
         out["documents"] = list(docs)
+    for key in (
+        "license",
+        "lineage",
+        "stage_unresolved",
+        "stage_unresolved_subjects",
+        "provisional_entity_type",
+    ):
+        if raw.get(key) not in (None, "", {}, []):
+            value = raw[key]
+            out[key] = dict(value) if isinstance(value, dict) else value
     return out
 
 
@@ -397,9 +408,27 @@ def merge_packages(packages: Iterable[Package]) -> Package:
     sources_no_ref: List[dict] = []
     observations: List[dict] = []
     documents_by_id: Dict[str, dict] = {}
+    package_licenses = set()
+    lineage_by_json: Dict[str, dict] = {}
 
     for pkg in packages:
         clean = strip_package(pkg)
+        if clean.get("license"):
+            package_licenses.add(str(clean["license"]).strip())
+        lineage = clean.get("lineage")
+        if isinstance(lineage, dict):
+            lineage_items = (
+                lineage.get("datasets")
+                if lineage.get("schema_version") == "aurora-package-lineage/v1"
+                else [lineage]
+            )
+            for item in lineage_items or []:
+                if not isinstance(item, dict):
+                    continue
+                key = json.dumps(
+                    item, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                )
+                lineage_by_json[key] = dict(item)
         for ent in clean["entities"]:
             key = _entity_key(ent)
             if key in entities:
@@ -431,6 +460,15 @@ def merge_packages(packages: Iterable[Package]) -> Package:
     }
     if documents_by_id:
         merged["documents"] = [documents_by_id[k] for k in sorted(documents_by_id.keys())]
+    if len(package_licenses) == 1:
+        merged["license"] = next(iter(package_licenses))
+    if len(lineage_by_json) == 1:
+        merged["lineage"] = next(iter(lineage_by_json.values()))
+    elif lineage_by_json:
+        merged["lineage"] = {
+            "schema_version": "aurora-package-lineage/v1",
+            "datasets": [lineage_by_json[key] for key in sorted(lineage_by_json)],
+        }
     # Fill any missing docs from source excerpts after merge
     return ensure_documents(merged)
 

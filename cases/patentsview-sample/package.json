@@ -1,673 +1,708 @@
 {
   "entities": [
     {
-      "entity_type": "TECHNOLOGY",
-      "canonical_name": "reversible iron oxidation",
+      "entity_type": "COMPANY",
+      "canonical_name": "Ethicon LLC",
       "aliases": [],
       "description": "",
-      "country": "",
-      "external_ids": [],
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
-      }
-    },
-    {
-      "entity_type": "COMPONENT",
-      "canonical_name": "porous iron electrode",
-      "aliases": [],
-      "description": "",
-      "country": "",
-      "external_ids": [],
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
-      }
-    },
-    {
-      "entity_type": "PERSON",
-      "canonical_name": "A. Researcher",
-      "aliases": [],
-      "description": "Inventor / individual",
       "country": "",
       "external_ids": [
         {
-          "system": "person_name",
-          "id": "A. Researcher"
+          "system": "uspto_assignee_name",
+          "id": "Ethicon LLC"
+        },
+        {
+          "system": "patentsview_assignee",
+          "id": "04fae171-3c0f-43be-a5a6-8817c8fd7db7"
         }
       ],
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     },
     {
       "entity_type": "COMPANY",
-      "canonical_name": "LongHaul Energy",
-      "aliases": [],
-      "description": "",
-      "country": "US",
-      "external_ids": [
-        {
-          "system": "uspto_assignee_name",
-          "id": "LongHaul Energy"
-        }
-      ],
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
-      }
-    },
-    {
-      "entity_type": "COMPANY",
-      "canonical_name": "OxaCell Systems",
-      "aliases": [],
-      "description": "",
-      "country": "DE",
-      "external_ids": [
-        {
-          "system": "uspto_assignee_name",
-          "id": "OxaCell Systems"
-        }
-      ],
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
-      }
-    },
-    {
-      "entity_type": "MATERIAL",
-      "canonical_name": "food-grade iron powder",
+      "canonical_name": "Cilag GmbH International",
       "aliases": [],
       "description": "",
       "country": "",
-      "external_ids": [],
+      "external_ids": [
+        {
+          "system": "uspto_assignee_name",
+          "id": "Cilag GmbH International"
+        },
+        {
+          "system": "patentsview_assignee",
+          "id": "16caac49-93af-47e2-9d64-085c0858431e"
+        }
+      ],
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     },
     {
       "entity_type": "COMPANY",
-      "canonical_name": "FerroGrid Power",
+      "canonical_name": "Far Great Plastics Industrial Co., Ltd.",
       "aliases": [],
       "description": "",
-      "country": "US",
+      "country": "",
       "external_ids": [
         {
           "system": "uspto_assignee_name",
-          "id": "FerroGrid Power"
+          "id": "Far Great Plastics Industrial Co., Ltd."
+        },
+        {
+          "system": "patentsview_assignee",
+          "id": "ee21b0f5-f8f9-4ee3-8610-aee01788f22a"
         }
       ],
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2"
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "Dutch Blacksmith Shop Ltd.",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [
+        {
+          "system": "uspto_assignee_name",
+          "id": "Dutch Blacksmith Shop Ltd."
+        },
+        {
+          "system": "patentsview_assignee",
+          "id": "c71e4cc3-b188-4bd4-a113-482df69a1ad4"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
+      }
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "Rain Bird Corporation",
+      "aliases": [],
+      "description": "",
+      "country": "",
+      "external_ids": [
+        {
+          "system": "uspto_assignee_name",
+          "id": "Rain Bird Corporation"
+        },
+        {
+          "system": "patentsview_assignee",
+          "id": "8cc7d6af-d0d3-4cae-a158-26a4c265eae0"
+        }
+      ],
+      "metadata": {
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     }
   ],
   "sources": [
     {
-      "ref": "pat-10476080",
+      "ref": "pat-10905426",
       "source_type": "PATENT",
-      "publisher": "USPTO",
-      "title": "Metal-air electrochemical cell with iron anode for multi-day discharge",
-      "published_at": "2019-11-12",
-      "excerpt": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
-      "independence_group": "family:fam-ironair-2018",
+      "publisher": "United States Patent and Trademark Office",
+      "title": "Detachable motor powered surgical instrument",
+      "published_at": "2021-02-02",
+      "excerpt": "Detachable motor powered surgical instrument",
+      "independence_group": "patent:10905426",
       "reliability_tier": "A",
-      "url_or_local_path": "https://patents.google.com/patent/US10476080",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
       "outlet_domain": "uspto",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "external_ids": [
           {
             "system": "us_publication",
-            "id": "10476080"
+            "id": "10905426"
           },
           {
-            "system": "patent_family",
-            "id": "fam-ironair-2018"
+            "system": "patentsview_patent",
+            "id": "10905426"
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.2",
-        "family_id": "fam-ironair-2018",
-        "classification_codes": [
-          "H01M12/06",
-          "H01M4/86"
-        ],
+        "extractor_version": "0.2.0",
         "date_policy": "observed_at=application_date; published_at=publication_date; event_date=application_date",
-        "source_format": "patentsview-compatible-v1"
+        "source_format": "patentsview-api-or-derived-v2",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "family_id": "fam-ironair-2018",
-      "event_date": "2018-03-20"
+      "retrieved_at": "2026-08-30T14:12:16+08:00",
+      "event_date": "2018-12-26"
     },
     {
-      "ref": "pat-10930940",
+      "ref": "pat-11172927",
       "source_type": "PATENT",
-      "publisher": "USPTO",
-      "title": "Oxygen electrode stack for long-duration iron-air modules",
-      "published_at": "2021-02-23",
-      "excerpt": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
-      "independence_group": "family:fam-oxa-2019",
+      "publisher": "United States Patent and Trademark Office",
+      "title": "Staple cartridges for forming staples having differing formed staple heights",
+      "published_at": "2021-11-16",
+      "excerpt": "Staple cartridges for forming staples having differing formed staple heights",
+      "independence_group": "patent:11172927",
       "reliability_tier": "A",
-      "url_or_local_path": "https://patents.google.com/patent/US10930940",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
       "outlet_domain": "uspto",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "external_ids": [
           {
             "system": "us_publication",
-            "id": "10930940"
+            "id": "11172927"
           },
           {
-            "system": "patent_family",
-            "id": "fam-oxa-2019"
+            "system": "patentsview_patent",
+            "id": "11172927"
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.2",
-        "family_id": "fam-oxa-2019",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M12/06"
-        ],
+        "extractor_version": "0.2.0",
         "date_policy": "observed_at=application_date; published_at=publication_date; event_date=application_date",
-        "source_format": "patentsview-compatible-v1"
+        "source_format": "patentsview-api-or-derived-v2",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "family_id": "fam-oxa-2019",
-      "event_date": "2019-07-01"
+      "retrieved_at": "2026-08-30T14:12:16+08:00",
+      "event_date": "2019-04-01"
     },
     {
-      "ref": "pat-11271215",
+      "ref": "pat-d345393",
       "source_type": "PATENT",
-      "publisher": "USPTO",
-      "title": "Porous iron electrode structures for hundred-hour storage",
-      "published_at": "2022-03-08",
-      "excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
-      "independence_group": "family:fam-ironair-2018",
+      "publisher": "United States Patent and Trademark Office",
+      "title": "Turtle toy car",
+      "published_at": "1994-03-22",
+      "excerpt": "Turtle toy car",
+      "independence_group": "patent:D345393",
       "reliability_tier": "A",
-      "url_or_local_path": "https://patents.google.com/patent/US11271215",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
       "outlet_domain": "uspto",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "external_ids": [
           {
             "system": "us_publication",
-            "id": "11271215"
+            "id": "D345393"
           },
           {
-            "system": "patent_family",
-            "id": "fam-ironair-2018"
+            "system": "patentsview_patent",
+            "id": "D345393"
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.2",
-        "family_id": "fam-ironair-2018",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ],
+        "extractor_version": "0.2.0",
         "date_policy": "observed_at=application_date; published_at=publication_date; event_date=application_date",
-        "source_format": "patentsview-compatible-v1"
+        "source_format": "patentsview-api-or-derived-v2",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "family_id": "fam-ironair-2018",
-      "event_date": "2020-09-15"
+      "retrieved_at": "2026-08-30T14:12:16+08:00",
+      "event_date": "1992-12-21"
     },
     {
-      "ref": "pat-11575128",
+      "ref": "pat-10849265",
       "source_type": "PATENT",
-      "publisher": "USPTO",
-      "title": "Alkaline electrolyte additives for iron-air grid modules",
-      "published_at": "2023-02-07",
-      "excerpt": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
-      "independence_group": "family:fam-ferro-elyte-2021",
+      "publisher": "United States Patent and Trademark Office",
+      "title": "Manure spreader improvements",
+      "published_at": "2020-12-01",
+      "excerpt": "Manure spreader improvements",
+      "independence_group": "patent:10849265",
       "reliability_tier": "A",
-      "url_or_local_path": "https://patents.google.com/patent/US11575128",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
       "outlet_domain": "uspto",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "external_ids": [
           {
             "system": "us_publication",
-            "id": "11575128"
+            "id": "10849265"
           },
           {
-            "system": "patent_family",
-            "id": "fam-ferro-elyte-2021"
+            "system": "patentsview_patent",
+            "id": "10849265"
           }
         ],
         "extractor_id": "patentsview-offline",
-        "extractor_version": "0.1.2",
-        "family_id": "fam-ferro-elyte-2021",
-        "classification_codes": [
-          "H01M10/26",
-          "H01M12/06"
-        ],
+        "extractor_version": "0.2.0",
         "date_policy": "observed_at=application_date; published_at=publication_date; event_date=application_date",
-        "source_format": "patentsview-compatible-v1"
+        "source_format": "patentsview-api-or-derived-v2",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "family_id": "fam-ferro-elyte-2021",
-      "event_date": "2021-05-10"
+      "retrieved_at": "2026-08-30T14:12:16+08:00",
+      "event_date": "2019-08-27"
+    },
+    {
+      "ref": "pat-10849287",
+      "source_type": "PATENT",
+      "publisher": "United States Patent and Trademark Office",
+      "title": "User interface for a sensor-based interface device for interrupting an irrigation controller",
+      "published_at": "2020-12-01",
+      "excerpt": "User interface for a sensor-based interface device for interrupting an irrigation controller",
+      "independence_group": "patent:10849287",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
+      "language": "en",
+      "outlet_domain": "uspto",
+      "license": "CC-BY-4.0",
+      "metadata": {
+        "external_ids": [
+          {
+            "system": "us_publication",
+            "id": "10849287"
+          },
+          {
+            "system": "patentsview_patent",
+            "id": "10849287"
+          }
+        ],
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "date_policy": "observed_at=application_date; published_at=publication_date; event_date=application_date",
+        "source_format": "patentsview-api-or-derived-v2",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
+      },
+      "retrieved_at": "2026-08-30T14:12:16+08:00",
+      "event_date": "2018-12-21"
     }
   ],
   "observations": [
     {
-      "source_ref": "pat-10476080",
+      "source_ref": "pat-10905426",
       "observation_type": "PATENT_ACTIVITY",
-      "subject": "LongHaul Energy",
-      "object": "reversible iron oxidation",
-      "observed_at": "2018-03-20",
-      "text_excerpt": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
+      "subject": "Ethicon LLC",
+      "object": null,
+      "observed_at": "2018-12-26",
+      "text_excerpt": "Detachable motor powered surgical instrument",
       "confidence": 0.9,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-10476080",
+      "event_id": "evt_10905426",
+      "document_id": "pat-10905426",
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M12/06",
-          "H01M4/86"
-        ],
-        "inventors": [
-          "A. Researcher"
-        ],
-        "char_span_auto": true
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "char_span_auto": true,
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "subject_raw": "LongHaul Energy",
-      "object_raw": "reversible iron oxidation",
+      "subject_raw": "Ethicon LLC",
       "char_span": [
         0,
-        231
+        44
       ]
     },
     {
-      "source_ref": "pat-10476080",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "LongHaul Energy",
-      "object": "reversible iron oxidation",
-      "observed_at": "2018-03-20",
-      "text_excerpt": "LongHaul Energy discloses reversible iron oxidation: Metal-air electrochemical cell with iron anode for multi-day discharge",
-      "confidence": 0.8,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-10476080",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M12/06",
-          "H01M4/86"
-        ],
-        "inventors": [
-          "A. Researcher"
-        ]
-      },
-      "subject_raw": "LongHaul Energy",
-      "object_raw": "reversible iron oxidation"
-    },
-    {
-      "source_ref": "pat-10476080",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "LongHaul Energy",
-      "object": "porous iron electrode",
-      "observed_at": "2018-03-20",
-      "text_excerpt": "Metal-air electrochemical cell with iron anode for multi-day discharge — component porous iron electrode",
-      "confidence": 0.75,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-10476080",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M12/06",
-          "H01M4/86"
-        ],
-        "inventors": [
-          "A. Researcher"
-        ]
-      },
-      "subject_raw": "LongHaul Energy",
-      "object_raw": "porous iron electrode"
-    },
-    {
-      "source_ref": "pat-10930940",
+      "source_ref": "pat-11172927",
       "observation_type": "PATENT_ACTIVITY",
-      "subject": "OxaCell Systems",
-      "object": "reversible iron oxidation",
-      "observed_at": "2019-07-01",
-      "text_excerpt": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
+      "subject": "Cilag GmbH International",
+      "object": null,
+      "observed_at": "2019-04-01",
+      "text_excerpt": "Staple cartridges for forming staples having differing formed staple heights",
       "confidence": 0.9,
-      "event_id": "evt_fam-oxa-2019",
-      "document_id": "pat-10930940",
+      "event_id": "evt_11172927",
+      "document_id": "pat-11172927",
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M12/06"
-        ],
-        "char_span_auto": true
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "char_span_auto": true,
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "subject_raw": "OxaCell Systems",
-      "object_raw": "reversible iron oxidation",
+      "subject_raw": "Cilag GmbH International",
       "char_span": [
         0,
-        214
+        76
       ]
     },
     {
-      "source_ref": "pat-10930940",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "OxaCell Systems",
-      "object": "reversible iron oxidation",
-      "observed_at": "2019-07-01",
-      "text_excerpt": "OxaCell Systems discloses reversible iron oxidation: Oxygen electrode stack for long-duration iron-air modules",
-      "confidence": 0.8,
-      "event_id": "evt_fam-oxa-2019",
-      "document_id": "pat-10930940",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M12/06"
-        ]
-      },
-      "subject_raw": "OxaCell Systems",
-      "object_raw": "reversible iron oxidation"
-    },
-    {
-      "source_ref": "pat-11271215",
+      "source_ref": "pat-d345393",
       "observation_type": "PATENT_ACTIVITY",
-      "subject": "FerroGrid Power",
-      "object": "reversible iron oxidation",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "subject": "Far Great Plastics Industrial Co., Ltd.",
+      "object": null,
+      "observed_at": "1992-12-21",
+      "text_excerpt": "Turtle toy car",
       "confidence": 0.9,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
+      "event_id": "evt_D345393",
+      "document_id": "pat-d345393",
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ],
-        "char_span_auto": true
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "char_span_auto": true,
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "subject_raw": "FerroGrid Power",
-      "object_raw": "reversible iron oxidation",
+      "subject_raw": "Far Great Plastics Industrial Co., Ltd.",
       "char_span": [
         0,
-        221
+        14
       ]
     },
     {
-      "source_ref": "pat-11271215",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "FerroGrid Power",
-      "object": "reversible iron oxidation",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "FerroGrid Power discloses reversible iron oxidation: Porous iron electrode structures for hundred-hour storage",
-      "confidence": 0.8,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ]
-      },
-      "subject_raw": "FerroGrid Power",
-      "object_raw": "reversible iron oxidation"
-    },
-    {
-      "source_ref": "pat-11271215",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "FerroGrid Power",
-      "object": "porous iron electrode",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "Porous iron electrode structures for hundred-hour storage — component porous iron electrode",
-      "confidence": 0.75,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ],
-        "char_span_auto": true
-      },
-      "subject_raw": "FerroGrid Power",
-      "object_raw": "porous iron electrode",
-      "char_span": [
-        0,
-        32
-      ]
-    },
-    {
-      "source_ref": "pat-11271215",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "porous iron electrode",
-      "object": "food-grade iron powder",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "Depends on material food-grade iron powder",
-      "confidence": 0.7,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ]
-      },
-      "subject_raw": "porous iron electrode",
-      "object_raw": "food-grade iron powder"
-    },
-    {
-      "source_ref": "pat-11271215",
+      "source_ref": "pat-10849265",
       "observation_type": "PATENT_ACTIVITY",
-      "subject": "LongHaul Energy",
-      "object": "reversible iron oxidation",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
+      "subject": "Dutch Blacksmith Shop Ltd.",
+      "object": null,
+      "observed_at": "2019-08-27",
+      "text_excerpt": "Manure spreader improvements",
       "confidence": 0.9,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
+      "event_id": "evt_10849265",
+      "document_id": "pat-10849265",
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ],
-        "char_span_auto": true
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "char_span_auto": true,
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "subject_raw": "LongHaul Energy",
-      "object_raw": "reversible iron oxidation",
+      "subject_raw": "Dutch Blacksmith Shop Ltd.",
       "char_span": [
         0,
-        221
+        28
       ]
     },
     {
-      "source_ref": "pat-11271215",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "LongHaul Energy",
-      "object": "reversible iron oxidation",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "LongHaul Energy discloses reversible iron oxidation: Porous iron electrode structures for hundred-hour storage",
-      "confidence": 0.8,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ]
-      },
-      "subject_raw": "LongHaul Energy",
-      "object_raw": "reversible iron oxidation"
-    },
-    {
-      "source_ref": "pat-11271215",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "LongHaul Energy",
-      "object": "porous iron electrode",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "Porous iron electrode structures for hundred-hour storage — component porous iron electrode",
-      "confidence": 0.75,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ],
-        "char_span_auto": true
-      },
-      "subject_raw": "LongHaul Energy",
-      "object_raw": "porous iron electrode",
-      "char_span": [
-        0,
-        32
-      ]
-    },
-    {
-      "source_ref": "pat-11271215",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "porous iron electrode",
-      "object": "food-grade iron powder",
-      "observed_at": "2020-09-15",
-      "text_excerpt": "Depends on material food-grade iron powder",
-      "confidence": 0.7,
-      "event_id": "evt_fam-ironair-2018",
-      "document_id": "pat-11271215",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M4/86",
-          "H01M4/02"
-        ]
-      },
-      "subject_raw": "porous iron electrode",
-      "object_raw": "food-grade iron powder"
-    },
-    {
-      "source_ref": "pat-11575128",
+      "source_ref": "pat-10849287",
       "observation_type": "PATENT_ACTIVITY",
-      "subject": "FerroGrid Power",
-      "object": "reversible iron oxidation",
-      "observed_at": "2021-05-10",
-      "text_excerpt": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
+      "subject": "Rain Bird Corporation",
+      "object": null,
+      "observed_at": "2018-12-21",
+      "text_excerpt": "User interface for a sensor-based interface device for interrupting an irrigation controller",
       "confidence": 0.9,
-      "event_id": "evt_fam-ferro-elyte-2021",
-      "document_id": "pat-11575128",
+      "event_id": "evt_10849287",
+      "document_id": "pat-10849287",
       "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M10/26",
-          "H01M12/06"
-        ],
-        "char_span_auto": true
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "char_span_auto": true,
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       },
-      "subject_raw": "FerroGrid Power",
-      "object_raw": "reversible iron oxidation",
+      "subject_raw": "Rain Bird Corporation",
       "char_span": [
         0,
-        213
+        92
       ]
-    },
-    {
-      "source_ref": "pat-11575128",
-      "observation_type": "TECHNICAL_DEPENDENCY",
-      "subject": "FerroGrid Power",
-      "object": "reversible iron oxidation",
-      "observed_at": "2021-05-10",
-      "text_excerpt": "FerroGrid Power discloses reversible iron oxidation: Alkaline electrolyte additives for iron-air grid modules",
-      "confidence": 0.8,
-      "event_id": "evt_fam-ferro-elyte-2021",
-      "document_id": "pat-11575128",
-      "metadata": {
-        "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.2",
-        "classification_codes": [
-          "H01M10/26",
-          "H01M12/06"
-        ]
-      },
-      "subject_raw": "FerroGrid Power",
-      "object_raw": "reversible iron oxidation"
     }
   ],
   "documents": [
     {
-      "document_id": "pat-10476080",
-      "source_ref": "pat-10476080",
-      "title": "Metal-air electrochemical cell with iron anode for multi-day discharge",
-      "text": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
-      "url_or_local_path": "https://patents.google.com/patent/US10476080",
+      "document_id": "pat-10849265",
+      "source_ref": "pat-10849265",
+      "title": "Manure spreader improvements",
+      "text": "Manure spreader improvements",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     },
     {
-      "document_id": "pat-10930940",
-      "source_ref": "pat-10930940",
-      "title": "Oxygen electrode stack for long-duration iron-air modules",
-      "text": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
-      "url_or_local_path": "https://patents.google.com/patent/US10930940",
+      "document_id": "pat-10849287",
+      "source_ref": "pat-10849287",
+      "title": "User interface for a sensor-based interface device for interrupting an irrigation controller",
+      "text": "User interface for a sensor-based interface device for interrupting an irrigation controller",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     },
     {
-      "document_id": "pat-11271215",
-      "source_ref": "pat-11271215",
-      "title": "Porous iron electrode structures for hundred-hour storage",
-      "text": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
-      "url_or_local_path": "https://patents.google.com/patent/US11271215",
+      "document_id": "pat-10905426",
+      "source_ref": "pat-10905426",
+      "title": "Detachable motor powered surgical instrument",
+      "text": "Detachable motor powered surgical instrument",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     },
     {
-      "document_id": "pat-11575128",
-      "source_ref": "pat-11575128",
-      "title": "Alkaline electrolyte additives for iron-air grid modules",
-      "text": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
-      "url_or_local_path": "https://patents.google.com/patent/US11575128",
+      "document_id": "pat-11172927",
+      "source_ref": "pat-11172927",
+      "title": "Staple cartridges for forming staples having differing formed staple heights",
+      "text": "Staple cartridges for forming staples having differing formed staple heights",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
       "language": "en",
-      "license": "public-patent-text",
+      "license": "CC-BY-4.0",
       "metadata": {
         "auto_built": true,
-        "from": "source_excerpt"
+        "from": "source_excerpt",
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
+      }
+    },
+    {
+      "document_id": "pat-d345393",
+      "source_ref": "pat-d345393",
+      "title": "Turtle toy car",
+      "text": "Turtle toy car",
+      "url_or_local_path": "https://doi.org/10.5281/zenodo.15058362",
+      "language": "en",
+      "license": "CC-BY-4.0",
+      "metadata": {
+        "auto_built": true,
+        "from": "source_excerpt",
+        "extractor_id": "patentsview-offline",
+        "extractor_version": "0.2.0",
+        "corpus_lineage": {
+          "schema_version": "aurora-corpus-lineage/v1",
+          "dataset_id": "uspto-patentsview-granted-metadata",
+          "dataset_version": "2024-12-31",
+          "retrieved_at": "2026-08-30T14:12:16+08:00",
+          "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+          "license": "CC-BY-4.0",
+          "artifact_path": "dump.json",
+          "artifact_bytes": 4936,
+          "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+          "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+        }
       }
     }
-  ]
+  ],
+  "license": "CC-BY-4.0",
+  "lineage": {
+    "schema_version": "aurora-corpus-lineage/v1",
+    "dataset_id": "uspto-patentsview-granted-metadata",
+    "dataset_version": "2024-12-31",
+    "retrieved_at": "2026-08-30T14:12:16+08:00",
+    "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+    "license": "CC-BY-4.0",
+    "artifact_path": "dump.json",
+    "artifact_bytes": 4936,
+    "artifact_sha256": "sha256:6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d",
+    "manifest_sha256": "sha256:ac5c6a5c3e54820656f48e3ea613b6b562d01c5b94f490898d5d16051c8064c0"
+  }
 }

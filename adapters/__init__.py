@@ -33,4 +33,4 @@ __all__ = [
     "merge_packages",
     "strip_package",
 ]
-__version__ = "0.1.9"
+__version__ = "0.1.10"

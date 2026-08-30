@@ -9,7 +9,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.2.0"
       }
     },
     {
@@ -21,7 +21,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.2.0"
       }
     },
     {
@@ -33,7 +33,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.2.0"
       }
     },
     {
@@ -50,7 +50,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.2.0"
       }
     },
     {
@@ -71,7 +71,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "domains": [
           "ferrogrid.example"
         ]
@@ -95,7 +95,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "domains": [
           "oxacell.example"
         ]
@@ -119,7 +119,7 @@
       ],
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "domains": [
           "longhaul.example"
         ]
@@ -134,7 +134,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -146,7 +146,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     },
     {
@@ -158,7 +158,7 @@
       "external_ids": [],
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       }
     }
   ],
@@ -188,7 +188,7 @@
           }
         ],
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "family_id": "ironair-ferro-2022",
         "classification_codes": [
           "H01M4/86",
@@ -224,7 +224,7 @@
           }
         ],
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "family_id": "oxa-o2-2023",
         "classification_codes": [
           "H01M4/86",
@@ -260,7 +260,7 @@
           }
         ],
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "family_id": "ironair-ferro-2022",
         "classification_codes": [
           "H01M10/26",
@@ -284,7 +284,7 @@
       "language": "en",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "job_id",
@@ -313,7 +313,7 @@
       "language": "en",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "job_id",
@@ -341,7 +341,7 @@
       "language": "en",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "job_id",
@@ -369,7 +369,7 @@
       "language": "en",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "article_id",
@@ -394,7 +394,7 @@
       "language": "en",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "article_id",
@@ -421,7 +421,7 @@
       "language": "en",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "external_ids": [
           {
             "system": "article_id",
@@ -446,7 +446,7 @@
       "document_id": "pat-us20220123456a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
@@ -456,6 +456,8 @@
         ],
         "char_span_auto": true
       },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         139
@@ -473,7 +475,7 @@
       "document_id": "pat-us20220123456a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
@@ -481,7 +483,9 @@
         "inventors": [
           "J. Inventor"
         ]
-      }
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-us20220123456a1",
@@ -495,15 +499,22 @@
       "document_id": "pat-us20220123456a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
         ],
         "inventors": [
           "J. Inventor"
-        ]
-      }
+        ],
+        "char_span_auto": true
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "porous iron electrode",
+      "char_span": [
+        2,
+        23
+      ]
     },
     {
       "source_ref": "pat-us20220123456a1",
@@ -517,7 +528,7 @@
       "document_id": "pat-us20220123456a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
@@ -525,7 +536,9 @@
         "inventors": [
           "J. Inventor"
         ]
-      }
+      },
+      "subject_raw": "porous iron electrode",
+      "object_raw": "food-grade iron powder"
     },
     {
       "source_ref": "pat-ep4123456a1",
@@ -539,13 +552,15 @@
       "document_id": "pat-ep4123456a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "OxaCell Systems",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         129
@@ -563,12 +578,14 @@
       "document_id": "pat-ep4123456a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M4/86",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "OxaCell Systems",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-us20230111222a1",
@@ -582,13 +599,15 @@
       "document_id": "pat-us20230111222a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         120
@@ -606,12 +625,14 @@
       "document_id": "pat-us20230111222a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-us20230111222a1",
@@ -625,12 +646,14 @@
       "document_id": "pat-us20230111222a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "food-grade iron powder"
     },
     {
       "source_ref": "pat-us20230111222a1",
@@ -644,13 +667,15 @@
       "document_id": "pat-us20230111222a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ],
         "char_span_auto": true
       },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         120
@@ -668,12 +693,14 @@
       "document_id": "pat-us20230111222a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "pat-us20230111222a1",
@@ -687,12 +714,14 @@
       "document_id": "pat-us20230111222a1",
       "metadata": {
         "extractor_id": "uspto-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.2.0",
         "classification_codes": [
           "H01M10/26",
           "H01M12/06"
         ]
-      }
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "food-grade iron powder"
     },
     {
       "source_ref": "job-ferro-2024-chem",
@@ -706,7 +735,7 @@
       "confidence": 0.8,
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01",
         "char_span_auto": true
@@ -717,6 +746,8 @@
       },
       "numeric_value": 6.0,
       "unit": "openings",
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "porous iron electrode",
       "char_span": [
         0,
         182
@@ -734,14 +765,16 @@
       "document_id": "job-ferro-2024-chem",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-03-01",
         "valid_to": "2024-09-01"
       },
       "geo": {
         "country": "US",
         "region": "AZ"
-      }
+      },
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "job-oxa-2024-mfg",
@@ -755,7 +788,7 @@
       "confidence": 0.8,
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-05-10",
         "char_span_auto": true
       },
@@ -765,6 +798,8 @@
       },
       "numeric_value": 12.0,
       "unit": "openings",
+      "subject_raw": "OxaCell Systems",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         79
@@ -782,13 +817,15 @@
       "document_id": "job-oxa-2024-mfg",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-05-10"
       },
       "geo": {
         "country": "DE",
         "region": "BY"
-      }
+      },
+      "subject_raw": "OxaCell Systems",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "job-longhaul-2024-apps",
@@ -802,7 +839,7 @@
       "confidence": 0.8,
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-04-01",
         "char_span_auto": true
       },
@@ -812,6 +849,8 @@
       },
       "numeric_value": 3.0,
       "unit": "openings",
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         98
@@ -829,13 +868,15 @@
       "document_id": "job-longhaul-2024-apps",
       "metadata": {
         "extractor_id": "jobs-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "valid_from": "2024-04-01"
       },
       "geo": {
         "country": "US",
         "region": "TX"
-      }
+      },
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation"
     },
     {
       "source_ref": "news-reuter-ferro-supply-2024",
@@ -848,9 +889,16 @@
       "document_id": "news-reuter-ferro-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2",
+        "char_span_auto": true
       },
-      "event_id": "evt_ferro_purechitin_supply_2024"
+      "event_id": "evt_ferro_purechitin_supply_2024",
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "PureChitin Bio",
+      "char_span": [
+        25,
+        101
+      ]
     },
     {
       "source_ref": "news-reuter-ferro-supply-2024",
@@ -863,9 +911,11 @@
       "document_id": "news-reuter-ferro-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       },
-      "event_id": "evt_ferro_purechitin_supply_2024"
+      "event_id": "evt_ferro_purechitin_supply_2024",
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "food-grade iron powder"
     },
     {
       "source_ref": "news-reuter-ferro-supply-2024",
@@ -878,9 +928,11 @@
       "document_id": "news-reuter-ferro-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1"
+        "extractor_version": "0.1.2"
       },
-      "event_id": "evt_ferro_purechitin_supply_2024"
+      "event_id": "evt_ferro_purechitin_supply_2024",
+      "subject_raw": "grid firming",
+      "object_raw": "regional utility"
     },
     {
       "source_ref": "news-regional-reprint-supply-2024",
@@ -893,10 +945,17 @@
       "document_id": "news-regional-reprint-supply-2024",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
-        "is_reprint_of": "reuter-ferro-supply-2024"
+        "extractor_version": "0.1.2",
+        "is_reprint_of": "reuter-ferro-supply-2024",
+        "char_span_auto": true
       },
-      "event_id": "evt_ferro_purechitin_supply_2024"
+      "event_id": "evt_ferro_purechitin_supply_2024",
+      "subject_raw": "FerroGrid Power",
+      "object_raw": "PureChitin Bio",
+      "char_span": [
+        25,
+        101
+      ]
     },
     {
       "source_ref": "news-gridtech-longhaul-2023",
@@ -909,10 +968,12 @@
       "document_id": "news-gridtech-longhaul-2023",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "char_span_auto": true
       },
       "event_id": "evt_longhaul_pilot_2023",
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "regional utility",
       "char_span": [
         0,
         175
@@ -929,10 +990,12 @@
       "document_id": "news-gridtech-longhaul-2023",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "char_span_auto": true
       },
       "event_id": "evt_longhaul_pilot_2023",
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "grid firming",
       "char_span": [
         0,
         175
@@ -949,10 +1012,12 @@
       "document_id": "news-gridtech-longhaul-2023",
       "metadata": {
         "extractor_id": "news-offline",
-        "extractor_version": "0.1.1",
+        "extractor_version": "0.1.2",
         "char_span_auto": true
       },
       "event_id": "evt_longhaul_pilot_2023",
+      "subject_raw": "LongHaul Energy",
+      "object_raw": "reversible iron oxidation",
       "char_span": [
         0,
         175

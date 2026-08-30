@@ -1,39 +1,58 @@
-# Case: patentsview-sample (Loop 4A)
+# Case: patentsview-sample
 
-Offline **PatentsView-compatible** patent dump → AURORA package.
+Five real granted-patent metadata records from the USPTO PatentsView final 2024
+archive, joined offline and converted into an AURORA package.
 
-## Honesty
+## Provenance and honesty
 
-- Default `dump.json` is a **CI fixture** in PatentsView field layout (synthetic content).
-- The adapter accepts a **real PatentsView / bulk export** of the same shape with **no code changes**.
-- This case proves **ingest path + independence + cutoff leakage**, not real-world industry discovery.
-- Not investment advice.
+- Upstream: USPTO, *Final release of PatentsView metadata, pre-grant and
+  granted (12/31/2024)*, DOI `10.5281/zenodo.15058362`.
+- License: `CC-BY-4.0`; attribution and all upstream checksums are recorded in
+  `corpus-manifest.json`.
+- Selection: three IDs from the commit-pinned PatentSearch API example and two
+  from its commit-pinned validation data. This is an adapter integration sample,
+  not a topical sample and not evidence of industry discovery performance.
+- PatentsView is research data, not the official USPTO record. Changes were made
+  when the three TSV tables were joined and serialized as JSON.
+- The selected tables contain no patent-family field. Aurora therefore treats
+  all five patents as independent; no family relationship is invented to pass a
+  scorecard.
 
-## Reproduce
+## Rebuild the vendored snapshot
+
+Download the three artifacts named in `corpus-manifest.json` into
+`.tmp/patentsview-2024/`, then run:
 
 ```bash
-# from repo root
+python scripts/extract_patentsview_case.py \
+  --input-dir .tmp/patentsview-2024 \
+  --case-dir cases/patentsview-sample
+```
+
+The extractor verifies every official byte count and MD5, joins only the five
+declared `patent_id` values, emits LF-stable JSON, and records the resulting
+`dump.json` SHA-256. The large upstream files are never committed.
+
+## Convert and verify
+
+```bash
 python -m adapters patentsview cases/patentsview-sample/dump.json \
   -o cases/patentsview-sample/package.json --strip --validate --strict
 
 PYTHONPATH=backend python scripts/check_case_scorecard.py cases/patentsview-sample
-
-# or
-make patentsview-sample
+PYTHONPATH=backend python scripts/lint_package.py \
+  cases/patentsview-sample/package.json --strict --require-documents \
+  --min-char-span-ratio 1.0 --no-provisional --public-corpus
 ```
 
-## Replace with a real dump
+When `corpus-manifest.json` sits beside the input, the adapter validates the
+artifact and stamps its canonical manifest SHA-256 into package lineage and
+every entity, source, observation, and document.
 
-1. Export patents as JSON with a top-level `patents` (or `results`) array.
-2. Overwrite `cases/patentsview-sample/dump.json` (keep a copy of the fixture if needed).
-3. Re-run `make patentsview-sample`.
-4. Update this README’s honesty section to name the real source and date accessed.
+## Scorecard
 
-## Scorecard gates
-
-See `scorecard.json`:
-
-- import_errors = 0
-- has `PATENT_ACTIVITY`
-- independent_source_count < raw_source_count (shared family)
-- min 4 sources in the default fixture
+The committed case requires zero import errors, five sources/documents, five
+independent sources, `PATENT_ACTIVITY`, 100% observation spans, no provisional
+entities, an exact digest-bound corpus lineage match, and equality with a fresh
+deterministic conversion of `dump.json`. The full gate also rebuilds to `.tmp`
+and byte-compares the LF-stable package so stale or hand-edited output fails.

@@ -139,3 +139,38 @@ def test_inventors_become_person_entities(uspto_pkg):
     people = [e for e in uspto_pkg["entities"] if e.get("entity_type") == "PERSON"]
     names = {e["canonical_name"] for e in people}
     assert "J. Inventor" in names
+
+
+@pytest.mark.unit
+def test_missing_assignee_keeps_source_without_inventing_company():
+    pkg = convert_uspto({
+        "patents": [{
+            "publication_number": "US-NO-ASSIGNEE",
+            "title": "Unassigned patent",
+            "publication_date": "2024-01-02",
+        }]
+    })
+    assert len(pkg["sources"]) == 1
+    assert pkg["entities"] == []
+    assert pkg["observations"] == []
+    assert "Unknown assignee" not in json.dumps(pkg)
+
+
+@pytest.mark.unit
+def test_merge_packages_preserves_distinct_lineages(uspto_pkg):
+    first = dict(uspto_pkg)
+    first["lineage"] = {
+        "schema_version": "aurora-corpus-lineage/v1",
+        "dataset_id": "one",
+        "retrieved_at": "2024-01-01T00:00:00+00:00",
+    }
+    second = {"entities": [], "sources": [], "observations": [], "lineage": {
+        "schema_version": "aurora-corpus-lineage/v1",
+        "dataset_id": "two",
+        "retrieved_at": "2024-02-01T00:00:00+00:00",
+    }}
+    merged = merge_packages([first, second])
+    assert merged["lineage"]["schema_version"] == "aurora-package-lineage/v1"
+    assert {row["dataset_id"] for row in merged["lineage"]["datasets"]} == {
+        "one", "two"
+    }

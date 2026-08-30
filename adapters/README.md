@@ -32,7 +32,7 @@ Makefile:
 ```bash
 make adapt-uspto
 make adapt-merge-demo      # builds cases/iron-air-mini/package.json + scorecard check
-make patentsview-sample    # PatentsView-compatible dump case
+make patentsview-sample    # digest-verified real PatentsView sample
 make multisource-case      # five-adapter LEI-joined package
 ```
 
@@ -41,7 +41,7 @@ make multisource-case      # five-adapter LEI-joined package
 | Adapter | Input key | source_type | Typical observations |
 |---------|-----------|-------------|----------------------|
 | `uspto` | `patents[]` (simple shape) | `PATENT` | `PATENT_ACTIVITY`, `TECHNICAL_DEPENDENCY` |
-| `patentsview` | `patents[]` / `results[]` (PatentsView fields) | `PATENT` | same via normalize → uspto |
+| `patentsview` | `patents[]` / `results[]` (API or joined-bulk JSON) | `PATENT` | same via normalize → uspto |
 | `jobs` | `postings[]` | `JOB_POSTING` | `HIRING_ACTIVITY` (+ weak tech edges) |
 | `news` | `articles[]` + `claims[]` | `NEWS` | whatever claims declare (`SUPPLIER_RELATIONSHIP`, …) |
 | `openalex` | `results[]` / `works[]` | `PAPER` | `RESEARCH_ACTIVITY` per institution |
@@ -62,11 +62,16 @@ News reprints: set `is_reprint_of` to the primary article `id` **and** share `wi
 | File | Role |
 |------|------|
 | `fixtures/uspto_sample.json` | 3 patents (shared family) |
-| `fixtures/patentsview_sample.json` | 4 patents, PatentsView field names (replaceable) |
+| `fixtures/patentsview_sample.json` | 4 synthetic patents for unit-contract tests |
 | `fixtures/jobs_sample.json` | 3 postings (hiring) |
 | `fixtures/news_sample.json` | wire + reprint + pilot article |
 | `fixtures/openalex_sample.json` | 2 OpenAlex-shaped works |
 | `fixtures/filings_sample.json` | 3 company filings (tier A) |
+
+The official PatentsView bulk products are relational TSV tables, not a single
+adapter-ready JSON file. `scripts/extract_patentsview_case.py` is the reference
+offline join for the real five-record case. A sibling `corpus-manifest.json` is
+validated automatically and its digest is stamped into all output rows.
 
 ## Adding another source
 

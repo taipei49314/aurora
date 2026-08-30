@@ -38,7 +38,7 @@ from typing import Any, Dict, List, Optional
 from .package_util import Package, ensure_documents, strip_package
 
 ADAPTER_ID = "uspto-offline"
-ADAPTER_VERSION = "0.1.2"
+ADAPTER_VERSION = "0.2.0"
 
 
 def _date(value: Optional[str]) -> Optional[str]:
@@ -166,6 +166,8 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             "license": patent.get("license") or "public-patent-text",  # first-class 0.1.14+
             "metadata": source_meta,
         }
+        if patent.get("retrieved_at"):
+            src_row["retrieved_at"] = str(patent["retrieved_at"]).strip()
         if family:
             # First-class family_id (engine 0.1.8+); also kept in metadata for older tooling
             src_row["family_id"] = family
@@ -177,10 +179,6 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
         assignees = patent.get("assignees") or []
         if not assignees and patent.get("assignee"):
             assignees = [patent["assignee"]]
-        if not assignees:
-            # still emit a research-institute placeholder? Prefer explicit skip of
-            # company obs but keep the source for audit — use title-only entity.
-            assignees = [{"name": f"Unknown assignee for {pub}", "country": ""}]
 
         tech_names = [str(t).strip() for t in (patent.get("technologies") or []) if str(t).strip()]
         comp_names = [str(t).strip() for t in (patent.get("components") or []) if str(t).strip()]
@@ -213,11 +211,20 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             if not iname:
                 continue
             inventor_names.append(iname)
+            inventor_ext = [{"system": "person_name", "id": iname}]
+            if isinstance(inv, dict):
+                for external_id in inv.get("external_ids") or []:
+                    if (
+                        isinstance(external_id, dict)
+                        and external_id.get("system")
+                        and external_id.get("id")
+                    ):
+                        inventor_ext.append(external_id)
             ensure_entity(
                 iname,
                 "PERSON",
                 country=icountry,
-                external_ids=[{"system": "person_name", "id": iname}],
+                external_ids=inventor_ext,
                 description="Inventor / individual",
             )
 
@@ -228,6 +235,9 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
             if not name:
                 continue
             country = (asg.get("country") or "").strip()
+            entity_type = str(asg.get("entity_type") or "COMPANY").strip().upper()
+            if entity_type not in {"COMPANY", "PERSON"}:
+                entity_type = "COMPANY"
             asg_ext = [{"system": "uspto_assignee_name", "id": name}]
             # optional stable ids from enriched dumps
             for x in asg.get("external_ids") or []:
@@ -239,7 +249,7 @@ def convert_uspto(raw: dict, *, publisher: str = "USPTO") -> Package:
                 asg_ext.append({"system": "domain", "id": str(asg["domain"])})
             ensure_entity(
                 name,
-                "COMPANY",
+                entity_type,
                 country=country,
                 external_ids=asg_ext,
             )

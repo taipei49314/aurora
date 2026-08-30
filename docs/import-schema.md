@@ -42,7 +42,7 @@ content-addressed ids and does not double-count evidence.
 |-------|---------|------|
 | `Source.published_at` | When the **document** was published or became public | ISO date `YYYY-MM-DD` preferred; full ISO datetime accepted (first 10 chars used) |
 | `Observation.observed_at` | When the **underlying event** occurred | Prefer event date over crawl date; use `null` if unknown — **do not** invent with retrieve time |
-| `Source.retrieved_at` | Set by importer to import wall-clock | Callers cannot override today |
+| `Source.retrieved_at` | When this exact source artifact was acquired | Explicit timezone-qualified timestamp is preserved; otherwise compact corpus lineage, then import wall-clock (0.1.49+) |
 
 **Leakage rule:** cutoff runs keep an observation only when **both** dates are on
 or before the cutoff — its own `observed_at` **and** its source's `published_at`.
@@ -181,6 +181,7 @@ Without `ref`, observations cannot attach to the source.
 |-------|------|---------|------------|
 | `published_at` | string \| null | null | Publication / grant date (audit + source leakage filter) |
 | `event_date` | string \| null | null | **First-class** (engine 0.1.10+); activity / application / filing date. Metadata fallback accepted. Empty `observed_at` on observations falls back to `event_date` then `published_at` |
+| `retrieved_at` | string | import/lineage time | **First-class** acquisition timestamp (0.1.49+); invalid values produce `SOURCE_RETRIEVED_AT_INVALID` and fall back to snapshot creation time |
 | `excerpt` | string | `""` | **Part of content hash** + near-duplicate tokens (also stored in `metadata.excerpt`) |
 | `independence_group` | string | auto or `""` | Declared non-independence; if empty, engine derives from `metadata.wire_id` → `wire:…`, `outlet_domain` → `domain:…`, or `family_id` → `family:…` (0.1.1+) |
 | `family_id` | string | `""` | **First-class** (engine 0.1.8+); patent/document family. Metadata fallback still accepted; promoted onto `Source.family_id`. When `independence_group` empty → `family:<id>` |
@@ -198,7 +199,8 @@ Without `ref`, observations cannot attach to the source.
 
 - `content_hash` = hash(`source_type`, normalized `title`, normalized `excerpt`, `publisher`)
 - `source_id` = content-addressed from that hash
-- `retrieved_at` = import time
+- `retrieved_at` = explicit source acquisition time, else package-lineage
+  retrieval time, else import wall-clock time
 
 **Warning:** changing excerpt truncation length changes `content_hash` and thus `source_id`.
 Adapters should canonicalize excerpt (e.g. first 500 chars of abstract, stable whitespace).
@@ -214,6 +216,21 @@ Adapters should canonicalize excerpt (e.g. first 500 chars of abstract, stable w
   "extractor_version": "0.1.0"
 }
 ```
+
+### Digest-bound corpus lineage (engine 0.1.49+)
+
+Real offline corpora may add a compact package-level `lineage` object. Adapters
+stamp the same object into `metadata.corpus_lineage` on their rows so the
+normalized input manifest and research-run identity change when the dataset
+version or acquisition manifest changes. The compact object contains the
+dataset id/version, retrieval timestamp, origin/license, the artifact SHA-256,
+and the canonical `manifest_sha256`.
+
+Artifact-level SHA-256 belongs in a separate `corpus-manifest.json`; it is not
+the same as the engine's short row `Source.content_hash`. The PatentsView case
+provides the reference validator and manifest shape. `strip_package` preserves
+`lineage`, and merging distinct datasets produces a sorted
+`aurora-package-lineage/v1` `datasets[]` envelope.
 
 ### Public-corpus license policy (engine 0.1.14+)
 
@@ -436,8 +453,8 @@ See also:
 - `examples/real_mini_package.json` — hand-authored multi-source package
 - `adapters/` — offline converters (`uspto`, `patentsview`, `jobs`, `news`, `merge`)
 - `adapters/fixtures/uspto_sample.json` — simple USPTO-shaped input
-- `adapters/fixtures/patentsview_sample.json` — PatentsView field names (swap for real export)
-- `cases/patentsview-sample/` — end-to-end dump → package → scorecard
+- `adapters/fixtures/patentsview_sample.json` — synthetic PatentsView field-contract fixture
+- `cases/patentsview-sample/` — real USPTO archive rows → digest-bound package → scorecard
 
 ---
 

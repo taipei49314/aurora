@@ -11,6 +11,10 @@
       "type": "string",
       "description": "Package-level default redistribution license applied to sources missing license (0.1.14+)"
     },
+    "lineage": {
+      "type": "object",
+      "description": "Compact, digest-bound corpus lineage propagated by offline adapters (0.1.49+)"
+    },
     "stage_unresolved": {
       "type": "boolean",
       "description": "Opt-in: stage provisional entities for unresolved subject/object names (0.1.39+). Alias: stage_unresolved_subjects."
@@ -111,6 +115,10 @@
         "published_at": {
           "type": ["string", "null"],
           "description": "Publication/grant ISO date; first 10 chars used as date"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "description": "Source acquisition timestamp; preserved instead of replaced by import wall-clock time (0.1.49+)"
         },
         "event_date": {
           "type": ["string", "null"],

@@ -3,7 +3,7 @@
 **Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Engine](https://img.shields.io/badge/engine-0.1.48-blue.svg)](CHANGELOG.md)
+[![Engine](https://img.shields.io/badge/engine-0.1.49-blue.svg)](CHANGELOG.md)
 
 [![Core: Python 3.9+](https://img.shields.io/badge/core-Python%203.9%2B-blue.svg)](pyproject.toml)
 
@@ -146,7 +146,7 @@ AURORA does **not** crawl the web. Feed a JSON package:
 # validate a package
 PYTHONPATH=backend python scripts/validate_package.py examples/real_mini_package.json --run
 
-# offline PatentsView-shaped dump → package
+# digest-verified real PatentsView sample → package
 python -m adapters patentsview cases/patentsview-sample/dump.json --validate --strict
 
 # temporal honesty gates (curated timeline — not real-world lead-time proof)
@@ -175,8 +175,9 @@ Docs: [architecture](docs/architecture.md) · [feature model](docs/feature-model
 - **Northstar demo metrics** are on a **synthetic** corpus with ground truth.
 - **Retro case** (`cases/iron-air-retro`) tests **engine time behavior** on curated data —
   it does **not** claim real-world early discovery of iron-air storage.
-- **PatentsView sample dump** is a **format-compatible fixture** by default; replace
-  `dump.json` with a real export without code changes.
+- **PatentsView sample** vendors five real metadata records from the official
+  2024 USPTO archive with CC BY 4.0 attribution and artifact/manifest hashes. It
+  proves ingest fidelity and provenance, not industry-discovery performance.
 - See [docs/self-audit.md](docs/self-audit.md) for requirement evidence and known
   limitations. A PASS row does not erase the stated model or validation boundaries.
 - `python scripts/docker_audit.py` checks the Docker/Compose contract offline;
@@ -199,7 +200,7 @@ tests/            pytest (unit / integration / e2e)
 
 ## Version
 
-- Engine: **0.1.48** — see [CHANGELOG.md](CHANGELOG.md)
+- Engine: **0.1.49** — see [CHANGELOG.md](CHANGELOG.md)
 - License: **MIT** — see [LICENSE](LICENSE)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security: [SECURITY.md](SECURITY.md)

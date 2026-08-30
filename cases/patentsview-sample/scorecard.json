@@ -1,22 +1,27 @@
 {
   "case_id": "patentsview-sample",
-  "loop": 25,
-  "purpose": "PatentsView-compatible offline dump ingest + documents[] + span floors",
+  "loop": 49,
+  "purpose": "Official PatentsView archive extraction + digest-bound offline ingest",
   "gates": {
     "import_errors_max": 0,
     "require_observation_types": ["PATENT_ACTIVITY"],
-    "independent_lt_raw": true,
-    "min_sources": 4,
-    "min_documents": 4,
+    "independent_eq_raw": true,
+    "min_sources": 5,
+    "min_documents": 5,
     "require_no_orphan_document_ids": true,
     "min_observations_with_char_span": 5,
-    "min_char_span_ratio": 0.4,
-    "require_no_provisional": true
+    "min_char_span_ratio": 1.0,
+    "require_no_provisional": true,
+    "require_corpus_lineage": true,
+    "require_generated_package_match": true,
+    "require_provenance_status": "official-real-data-snapshot"
   },
   "adapters": ["patentsview"],
   "dump": "cases/patentsview-sample/dump.json",
+  "corpus_manifest": "corpus-manifest.json",
   "honesty": [
-    "Default dump is a format-compatible CI fixture, not a live PatentsView pull.",
-    "Swap dump.json for a real export without changing adapter code."
+    "The five records are a deterministic integration sample from the official 2024 PatentsView archive.",
+    "No family field exists in the joined tables, so each selected patent is independent.",
+    "This sample proves ingest fidelity and provenance, not industry discovery performance."
   ]
 }

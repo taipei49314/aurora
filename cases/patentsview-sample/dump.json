@@ -1,106 +1,158 @@
 {
   "_provenance": {
-    "format": "patentsview-compatible-v1",
-    "status": "offline-ci-fixture",
-    "honesty": [
-      "Field names match common PatentsView / patent-bulk JSON exports.",
-      "Record content is synthetic for reproducible CI (not a live API pull).",
-      "Replace this file with a real PatentsView bulk/API export of the same shape; no code changes required.",
-      "US patent text in production dumps is typically public as published patents — verify license for your jurisdiction before redistribution."
-    ],
-    "how_to_replace": [
-      "1. Export or download patents JSON with patents[] array.",
-      "2. Save as adapters/fixtures/patentsview_sample.json or cases/patentsview-sample/dump.json",
-      "3. python -m adapters patentsview <file> --strip --validate --strict"
+    "status": "official-real-data-snapshot",
+    "dataset_id": "uspto-patentsview-granted-metadata",
+    "dataset_version": "2024-12-31",
+    "source_owner": "United States Patent and Trademark Office",
+    "source_url": "https://doi.org/10.5281/zenodo.15058362",
+    "retrieved_at": "2026-08-30T14:12:16+08:00",
+    "license": "CC-BY-4.0",
+    "official_record": false,
+    "changes_made": true,
+    "record_ids": [
+      "10905426",
+      "11172927",
+      "D345393",
+      "10849265",
+      "10849287"
     ]
   },
-  "count": 4,
+  "count": 5,
   "patents": [
     {
-      "patent_number": "10476080",
-      "patent_title": "Metal-air electrochemical cell with iron anode for multi-day discharge",
-      "patent_abstract": "A metal-air cell uses a porous iron anode and oxygen cathode to provide multi-day depth of discharge suitable for grid firming applications. The cell supports reversible iron oxidation cycling under alkaline electrolyte conditions.",
-      "patent_date": "2019-11-12",
-      "app_date": "2018-03-20",
-      "patent_family_id": "fam-ironair-2018",
+      "patent_id": "10905426",
+      "patent_type": "utility",
+      "patent_date": "2021-02-02",
+      "patent_title": "Detachable motor powered surgical instrument",
+      "wipo_kind": "B2",
+      "num_claims": 20,
+      "withdrawn": false,
+      "application": {
+        "application_id": "16232217",
+        "patent_application_type": "16",
+        "filing_date": "2018-12-26",
+        "series_code": "16",
+        "rule_47_flag": false
+      },
       "assignees": [
         {
-          "assignee_organization": "LongHaul Energy",
-          "assignee_country": "US"
+          "assignee_sequence": 0,
+          "assignee_id": "04fae171-3c0f-43be-a5a6-8817c8fd7db7",
+          "raw_assignee_individual_name_first": "",
+          "raw_assignee_individual_name_last": "",
+          "raw_assignee_organization": "Ethicon LLC",
+          "assignee_type": 2,
+          "rawlocation_id": "i37ackq42dnvfuqxb5e7kl96e"
         }
-      ],
-      "cpcs": [
-        {"cpc_subgroup_id": "H01M12/06"},
-        {"cpc_subgroup_id": "H01M4/86"}
-      ],
-      "inventors": [
-        {"inventor_name_full": "A. Researcher"}
-      ],
-      "technologies": ["reversible iron oxidation"],
-      "components": ["porous iron electrode"]
+      ]
     },
     {
-      "patent_number": "10930940",
-      "patent_title": "Oxygen electrode stack for long-duration iron-air modules",
-      "patent_abstract": "An oxygen electrode stack architecture improves efficiency of long-duration iron-air modules used for multi-day grid dispatch. The design reduces catalyst loading while maintaining reversible oxidation duty cycles.",
-      "patent_date": "2021-02-23",
-      "app_date": "2019-07-01",
-      "patent_family_id": "fam-oxa-2019",
+      "patent_id": "11172927",
+      "patent_type": "utility",
+      "patent_date": "2021-11-16",
+      "patent_title": "Staple cartridges for forming staples having differing formed staple heights",
+      "wipo_kind": "B2",
+      "num_claims": 22,
+      "withdrawn": false,
+      "application": {
+        "application_id": "16371724",
+        "patent_application_type": "16",
+        "filing_date": "2019-04-01",
+        "series_code": "16",
+        "rule_47_flag": false
+      },
       "assignees": [
         {
-          "assignee_organization": "OxaCell Systems",
-          "assignee_country": "DE"
+          "assignee_sequence": 0,
+          "assignee_id": "16caac49-93af-47e2-9d64-085c0858431e",
+          "raw_assignee_individual_name_first": "",
+          "raw_assignee_individual_name_last": "",
+          "raw_assignee_organization": "Cilag GmbH International",
+          "assignee_type": 3,
+          "rawlocation_id": "oj98qg8pqhoglhwd9rvcihnn8"
         }
-      ],
-      "cpcs": [
-        {"cpc_subgroup_id": "H01M4/86"},
-        {"cpc_subgroup_id": "H01M12/06"}
-      ],
-      "technologies": ["reversible iron oxidation"]
+      ]
     },
     {
-      "patent_number": "11271215",
-      "patent_title": "Porous iron electrode structures for hundred-hour storage",
-      "patent_abstract": "Porous iron electrode structures enable hundred-hour depth-discharge operation in iron-air systems. Feedstock morphology of food-grade iron powder is controlled to stabilize reversible iron oxidation over repeated cycles.",
-      "patent_date": "2022-03-08",
-      "app_date": "2020-09-15",
-      "patent_family_id": "fam-ironair-2018",
+      "patent_id": "D345393",
+      "patent_type": "design",
+      "patent_date": "1994-03-22",
+      "patent_title": "Turtle toy car",
+      "wipo_kind": "S",
+      "num_claims": 1,
+      "withdrawn": false,
+      "application": {
+        "application_id": "02002761",
+        "patent_application_type": "02",
+        "filing_date": "1992-12-21",
+        "series_code": "02",
+        "rule_47_flag": false
+      },
       "assignees": [
         {
-          "assignee_organization": "FerroGrid Power",
-          "assignee_country": "US"
-        },
-        {
-          "assignee_organization": "LongHaul Energy",
-          "assignee_country": "US"
+          "assignee_sequence": 0,
+          "assignee_id": "ee21b0f5-f8f9-4ee3-8610-aee01788f22a",
+          "raw_assignee_individual_name_first": "",
+          "raw_assignee_individual_name_last": "",
+          "raw_assignee_organization": "Far Great Plastics Industrial Co., Ltd.",
+          "assignee_type": 3,
+          "rawlocation_id": "sd94hul8brmxor34yo6qhiig4"
         }
-      ],
-      "cpcs": [
-        {"cpc_subgroup_id": "H01M4/86"},
-        {"cpc_subgroup_id": "H01M4/02"}
-      ],
-      "technologies": ["reversible iron oxidation"],
-      "components": ["porous iron electrode"],
-      "materials": ["food-grade iron powder"]
+      ]
     },
     {
-      "patent_number": "11575128",
-      "patent_title": "Alkaline electrolyte additives for iron-air grid modules",
-      "patent_abstract": "Electrolyte additives extend cycle life of iron-air grid modules under multi-day firming duty. The formulation is compatible with porous iron electrodes and oxygen electrode stacks used in regional utility pilots.",
-      "patent_date": "2023-02-07",
-      "app_date": "2021-05-10",
-      "patent_family_id": "fam-ferro-elyte-2021",
+      "patent_id": "10849265",
+      "patent_type": "utility",
+      "patent_date": "2020-12-01",
+      "patent_title": "Manure spreader improvements",
+      "wipo_kind": "B2",
+      "num_claims": 6,
+      "withdrawn": false,
+      "application": {
+        "application_id": "16552054",
+        "patent_application_type": "16",
+        "filing_date": "2019-08-27",
+        "series_code": "16",
+        "rule_47_flag": false
+      },
       "assignees": [
         {
-          "assignee_organization": "FerroGrid Power",
-          "assignee_country": "US"
+          "assignee_sequence": 0,
+          "assignee_id": "c71e4cc3-b188-4bd4-a113-482df69a1ad4",
+          "raw_assignee_individual_name_first": "",
+          "raw_assignee_individual_name_last": "",
+          "raw_assignee_organization": "Dutch Blacksmith Shop Ltd.",
+          "assignee_type": 3,
+          "rawlocation_id": "36uhm3pg6cova2lqrizprz252"
         }
-      ],
-      "cpcs": [
-        {"cpc_subgroup_id": "H01M10/26"},
-        {"cpc_subgroup_id": "H01M12/06"}
-      ],
-      "technologies": ["reversible iron oxidation"]
+      ]
+    },
+    {
+      "patent_id": "10849287",
+      "patent_type": "utility",
+      "patent_date": "2020-12-01",
+      "patent_title": "User interface for a sensor-based interface device for interrupting an irrigation controller",
+      "wipo_kind": "B2",
+      "num_claims": 21,
+      "withdrawn": false,
+      "application": {
+        "application_id": "16230672",
+        "patent_application_type": "16",
+        "filing_date": "2018-12-21",
+        "series_code": "16",
+        "rule_47_flag": false
+      },
+      "assignees": [
+        {
+          "assignee_sequence": 0,
+          "assignee_id": "8cc7d6af-d0d3-4cae-a158-26a4c265eae0",
+          "raw_assignee_individual_name_first": "",
+          "raw_assignee_individual_name_last": "",
+          "raw_assignee_organization": "Rain Bird Corporation",
+          "assignee_type": 2,
+          "rawlocation_id": "1a74xgvxjui1lzwryclbfobye"
+        }
+      ]
     }
   ]
 }

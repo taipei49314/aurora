@@ -20,7 +20,7 @@ help:
 	@echo "make adapt-uspto - USPTO fixture -> package + import_package validation"
 	@echo "make adapt-merge-demo - uspto+jobs+news merge into cases/iron-air-mini + scorecard"
 	@echo "make retro-case  - iron-air-retro cutoff ledger (Loop 3)"
-	@echo "make patentsview-sample - PatentsView-compatible dump case (Loop 4A)"
+	@echo "make patentsview-sample - digest-verified real PatentsView case"
 	@echo "make multisource-case - patents+jobs+news with LEI external_ids"
 	@echo "make check-all   - pytest + cases + resolve smoke (pre-push gate)"
 	@echo "make docker-audit - static Docker/Compose readiness audit (no Docker required)"
@@ -76,6 +76,7 @@ retro-case:
 patentsview-sample:
 	$(PY) -m adapters patentsview cases/patentsview-sample/dump.json -o cases/patentsview-sample/package.json --strip --validate --strict
 	PYTHONPATH=$(PYTHONPATH) $(PY) scripts/check_case_scorecard.py cases/patentsview-sample
+	PYTHONPATH=$(PYTHONPATH) $(PY) scripts/lint_package.py cases/patentsview-sample/package.json --strict --require-documents --min-char-span-ratio 1.0 --no-provisional --public-corpus
 
 multisource-case:
 	$(PY) scripts/build_multisource_case.py

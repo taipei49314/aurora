@@ -23,6 +23,75 @@ def main(argv=None) -> int:
     scorecard = json.loads((case_dir / "scorecard.json").read_text(encoding="utf-8"))
     package = json.loads((case_dir / "package.json").read_text(encoding="utf-8"))
     gates = scorecard["gates"]
+    preflight_failures = []
+    lineage = None
+
+    manifest_name = scorecard.get("corpus_manifest")
+    if gates.get("require_corpus_lineage") and not manifest_name:
+        preflight_failures.append("require_corpus_lineage needs corpus_manifest")
+    if manifest_name:
+        sys.path.insert(0, str(ROOT))
+        from adapters.corpus_lineage import load_corpus_lineage
+
+        dump_value = Path(scorecard.get("dump") or "dump.json")
+        dump_path = dump_value if dump_value.is_absolute() else ROOT / dump_value
+        if not dump_path.is_file():
+            dump_path = case_dir / dump_value.name
+        try:
+            lineage = load_corpus_lineage(case_dir / manifest_name, dump_path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            preflight_failures.append(f"corpus lineage validation failed: {exc}")
+        else:
+            if package.get("lineage") != lineage:
+                preflight_failures.append(
+                    "package lineage does not match corpus manifest digest"
+                )
+            for collection in ("entities", "sources", "observations", "documents"):
+                mismatched = [
+                    index
+                    for index, row in enumerate(package.get(collection) or [])
+                    if not isinstance(row, dict)
+                    or (row.get("metadata") or {}).get("corpus_lineage") != lineage
+                ]
+                if mismatched:
+                    preflight_failures.append(
+                        f"{collection} rows missing corpus lineage: {mismatched[:5]}"
+                    )
+            dump = json.loads(dump_path.read_text(encoding="utf-8"))
+            status = str((dump.get("_provenance") or {}).get("status") or "")
+            required_status = gates.get("require_provenance_status")
+            if required_status and status != required_status:
+                preflight_failures.append(
+                    f"provenance status {status!r} != required {required_status!r}"
+                )
+            if "synthetic" in status.lower() or "fixture" in status.lower():
+                preflight_failures.append(
+                    f"real corpus gate rejects provenance status {status!r}"
+                )
+            manifest = json.loads(
+                (case_dir / manifest_name).read_text(encoding="utf-8")
+            )
+            expected_ids = (manifest.get("selection") or {}).get("record_ids") or []
+            actual_ids = [str(row.get("patent_id")) for row in dump.get("patents") or []]
+            if actual_ids != expected_ids:
+                preflight_failures.append(
+                    "dump patent IDs/order do not match corpus manifest selection"
+                )
+            if gates.get("require_generated_package_match"):
+                if scorecard.get("adapters") != ["patentsview"]:
+                    preflight_failures.append(
+                        "generated package comparison is unsupported for these adapters"
+                    )
+                else:
+                    from adapters import convert_patentsview, strip_package
+
+                    regenerated = strip_package(
+                        convert_patentsview(dump, lineage=lineage)
+                    )
+                    if package != regenerated:
+                        preflight_failures.append(
+                            "package does not match deterministic dump conversion"
+                        )
 
     sys.path.insert(0, str(ROOT / "backend"))
     from aurora import import_package
@@ -35,7 +104,13 @@ def main(argv=None) -> int:
     }
     if package.get("documents"):
         pkg["documents"] = package["documents"]
-    for flag in ("license", "stage_unresolved", "stage_unresolved_subjects", "provisional_entity_type"):
+    for flag in (
+        "license",
+        "lineage",
+        "stage_unresolved",
+        "stage_unresolved_subjects",
+        "provisional_entity_type",
+    ):
         if flag in package:
             pkg[flag] = package[flag]
     if isinstance(package.get("package"), dict):
@@ -70,7 +145,7 @@ def main(argv=None) -> int:
             referenced.add(did)
     orphans = sorted(referenced - present)
 
-    failures = []
+    failures = list(preflight_failures)
     if n_err > gates.get("import_errors_max", 0):
         failures.append(f"import_errors={n_err} > max {gates['import_errors_max']}")
     for t in gates.get("require_observation_types", []):
@@ -78,6 +153,8 @@ def main(argv=None) -> int:
             failures.append(f"missing observation_type {t}")
     if gates.get("independent_lt_raw") and not (indep < raw):
         failures.append(f"expected independent ({indep}) < raw ({raw})")
+    if gates.get("independent_eq_raw") and indep != raw:
+        failures.append(f"expected independent ({indep}) == raw ({raw})")
     if raw < gates.get("min_sources", 0):
         failures.append(f"raw sources {raw} < min_sources {gates['min_sources']}")
     if n_docs < gates.get("min_documents", 0):
@@ -116,7 +193,8 @@ def main(argv=None) -> int:
         f"sources={raw} independent={indep} documents={n_docs} "
         f"spans={n_spans}/{n_obs} ({span_ratio:.0%}) "
         f"orphan_doc_ids={len(orphans)} provisional={n_provisional} "
-        f"obs_types={sorted(obs_types)}"
+        f"obs_types={sorted(obs_types)} "
+        f"lineage={lineage.get('manifest_sha256', '')[:19] if lineage else 'none'}"
     )
     if failures:
         for f in failures:

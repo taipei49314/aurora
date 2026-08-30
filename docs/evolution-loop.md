@@ -8,7 +8,7 @@
   explicit publication steps.
 - GitHub Actions is live. `docs/ci-github-actions.yml` remains the reference copy.
 
-## Shipped (through 0.1.48)
+## Shipped (through 0.1.49)
 
 | Ver | Highlights |
 |-----|------------|
@@ -57,11 +57,12 @@
 | 0.1.46 | Offline Docker/Compose readiness audit; runtime was PARTIAL at release (verified 2026-08-21) |
 | 0.1.47 | Manifest hash v2 (full input digest); Frontier Atlas mothership submit |
 | 0.1.48 | Calendar-window hype fade; unit-safe bottleneck lead time; focused value-chain regressions |
+| 0.1.49 | Real USPTO PatentsView sample; digest-bound corpus lineage; current API field fidelity |
 
 ## Next
 
-1. Real PatentsView dump (human data)
-2. Record real-corpus source/license/hash lineage in backtest outputs
+1. Reference corpus/run digests from backtest outputs
+2. Add a second independently licensed real corpus to exercise merged lineage
 
 ## Done
 

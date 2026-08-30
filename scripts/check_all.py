@@ -9,6 +9,7 @@ Does not require network. Exit non-zero on first failure.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import subprocess
 import sys
 from pathlib import Path
@@ -33,6 +34,29 @@ def run(label: str, cmd: list[str]) -> None:
     if r.returncode != 0:
         print(f"FAIL: {label} (exit {r.returncode})", file=sys.stderr)
         raise SystemExit(r.returncode)
+    print(f"OK: {label}\n")
+
+
+def require_same_artifact(label: str, committed: Path, generated: Path) -> None:
+    """Fail when a committed generated artifact is stale or was hand-edited."""
+    print("=" * 72)
+    print(f"CHECK: {label}")
+    try:
+        committed_bytes = committed.read_bytes()
+        generated_bytes = generated.read_bytes()
+    except OSError as exc:
+        print(f"FAIL: {label}: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+    if committed_bytes != generated_bytes:
+        committed_sha = hashlib.sha256(committed_bytes).hexdigest()
+        generated_sha = hashlib.sha256(generated_bytes).hexdigest()
+        print(
+            f"FAIL: {label}: committed artifact differs from deterministic rebuild\n"
+            f"  committed={committed} sha256:{committed_sha}\n"
+            f"  generated={generated} sha256:{generated_sha}",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
     print(f"OK: {label}\n")
 
 
@@ -143,8 +167,9 @@ def main(argv=None) -> int:
         "iron-air-mini-scorecard",
         [py, "scripts/check_case_scorecard.py", "cases/iron-air-mini"],
     )
+    generated_patentsview = ROOT / ".tmp" / "patentsview-package.generated.json"
     run(
-        "patentsview-scorecard",
+        "patentsview-generate",
         [
             py,
             "-m",
@@ -152,11 +177,20 @@ def main(argv=None) -> int:
             "patentsview",
             "cases/patentsview-sample/dump.json",
             "-o",
-            "cases/patentsview-sample/package.json",
+            str(generated_patentsview.relative_to(ROOT)),
             "--strip",
             "--validate",
             "--strict",
         ],
+    )
+    require_same_artifact(
+        "patentsview-generated-artifact",
+        ROOT / "cases" / "patentsview-sample" / "package.json",
+        generated_patentsview,
+    )
+    run(
+        "patentsview-scorecard",
+        [py, "scripts/check_case_scorecard.py", "cases/patentsview-sample"],
     )
     run(
         "lint-patentsview",
@@ -167,8 +201,9 @@ def main(argv=None) -> int:
             "--strict",
             "--require-documents",
             "--min-char-span-ratio",
-            "0.4",
+            "1.0",
             "--no-provisional",
+            "--public-corpus",
         ],
     )
     run(

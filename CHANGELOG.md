@@ -8,6 +8,50 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 ## [Unreleased]
 
+## [0.1.49] — 2026-08-30
+
+### Added
+
+- Replaced the synthetic end-to-end PatentsView case with five real granted-
+  patent metadata records extracted from the official USPTO 2024 Zenodo
+  archive. The reproducible extractor verifies three upstream byte counts and
+  MD5s, performs a bounded streaming join, and writes an LF-stable vendored
+  snapshot.
+- Added `aurora-corpus-lineage/v1`: source/release/license/retrieval metadata,
+  vendored artifact bytes and SHA-256, a canonical manifest SHA-256, and compact
+  lineage stamps on every adapter row. The case scorecard fails closed on stale
+  data, mismatched package lineage, synthetic status, or changed record IDs.
+- Added current PatentSearch API field coverage for nested application dates,
+  `cpc_current` / `cpc_at_issue`, inventor first/last names, countries, and
+  PatentsView assignee/inventor IDs.
+- Expanded the suite to 398 tests (266 unit, 93 integration, 14 e2e, and 25
+  unmarked support/contract tests).
+
+### Changed
+
+- `strip_package` now retains package license and lineage. Merging independent
+  corpora retains a sorted multi-dataset lineage envelope.
+- Explicit source `retrieved_at` now survives import. When no import time is
+  supplied, the latest valid corpus/source acquisition timestamp gives
+  deterministic entity, snapshot, input-manifest, and run identities.
+- Advanced the engine/package version to `0.1.49`, adapter bundle to `0.1.10`,
+  and both patent adapter contracts to `0.2.0`. Feature construction is
+  unchanged, so `FEATURE_VERSION` remains `0.1.47`.
+
+### Fixed
+
+- Patent records without an assignee remain auditable sources but no longer
+  create fabricated `Unknown assignee` companies or observations.
+- PatentsView conversion now stamps its own adapter identity consistently on
+  entities, sources, observations, and documents instead of leaving reused
+  `uspto-offline` metadata behind.
+- The full local gate now runs the PatentsView scorecard after regenerating the
+  package into an ignored temporary path, byte-compares it with the committed
+  artifact, and enforces its public-corpus license policy. The scorecard also
+  independently compares the committed package with an in-memory conversion;
+  adapter file output and the case artifacts are pinned to UTF-8/LF so this is
+  stable across Windows and POSIX.
+
 ## [0.1.48] — 2026-08-30
 
 ### Changed

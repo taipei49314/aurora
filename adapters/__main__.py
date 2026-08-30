@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from .doctor import run_doctor
+from .corpus_lineage import load_corpus_lineage
 from .filings import convert_filings
 from .jobs import convert_jobs
 from .news import convert_news
@@ -31,7 +32,8 @@ def _write_pkg(pkg: dict, output: Optional[str], strip: bool) -> None:
     out_pkg = strip_package(pkg) if strip else pkg
     text = json.dumps(out_pkg, ensure_ascii=False, indent=2) + "\n"
     if output:
-        Path(output).write_text(text, encoding="utf-8")
+        # File artifacts are byte-stable across Windows and POSIX checkouts.
+        Path(output).write_bytes(text.encode("utf-8"))
         print(f"wrote {output}", file=sys.stderr)
     else:
         sys.stdout.write(text)
@@ -105,7 +107,7 @@ def _add_io_flags(p: argparse.ArgumentParser) -> None:
     p.add_argument(
         "--strip",
         action="store_true",
-        help="Omit _adapter diagnostic key (engine-only three arrays)",
+        help="Omit adapter diagnostics; retain engine data/defaults/lineage",
     )
     p.add_argument("--validate", action="store_true", help="Run import_package")
     p.add_argument("--run", action="store_true", help="Validate and run discovery")
@@ -133,8 +135,19 @@ def _cmd_uspto(args: argparse.Namespace) -> int:
 
 
 def _cmd_patentsview(args: argparse.Namespace) -> int:
-    raw = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    pkg = convert_patentsview(raw)
+    input_path = Path(args.input).resolve()
+    raw = json.loads(input_path.read_text(encoding="utf-8"))
+    manifest_path = (
+        Path(args.lineage_manifest).resolve()
+        if args.lineage_manifest
+        else input_path.with_name("corpus-manifest.json")
+    )
+    lineage = None
+    if manifest_path.is_file():
+        lineage = load_corpus_lineage(manifest_path, input_path)
+    elif args.lineage_manifest:
+        raise FileNotFoundError(f"lineage manifest not found: {manifest_path}")
+    pkg = convert_patentsview(raw, lineage=lineage)
     return _emit_convert(
         "patentsview",
         pkg,
@@ -254,6 +267,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="Convert PatentsView-compatible patent export JSON",
     )
     p_pv.add_argument("input", help="Path to PatentsView-shaped JSON")
+    p_pv.add_argument(
+        "--lineage-manifest",
+        help=(
+            "Validate and stamp a corpus manifest (default: corpus-manifest.json "
+            "beside the input when present)"
+        ),
+    )
     _add_io_flags(p_pv)
     p_pv.set_defaults(func=_cmd_patentsview)
 

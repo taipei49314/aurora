@@ -1,0 +1,81 @@
+{
+  "schema_version": "aurora-corpus-lineage/v1",
+  "dataset": {
+    "id": "uspto-patentsview-granted-metadata",
+    "title": "Final release of PatentsView metadata, granted patents",
+    "owner": "United States Patent and Trademark Office",
+    "version": "2024-12-31",
+    "publication_date": "2025-03-20",
+    "doi": "10.5281/zenodo.15058362",
+    "origin_url": "https://doi.org/10.5281/zenodo.15058362",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "official_record": false
+  },
+  "retrieval": {
+    "retrieved_at": "2026-08-30T14:12:16+08:00",
+    "method": "official Zenodo archive download"
+  },
+  "selection": {
+    "record_key": "patent_id",
+    "record_ids": [
+      "10905426",
+      "11172927",
+      "D345393",
+      "10849265",
+      "10849287"
+    ],
+    "rule": "Three records from the commit-pinned PatentSearch API example and two from its commit-pinned validation data.",
+    "sources": [
+      {
+        "record_ids": [
+          "10905426",
+          "11172927",
+          "D345393"
+        ],
+        "url": "https://github.com/PatentsView/PatentSearch-API/blob/9dd76bf92168a84a6a5e9be429e7df575ce99c5e/docs/docs/Search%20API/Examples.md"
+      },
+      {
+        "record_ids": [
+          "10849265",
+          "10849287"
+        ],
+        "url": "https://github.com/PatentsView/PatentSearch-API/blob/9dd76bf92168a84a6a5e9be429e7df575ce99c5e/API/testing_validation/patent_citations/test_and_simple.json"
+      }
+    ]
+  },
+  "upstream_artifacts": [
+    {
+      "name": "g_patent.tsv.zip",
+      "url": "https://zenodo.org/api/records/15058362/files/g_patent.tsv.zip/content",
+      "bytes": 223192856,
+      "checksum": "md5:f74fbde4b2adbf980b8e4ed5394f16d2"
+    },
+    {
+      "name": "g_application.tsv.zip",
+      "url": "https://zenodo.org/api/records/15058362/files/g_application.tsv.zip/content",
+      "bytes": 68669855,
+      "checksum": "md5:26001068098f4240e0762c63ffbb331e"
+    },
+    {
+      "name": "g_assignee_not_disambiguated.tsv.zip",
+      "url": "https://zenodo.org/api/records/15058362/files/g_assignee_not_disambiguated.tsv.zip/content",
+      "bytes": 476589877,
+      "checksum": "md5:6154c6d989206de65b1367b886f744d3"
+    }
+  ],
+  "transform": {
+    "script": "scripts/extract_patentsview_case.py",
+    "version": "1",
+    "description": "Verify official archives, join patent/application/assignee rows by patent_id, trim surrounding whitespace, and serialize a PatentsView-compatible JSON snapshot. No evidence fields are synthesized.",
+    "changes_made": true
+  },
+  "artifacts": [
+    {
+      "path": "dump.json",
+      "bytes": 4936,
+      "sha256": "6c4062cda477a78474bd3b17adb0b6b095b4e67ddc4fc6c679ab1ee5450bfb8d"
+    }
+  ],
+  "attribution": "Contains PatentsView patent data from the U.S. Patent and Trademark Office, retrieved from the cited archive and licensed under CC BY 4.0. Transformed to the Aurora fixture schema; changes made. PatentsView research data do not constitute the official USPTO record."
+}

@@ -2,9 +2,11 @@
 
 Copy into GitHub issues when seeking contributors.
 
-## 1. Real PatentsView dump smoke
+## 1. Real PatentsView dump smoke — **done (v0.1.49)**
 
-Replace `cases/patentsview-sample/dump.json` with a small real export (respect license), update case README with source + date, run `make patentsview-sample`.
+The case now vendors five records extracted from the official USPTO Zenodo 2024
+archive, with CC BY 4.0 attribution, upstream MD5s, vendored SHA-256, a
+reproducible extraction script, and lineage gates.
 
 ## 2. Adapter: OpenAlex paper dump — **done (v0.1.4)**
 
@@ -229,7 +231,8 @@ cluster boundaries, and infrastructure-promotion completeness.
 
 ## Suggested next issues
 
-- Wire real PatentsView dump into `cases/patentsview-sample` (human data)
+- Add digest/run references to the public backtest report without duplicating
+  mutable URLs or license prose.
 
 The named Phase 0 model docs, Docker runtime verification, and GitHub Actions
 are complete. Re-run the Docker smoke after deployment-contract changes, but do
