@@ -1,16 +1,17 @@
 # AURORA
 
-**Unknown Industry Discovery Engine** — local-first, deterministic, evidence-grounded.
+Finds industries that may be forming but do not have a name yet.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Engine](https://img.shields.io/badge/engine-0.1.47-blue.svg)](CHANGELOG.md)
 
 [![Core: Python 3.9+](https://img.shields.io/badge/core-Python%203.9%2B-blue.svg)](pyproject.toml)
 
-AURORA looks for **industries that may be forming but are not yet named**, from
-dispersed signals (patents, hiring, capex, supply chain, standards, news, notes).
+It reads patents, hiring, capex, supply chain, standards, news, and notes.
+It clusters what repeats across those sources, then says whether that looks
+like a new industry, a rebrand, hype, or not enough evidence.
 
-It is **not** a stock tool: it never outputs BUY/SELL, target prices, or return forecasts.
+It is **not** a stock tool. No BUY/SELL, no target prices, no LLM at runtime.
 
 > **Design principles:** local-first · single-user · reproducible · evidence-grounded ·
 > time-aware · auditable · **no external API / LLM at runtime** · no fabricated evidence ·
