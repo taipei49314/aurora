@@ -1,0 +1,188 @@
+{
+  "license": "Public domain. Every source row is a work of the U.S. Government (ARPA-E / NASA / NSF / Army award records via sbir.gov and arpa-e.energy.gov) or a USPTO patent publication. Facts were retrieved on 2026-09-08; the retrieval URL is stored on each source row.",
+  "meta": {
+    "dataset_id": "sodium-ion-us-2025",
+    "dataset_version": "1.0.0",
+    "description": "Small real-world offline package: U.S. sodium-ion battery activity (companies, government awards, patent publication) drawn only from public-domain U.S. Government records and USPTO publications.",
+    "provenance": "Compiled by hand from the cited .gov / USPTO records; every observation quotes or closely paraphrases its source record and carries the retrieval URL on its source row.",
+    "retrieved_at": "2026-09-08",
+    "cutoff_guidance": "All observation dates are real award/publication dates. A historical replay can use cutoff 2025-01-01: the three 2025 awards then drop out, and the 2021 ARPA-E award plus the 2014 patent publication remain."
+  },
+  "entities": [
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "Natron Energy",
+      "aliases": ["Natron Energy, Inc.", "Alveo Energy"],
+      "country": "US",
+      "description": "California-based manufacturer of Prussian blue electrode sodium-ion batteries for data-center and industrial power."
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "Mana Battery",
+      "aliases": ["Mana Battery, Inc."],
+      "country": "US",
+      "description": "Denver, Colorado startup developing low-cost sodium-ion electrolytes for grid storage."
+    },
+    {
+      "entity_type": "COMPANY",
+      "canonical_name": "Airtronics",
+      "aliases": ["AIRTRONICS, LLC"],
+      "country": "US",
+      "description": "Tucson, Arizona aerospace components company (SBIR awardee)."
+    },
+    {
+      "entity_type": "TECHNOLOGY",
+      "canonical_name": "Prussian blue sodium-ion battery",
+      "aliases": ["Prussian blue analogue sodium-ion battery"],
+      "description": "Sodium-ion battery chemistry using Prussian blue analogue electrode materials."
+    },
+    {
+      "entity_type": "TECHNOLOGY",
+      "canonical_name": "sodium borate electrolyte",
+      "description": "Liquid sodium-borate electrolyte formulation targeting wide-temperature sodium cells."
+    }
+  ],
+  "sources": [
+    {
+      "ref": "arpa-e-natron-scaleup",
+      "source_type": "GOVERNMENT_PROGRAM",
+      "publisher": "ARPA-E (U.S. Department of Energy)",
+      "title": "Domestic Manufacturing of Sodium-Ion Batteries",
+      "excerpt": "Natron Energy, Inc. Start Date Feb 22 2021. Amount $19,883,951. SCALEUP.",
+      "published_at": "2021-02-22",
+      "independence_group": "us-gov-arpae",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://arpa-e.energy.gov/programs-and-initiatives/search-all-projects/domestic-manufacturing-sodium-ion-batteries",
+      "license": "Public domain (U.S. Government work)"
+    },
+    {
+      "ref": "sbir-mana-nsf-2423370",
+      "source_type": "GOVERNMENT_PROGRAM",
+      "publisher": "U.S. National Science Foundation (SBIR.gov)",
+      "title": "SBIR Phase I: Electrolyte and Interphase Design for Stable, Safe, and Low-Cost Sodium Batteries",
+      "excerpt": "Mana Battery, Inc. (Denver, CO). NSF Phase I. Award amount $275,000. Award start date May 22, 2025. Contract number 2423370. An economical solution to achieving sodium-ion batteries that meet the performance requirements for grid energy storage.",
+      "published_at": "2025-05-22",
+      "independence_group": "us-gov-sbir",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://www.sbir.gov/awards/215029",
+      "license": "Public domain (U.S. Government work)"
+    },
+    {
+      "ref": "sbir-mana-army-w51701",
+      "source_type": "GOVERNMENT_PROGRAM",
+      "publisher": "U.S. Department of the Army (SBIR.gov)",
+      "title": "Demonstration of a High Energy Sodium Ion Cell with Wide Operating Window",
+      "excerpt": "Mana Battery, Inc. Award amount $249,998. Award start date February 25, 2025. Phase I. Contract number W51701-25-C-A023. The Army needs resilient batteries that span roughly -60C to 70C.",
+      "published_at": "2025-02-25",
+      "independence_group": "us-gov-sbir",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://www.sbir.gov/awards/215637",
+      "license": "Public domain (U.S. Government work)"
+    },
+    {
+      "ref": "sbir-airtronics-nasa-80nssc25c0127",
+      "source_type": "GOVERNMENT_PROGRAM",
+      "publisher": "NASA (SBIR.gov)",
+      "title": "Feasibility Demonstration of Prussian Blue Sodium-Ion Batteries in Lunar Applications",
+      "excerpt": "AIRTRONICS, LLC (Tucson, AZ). NASA SBIR Phase I. Total award amount $147,205. Award start date September 9, 2025. Contract number 80NSSC25C0127. Prussian blue sodium-ion batteries are an emerging energy storage technology; the project aims to demonstrate their utility for Moon to Mars missions with focus on lunar applications.",
+      "published_at": "2025-09-09",
+      "independence_group": "us-gov-sbir",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://www.sbir.gov/awards/220508",
+      "license": "Public domain (U.S. Government work)"
+    },
+    {
+      "ref": "uspto-us20140220392a1",
+      "source_type": "PATENT",
+      "publisher": "USPTO",
+      "title": "Prussian Blue Analogue Anodes for Aqueous Electrolyte Batteries",
+      "excerpt": "A system and method producing electrodes in an aqueous electrolyte battery that maximizes energy storage, reduces electrochemical decomposition of the electrolyte, and uses Prussian Blue analogue materials for both electrodes.",
+      "published_at": "2014-08-07",
+      "independence_group": "uspto",
+      "reliability_tier": "A",
+      "url_or_local_path": "https://patents.google.com/patent/US20140220392A1/en",
+      "license": "Public domain (USPTO publication)"
+    }
+  ],
+  "observations": [
+    {
+      "source_ref": "arpa-e-natron-scaleup",
+      "observation_type": "STRATEGIC_INVESTMENT",
+      "subject": "Natron Energy",
+      "observed_at": "2021-02-22",
+      "text_excerpt": "ARPA-E SCALEUP award of $19,883,951 to Natron Energy for domestic manufacturing of sodium-ion batteries, start date Feb 22 2021.",
+      "numeric_value": 19883951,
+      "unit": "USD"
+    },
+    {
+      "source_ref": "arpa-e-natron-scaleup",
+      "observation_type": "TECHNICAL_DEPENDENCY",
+      "subject": "Natron Energy",
+      "object": "Prussian blue sodium-ion battery",
+      "observed_at": "2021-02-22",
+      "text_excerpt": "The ARPA-E project funds scale-up of Natron's Prussian blue electrode sodium-ion battery manufacturing.",
+      "confidence": 0.9
+    },
+    {
+      "source_ref": "sbir-mana-nsf-2423370",
+      "observation_type": "STRATEGIC_INVESTMENT",
+      "subject": "Mana Battery",
+      "observed_at": "2025-05-22",
+      "text_excerpt": "NSF SBIR Phase I award of $275,000 (contract 2423370) to Mana Battery for electrolyte and interphase design for stable, safe, and low-cost sodium batteries, start date May 22 2025.",
+      "numeric_value": 275000,
+      "unit": "USD"
+    },
+    {
+      "source_ref": "sbir-mana-nsf-2423370",
+      "observation_type": "RESEARCH_ACTIVITY",
+      "subject": "Mana Battery",
+      "object": "sodium borate electrolyte",
+      "observed_at": "2025-05-22",
+      "text_excerpt": "The project optimizes a purpose-built low-cost electrolyte synthesis and validates prototype sodium-ion cells at commercially relevant scale for 2-8 hour grid storage.",
+      "confidence": 0.8
+    },
+    {
+      "source_ref": "sbir-mana-army-w51701",
+      "observation_type": "STRATEGIC_INVESTMENT",
+      "subject": "Mana Battery",
+      "observed_at": "2025-02-25",
+      "text_excerpt": "Army SBIR Phase I award of $249,998 (contract W51701-25-C-A023) to Mana Battery for a high energy sodium ion cell with wide operating window, start date February 25 2025.",
+      "numeric_value": 249998,
+      "unit": "USD"
+    },
+    {
+      "source_ref": "sbir-mana-army-w51701",
+      "observation_type": "DEMAND_SIGNAL",
+      "subject": "Mana Battery",
+      "observed_at": "2025-02-25",
+      "text_excerpt": "The Army needs resilient batteries spanning roughly -60C to 70C, creating demand for Mana's anodeless sodium cells with sodium borate electrolyte that stays liquid down to -60C.",
+      "confidence": 0.8
+    },
+    {
+      "source_ref": "sbir-airtronics-nasa-80nssc25c0127",
+      "observation_type": "STRATEGIC_INVESTMENT",
+      "subject": "Airtronics",
+      "observed_at": "2025-09-09",
+      "text_excerpt": "NASA SBIR Phase I award of $147,205 (contract 80NSSC25C0127) to AIRTRONICS, LLC for feasibility demonstration of Prussian blue sodium-ion batteries in lunar applications, start date September 9 2025.",
+      "numeric_value": 147205,
+      "unit": "USD"
+    },
+    {
+      "source_ref": "sbir-airtronics-nasa-80nssc25c0127",
+      "observation_type": "DEMAND_SIGNAL",
+      "subject": "Prussian blue sodium-ion battery",
+      "observed_at": "2025-09-09",
+      "text_excerpt": "NASA's Moon to Mars program seeks to demonstrate Prussian blue sodium-ion batteries for lunar applications.",
+      "confidence": 0.85
+    },
+    {
+      "source_ref": "uspto-us20140220392a1",
+      "observation_type": "PATENT_ACTIVITY",
+      "subject": "Natron Energy",
+      "object": "Prussian blue sodium-ion battery",
+      "observed_at": "2014-08-07",
+      "text_excerpt": "USPTO publication US20140220392A1 (Alveo Energy Inc., now Natron Energy) covers electrodes using Prussian Blue analogue materials for both electrodes of an aqueous electrolyte battery, published August 7 2014.",
+      "confidence": 0.95
+    }
+  ]
+}

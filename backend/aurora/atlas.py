@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from ._vendor.atlas_client import AtlasClient, AtlasError, RunReport
 from .backtest import run_backtest
+from .packaging import git_revision
 
 __all__ = ["AtlasError", "findings_from", "build_report", "push_run",
            "retention_null_model", "MODULE_ID", "CANDIDATE_STATUS"]
@@ -83,7 +84,9 @@ def findings_from(run, snapshot=None) -> list[str]:
         name = _clean(hypothesis.generated_name)
         out.append(
             f"群集「{name}」在 cutoff={cutoff} 被分類為 {hypothesis.status},"
-            f"總分 {hypothesis.overall_score:.1f},信心區間 {hypothesis.confidence_band}。")
+            f"總分 {hypothesis.overall_score:.1f},"
+            f"啟發式信心等級 {hypothesis.confidence_band}"
+            f"(由加權分數直接映射,非統計信賴區間)。")
 
         # The engine's own stated reason, forwarded rather than paraphrased.
         if hypothesis.summary:
@@ -179,11 +182,19 @@ def build_report(run, snapshot=None, *, inputs: str = "") -> RunReport:
     The mothership deduplicates on report content. A push-time stamp would make
     every re-push of the same run hash differently, so an unchanged run would be
     accepted again and again.
+
+    ``code_revision`` is the real git revision of the running code (empty when
+    unavailable, as the contract allows). It used to be filled with
+    ``run.result_manifest_hash`` — the hash of the run's *results* — which made
+    provenance look reproducible-by-revision while actually being a tautology;
+    results cannot identify the code that produced them. Runs already recorded
+    under the old convention keep their stored meaning on the mothership; this
+    fix applies to new submissions.
     """
     report = RunReport(
         MODULE_ID,
         module_version=run.engine_version,
-        code_revision=run.result_manifest_hash,
+        code_revision=git_revision(),
         inputs=inputs or f"cutoff={run.cutoff_date or 'full'} snapshot={run.snapshot_id}",
         run_started_at=run.created_at)
     for finding in findings_from(run, snapshot):

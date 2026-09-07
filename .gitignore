@@ -18,3 +18,5 @@ examples/generated_uspto_package.json
 cases/*/from_*.json
 cases/*/last_run.json
 
+runs/
+.receipts/
