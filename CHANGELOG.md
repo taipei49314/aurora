@@ -10,6 +10,45 @@ Versioning follows [SemVer](https://semver.org/) for the engine package
 
 ### Added
 
+- Real-data mode on the CLI: `--package PATH` loads a real offline package
+  (file or directory) through the same validation and evidence model as the
+  synthetic demo, and is mutually exclusive with `--scale`. Demo output is
+  labeled `[SYNTHETIC DEMO - not real-world data]`; real runs print `REAL`.
+- `--out-dir DIR` writes run artifacts: the exact report text (`run.md`),
+  a manifest separating deterministic hashes from wall-clock timestamps
+  (`run_manifest.json`), and per-finding evidence traces from hypothesis to
+  observation to source (`findings.jsonl`).
+- `datasets/sodium-ion-us-2025/`: a small real, offline, public-domain package
+  (three companies, five U.S. Government/USPTO records) for replay. Same
+  package + config + cutoff replays to the same run_id and result hash; the
+  package's own retrieval date anchors source `retrieved_at` so
+  `input_manifest_hash` is replay-stable.
+- `aurora.packaging` module: `load_package`, `git_revision`, run-manifest and
+  finding-trace builders, and `write_run_artifacts`.
+
+### Changed
+
+- `code_revision` in the Atlas run report now carries the real git revision
+  (`git rev-parse HEAD`, empty when unavailable) instead of
+  `run.result_manifest_hash` — results never identified the code that
+  produced them. Runs already recorded under the old convention keep their
+  stored meaning on the mothership.
+- The heuristic score band is now worded 啟發式信心等級 (mapped directly from
+  the weighted score, 非統計信賴區間) instead of 信心區間, which overclaimed a
+  statistical confidence interval.
+- `--atlas` default URL is now `http://127.0.0.1:8137`, matching the port
+  Frontier Atlas's own launcher serves, replacing the stale 8000 default. The
+  vendored SDK copy and its pin are unchanged.
+
+### Fixed
+
+- A failed Atlas push no longer hides provenance: `run_manifest.json` records
+  `atlas_submission: null` when nothing reached the mothership, while the run
+  and artifacts stay on disk.
+
+
+### Added
+
 - `--brain <vault>` on the demo CLI: write the same contract-shaped `FINDING`
   report Atlas would receive, then call `mdbrain ingest --module aurora`.
   Opens an episodic proposal only. Does not import md-brain. A failed ingest

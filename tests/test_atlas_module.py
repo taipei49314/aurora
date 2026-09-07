@@ -185,12 +185,25 @@ def test_prediction_is_registered_once_a_baseline_exists(monkeypatch):
 
 
 @pytest.mark.unit
-def test_report_carries_the_runs_own_time_not_push_time():
+def test_report_carries_the_runs_own_time_not_push_time(monkeypatch):
+    monkeypatch.setattr(atlas, "git_revision", lambda: "f" * 40)
     report = atlas.build_report(research_run([hypothesis()]))
     rendered = report.render()
     assert "- run_started_at: 2026-07-27T04:00:00+00:00" in rendered
-    assert "- code_revision: deadbeef" in rendered, "result hash pins reproducibility"
+    assert f"- code_revision: {'f' * 40}" in rendered, (
+        "code_revision carries the real code revision, not the result hash")
     assert atlas.build_report(research_run([hypothesis()])).render() == rendered
+
+
+@pytest.mark.unit
+def test_findings_report_heuristic_band_not_statistical_confidence():
+    found = atlas.findings_from(research_run([hypothesis()]))
+    joined = chr(10).join(found)
+    assert "啟發式信心等級" in joined
+    assert "非統計信賴區間" in joined
+    assert "信心區間" not in joined, (
+        "a heuristic score band must never be worded as a statistical "
+        "confidence interval")
 
 
 # ------------------------------------------------------- against real runs

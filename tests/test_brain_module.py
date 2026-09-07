@@ -178,13 +178,14 @@ def test_push_failure_does_not_raise(tmp_path, capsys):
 @pytest.mark.unit
 def test_parser_exposes_atlas_flags():
     bare = build_parser().parse_args(["--atlas"])
-    assert bare.atlas == "http://127.0.0.1:8000"
+    assert bare.atlas == "http://127.0.0.1:8137", (
+        "the default must match the port Atlas's own launcher serves")
     assert bare.atlas_workspace == "Fleet"
     named = build_parser().parse_args(["--atlas", "http://x", "--atlas-workspace", "Lab"])
     assert named.atlas == "http://x"
     assert named.atlas_workspace == "Lab"
     both = build_parser().parse_args(["--atlas", "--brain", r"C:\vaults\nelson"])
-    assert both.atlas == "http://127.0.0.1:8000"
+    assert both.atlas == "http://127.0.0.1:8137"
     assert both.brain == r"C:\vaults\nelson"
 
 

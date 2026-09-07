@@ -55,6 +55,12 @@ python backend/aurora/cli.py          # demo: generate corpus → classify
 # optional: send the same FINDING report into an md-brain Vault (proposal only)
 python backend/aurora/cli.py --brain C:\vaults\nelson
 python backend/aurora/cli.py --atlas  # findings only; no invented baseline
+
+# real offline data (the synthetic demo corpus is never involved):
+python backend/aurora/cli.py --package datasets/sodium-ion-us-2025/package.json --out-dir runs/demo-real
+# same package + config + cutoff replay to the same run_id and result hash
+# artifacts: runs/demo-real/{run.md, run_manifest.json, findings.jsonl}
+# Atlas submission defaults to http://127.0.0.1:8137 (the launcher's port)
 python scripts/check_engine.py        # engine gate (skips API/SQL tests)
 python -m pytest tests/ -q            # full suite (needs full requirements)
 python scripts/check_all.py --engine-only   # same as check_engine
@@ -148,6 +154,10 @@ python -m adapters patentsview cases/patentsview-sample/dump.json --validate --s
 # temporal honesty gates (curated timeline — not real-world lead-time proof)
 PYTHONPATH=backend python scripts/run_retro_case.py cases/iron-air-retro
 ```
+
+A small **real**, offline, public-domain package ships in-repo:
+`datasets/sodium-ion-us-2025/` (see its README for provenance, license, and
+honest scope). Run it with `--package`; the synthetic demo stays separate.
 
 ## Architecture
 
